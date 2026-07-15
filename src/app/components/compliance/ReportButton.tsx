@@ -18,12 +18,15 @@ interface ReportButtonProps {
   contentId: string
   /** Additional class names for the trigger button */
   className?: string
+  /** When set, renders as a labeled row (icon + text) instead of an icon-only button — for use as a menu item. */
+  label?: string
 }
 
 export default function ReportButton({
   contentType,
   contentId,
   className = '',
+  label,
 }: ReportButtonProps) {
   const [open, setOpen] = useState(false)
   const [selected, setSelected] = useState<ReportReason | null>(null)
@@ -58,9 +61,15 @@ export default function ReportButton({
         onClick={e => { e.stopPropagation(); setOpen(true) }}
         title="Report content"
         aria-label="Report this content"
-        className={`text-gray-400 hover:text-gray-600 transition-colors ${className}`}
+        className={
+          className ||
+          (label
+            ? 'w-full flex items-center gap-3 px-3 py-3 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-colors'
+            : 'text-gray-400 hover:text-gray-600 transition-colors')
+        }
       >
-        <FlagOutlinedIcon sx={{ fontSize: 16 }} />
+        <FlagOutlinedIcon sx={{ fontSize: label ? 20 : 16 }} />
+        {label}
       </button>
 
       {open && (

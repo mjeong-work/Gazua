@@ -1,11 +1,24 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router';
+import { useNavigate } from 'react-router';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { Checkbox } from '../ui/checkbox';
+import AgreementCheckboxGroup, { type AgreementKey } from './AgreementCheckboxGroup';
 import { signUpWithEmail, signInWithGoogle } from '../../../lib/auth.service';
 import { supabase } from '../../../lib/supabase';
+import { recordLegalAcceptance } from '../../../lib/services/legal.service';
+import { logAuditEvent } from '../../../lib/services/compliance.service';
+import { getLatestDocument } from '../../../lib/legal/registry';
 import { CheckCircle } from 'lucide-react';
+
+const INITIAL_AGREEMENTS: Record<AgreementKey, boolean> = {
+  educational_platform: false,
+  no_advice: false,
+  ai_inaccuracies: false,
+  creator_opinions: false,
+  sole_responsibility: false,
+  terms: false,
+  privacy: false,
+};
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -13,17 +26,39 @@ export default function SignUp() {
     email: '',
     password: '',
     confirmPassword: '',
-    agreedToTerms: false
   });
+  const [agreements, setAgreements] = useState<Record<AgreementKey, boolean>>(INITIAL_AGREEMENTS);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [isSubmitLoading, setIsSubmitLoading] = useState(false);
-  const [termsError, setTermsError] = useState(false);
+  const [agreementError, setAgreementError] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [confirmEmail, setConfirmEmail] = useState<string | null>(null);
 
+  const allAgreed = Object.values(agreements).every(Boolean);
+
+  const recordAcknowledgements = (userId: string) => {
+    // Record when the user accepted the terms (kept for backward compat — other code reads this column).
+    supabase.from('profiles').update({ terms_accepted_at: new Date().toISOString() })
+      .eq('id', userId)
+      .then(() => {});
+
+    // Versioned acceptance records for the two documents that require them.
+    const terms = getLatestDocument('terms');
+    const privacy = getLatestDocument('privacy');
+    if (terms) recordLegalAcceptance({ documentSlug: 'terms', documentVersion: terms.version }).catch(() => {});
+    if (privacy) recordLegalAcceptance({ documentSlug: 'privacy', documentVersion: privacy.version }).catch(() => {});
+
+    // The other 5 checkboxes are a one-time acknowledgement event, not versioned documents —
+    // logged to the existing compliance_audit_logs table rather than a new one.
+    logAuditEvent({
+      eventType: 'onboarding_acknowledgement_accepted',
+      metadata: { checkboxes: Object.keys(agreements) },
+    }).catch(() => {});
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.agreedToTerms || formData.password !== formData.confirmPassword) return;
+    if (!allAgreed || formData.password !== formData.confirmPassword) return;
 
     setAuthError(null);
     setIsSubmitLoading(true);
@@ -47,20 +82,17 @@ export default function SignUp() {
       return;
     }
 
-    // Record when the user accepted the terms.
-    supabase.from('profiles').update({ terms_accepted_at: new Date().toISOString() })
-      .eq('id', data.session.user.id)
-      .then(() => {});
+    recordAcknowledgements(data.session.user.id);
 
     navigate('/onboarding/level');
   };
 
   const handleGoogleAuth = async () => {
-    if (!formData.agreedToTerms) {
-      setTermsError(true);
+    if (!allAgreed) {
+      setAgreementError(true);
       return;
     }
-    setTermsError(false);
+    setAgreementError(false);
     setAuthError(null);
     setIsGoogleLoading(true);
     const { error } = await signInWithGoogle();
@@ -204,28 +236,19 @@ export default function SignUp() {
             )}
           </button>
 
-          {/* Terms Checkbox */}
+          {/* Responsible Investing Acknowledgement */}
           <div className="py-4">
-            <div className="flex items-start gap-3">
-              <Checkbox
-                id="terms"
-                checked={formData.agreedToTerms}
-                onCheckedChange={(checked) => {
-                  setFormData({ ...formData, agreedToTerms: checked as boolean });
-                  if (checked) setTermsError(false);
-                }}
-                className={`mt-1 ${termsError ? 'border-red-400' : ''}`}
-              />
-              <label htmlFor="terms" className="text-sm text-gray-600 leading-relaxed cursor-pointer">
-                I agree this platform is for educational purposes only, not financial advice. I have read the{' '}
-                <Link to="/terms" className="text-[#00a86b] hover:underline" target="_blank">Terms of Service</Link>
-                {' '}and{' '}
-                <Link to="/privacy" className="text-[#00a86b] hover:underline" target="_blank">Privacy Policy</Link>.
-              </label>
-            </div>
-            {termsError && (
-              <p className="text-xs text-red-500 mt-2 ml-7">
-                Please agree to the terms before continuing.
+            <AgreementCheckboxGroup
+              values={agreements}
+              onChange={(key, checked) => {
+                setAgreements((prev) => ({ ...prev, [key]: checked }));
+                if (checked) setAgreementError(false);
+              }}
+              className={agreementError ? 'border-red-400' : ''}
+            />
+            {agreementError && (
+              <p className="text-xs text-red-500 mt-2">
+                Please review and check all items before continuing.
               </p>
             )}
           </div>
@@ -238,7 +261,7 @@ export default function SignUp() {
           {/* Submit Button */}
           <Button
             type="submit"
-            disabled={!formData.agreedToTerms || formData.password !== formData.confirmPassword || isSubmitLoading}
+            disabled={!allAgreed || formData.password !== formData.confirmPassword || isSubmitLoading}
             className="w-full px-8 py-4 bg-black text-white rounded-full hover:bg-black/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitLoading ? (
@@ -247,7 +270,7 @@ export default function SignUp() {
                 Creating account…
               </span>
             ) : (
-              'Continue'
+              'Create Account'
             )}
           </Button>
         </form>

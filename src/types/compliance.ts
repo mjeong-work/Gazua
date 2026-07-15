@@ -4,7 +4,7 @@
 
 export type RiskScore = 'LOW' | 'MEDIUM' | 'HIGH' | 'BLOCKED'
 
-export type ContentType = 'post' | 'reel'
+export type ContentType = 'post' | 'reel' | 'video' | 'comment' | 'creator_profile'
 
 export type ReportReason =
   | 'guaranteed_returns'
@@ -19,6 +19,8 @@ export type ModerationActionType =
   | 'warning_sent'
   | 'content_removed'
   | 'user_suspended'
+  | 'content_restored'
+  | 'user_reinstated'
 
 export type DisclosureType =
   | 'position_held'
