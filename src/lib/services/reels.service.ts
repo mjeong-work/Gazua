@@ -18,7 +18,7 @@ const REEL_WITH_CREATOR_AND_LIKES = `
 const VIDEO_WITH_CREATOR = `
   *,
   creator:profiles!creator_id (
-    id, username, full_name, avatar_url
+    id, username, full_name, avatar_url, is_verified
   )
 ` as const
 
@@ -48,6 +48,7 @@ export async function getReels(options?: {
   const { data, error } = await supabase
     .from('reels')
     .select(REEL_WITH_CREATOR_AND_LIKES)
+    .eq('moderation_status', 'visible')
     .order('created_at', { ascending: false })
     .limit(options?.limit ?? 20)
 
@@ -68,6 +69,7 @@ export async function getReelsByCreator(
     .from('reels')
     .select(REEL_WITH_CREATOR_AND_LIKES)
     .eq('creator_id', creatorId)
+    .eq('moderation_status', 'visible')
     .order('created_at', { ascending: false })
     .limit(limit)
 
@@ -93,6 +95,7 @@ export async function getReelsByCreatorIds(
     .from('reels')
     .select(REEL_WITH_CREATOR_AND_LIKES)
     .in('creator_id', creatorIds)
+    .eq('moderation_status', 'visible')
     .order('created_at', { ascending: false })
     .limit(limit)
 
@@ -117,6 +120,7 @@ export async function getReelsByTicker(
     .select(REEL_WITH_CREATOR_AND_LIKES)
     // Postgres array overlap: tickers column contains the given ticker
     .contains('tickers', [ticker.toUpperCase()])
+    .eq('moderation_status', 'visible')
     .order('created_at', { ascending: false })
     .limit(limit)
 
@@ -184,11 +188,28 @@ export async function getVideosByCreator(
     .from('videos')
     .select(VIDEO_WITH_CREATOR)
     .eq('creator_id', creatorId)
+    .eq('moderation_status', 'visible')
     .order('created_at', { ascending: false })
     .limit(limit)
 
   if (error) return { data: null, error: error.message }
   return { data: data as unknown as VideoWithCreator[], error: null }
+}
+
+// ── getVideoById ─────────────────────────────────────────────────
+/** Single video + creator snippet, for the video watch page. */
+export async function getVideoById(
+  videoId: string
+): Promise<ServiceResult<VideoWithCreator>> {
+  const { data, error } = await supabase
+    .from('videos')
+    .select(VIDEO_WITH_CREATOR)
+    .eq('id', videoId)
+    .eq('moderation_status', 'visible')
+    .single()
+
+  if (error) return { data: null, error: error.message }
+  return { data: data as unknown as VideoWithCreator, error: null }
 }
 
 // ── createReel ───────────────────────────────────────────────────

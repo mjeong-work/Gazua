@@ -8,17 +8,20 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import CloseIcon from '@mui/icons-material/Close';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import AppHeader from './AppHeader';
 import SubscriptionModal from './SubscriptionModal';
+import CreatorChatWidget from './CreatorChatWidget';
+import ContentDisclaimer from './compliance/ContentDisclaimer';
 import { getCreator, type MockCreator } from '../data/creators';
 import { type Video, getVideosByCreator as getMockVideos } from '../data/reels';
 import { getCreatorByUsername, getFollowerCount } from '../../lib/services/profiles.service';
 import { getVideosByCreator as getDbVideos } from '../../lib/services/reels.service';
-import { getPostsByCreator, getPostCountByCreator } from '../../lib/services/posts.service';
+import { getPostCountByCreator, getPostsByCreator } from '../../lib/services/posts.service';
+import { getCommentCount } from '../../lib/services/comments.service';
 import { getFollowingCount } from '../../lib/services/follows.service';
 import type { Profile, VideoWithCreator, PostWithCreator } from '../../types/database';
 import { useFollow } from '../contexts/FollowContext';
+import { SUBSCRIBE_ENABLED } from '../featureFlags';
 
 // ── Helpers ──────────────────────────────────────────────────────────
 const FALLBACK_GRADIENTS = [
@@ -28,6 +31,47 @@ const FALLBACK_GRADIENTS = [
   'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
   'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
 ];
+
+// Fallback content for the small MOCK_CREATORS set (no real posts.service data for them).
+const MOCK_POSTS_FALLBACK: DisplayPost[] = [
+  { id: 'mock-1', time: '2h ago', content: "Just added to my NVDA position. AI infrastructure spending isn't slowing down — data center capex from the hyperscalers is still accelerating. This is a multi-year theme, not a trade.", likes: 1240, comments: 87, reposts: 203, tag: '📈 Portfolio Update' },
+  { id: 'mock-2', time: '1d ago', content: "Reminder: volatility is not risk. Risk is permanent loss of capital. A 20% drawdown in a fundamentally strong company is an opportunity, not a reason to panic sell. Zoom out.", likes: 3421, comments: 142, reposts: 891, tag: '💡 Investing Insight' },
+  { id: 'mock-3', time: '3d ago', content: "Fed held rates steady again. My read: we're in a higher-for-longer environment through at least Q3. Positioning accordingly — overweight value, underweight long-duration growth. Cash is still earning 5%+, don't sleep on it.", likes: 2108, comments: 219, reposts: 445, tag: '🏦 Macro Watch' },
+  { id: 'mock-4', time: '5d ago', content: "Q1 earnings recap: beat on revenue, missed on margins. Management guided conservatively for Q2 which I think is sandbagging. Holding my position. Full breakdown in my latest video — link in bio.", likes: 987, comments: 63, reposts: 134, tag: '📊 Earnings' },
+  { id: 'mock-5', time: '1w ago', content: "New to investing? The single best thing you can do this year: set up automatic contributions to a low-cost index fund and stop watching the daily price. Time in market beats timing the market — every time.", likes: 5832, comments: 314, reposts: 2109, tag: '🎓 Beginner Tips' },
+];
+
+interface DisplayPost {
+  id: string;
+  time: string;
+  content: string;
+  likes: number;
+  comments: number;
+  reposts: number;
+  tag: string;
+}
+
+function formatRelativeTime(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const h = Math.floor(diff / 3_600_000);
+  if (h < 1) return `${Math.max(1, Math.floor(diff / 60_000))}m ago`;
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  return d === 1 ? '1d ago' : `${d}d ago`;
+}
+
+async function normalizeDbPost(p: PostWithCreator): Promise<DisplayPost> {
+  const { data: commentCount } = await getCommentCount(p.id);
+  return {
+    id: p.id,
+    time: formatRelativeTime(p.created_at),
+    content: p.content,
+    likes: p.like_count,
+    comments: commentCount ?? 0,
+    reposts: p.share_count,
+    tag: p.category,
+  };
+}
 
 function normalizeDbVideo(v: VideoWithCreator, i: number): Video {
   const secs = v.duration_seconds ?? 0;
@@ -50,16 +94,6 @@ function normalizeDbVideo(v: VideoWithCreator, i: number): Video {
   };
 }
 
-function sentimentStyle(s: string | null) {
-  if (s === 'Bullish') return 'bg-green-100 text-green-700';
-  if (s === 'Bearish') return 'bg-red-100 text-red-700';
-  return 'bg-gray-100 text-gray-600';
-}
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-}
-
 // ── Component ─────────────────────────────────────────────────────────
 export default function CreatorProfileVideos() {
   const navigate = useNavigate();
@@ -70,14 +104,10 @@ export default function CreatorProfileVideos() {
   const [dbProfile, setDbProfile] = useState<Profile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [dbVideos, setDbVideos] = useState<Video[] | null>(null);
+  const [dbPosts, setDbPosts] = useState<DisplayPost[] | null>(null);
   const [followerCount, setFollowerCount] = useState<number | null>(null);
   const [followingCount, setFollowingCount] = useState<number | null>(null);
   const [postCount, setPostCount] = useState<number | null>(null);
-
-  // Posts are loaded lazily when the Posts tab is first opened
-  const [creatorPosts, setCreatorPosts] = useState<PostWithCreator[]>([]);
-  const [postsLoading, setPostsLoading] = useState(false);
-  const [postsFetched, setPostsFetched] = useState(false);
 
   // ── UI state ───────────────────────────────────────────────────────
   const [activeTab, setActiveTab] = useState<'investment' | 'videos' | 'posts' | 'about'>('videos');
@@ -85,6 +115,7 @@ export default function CreatorProfileVideos() {
     try { return localStorage.getItem(`gazua:notif:${creatorId}`) === 'true'; } catch { return false; }
   });
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
+  const [showChat, setShowChat] = useState(false);
   const [previewVideo, setPreviewVideo] = useState<Video | null>(null);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -104,20 +135,13 @@ export default function CreatorProfileVideos() {
         getFollowerCount(data.id).then(({ data: n }) => { if (n !== null) setFollowerCount(n); });
         getFollowingCount(data.id).then(({ data: n }) => { if (n !== null) setFollowingCount(n); });
         getPostCountByCreator(data.id).then(({ data: n }) => { if (n !== null) setPostCount(n); });
+        getPostsByCreator(data.id).then(({ data: posts, error }) => {
+          if (error || !posts) return;
+          Promise.all(posts.map(normalizeDbPost)).then(setDbPosts);
+        });
       }
     });
   }, [creatorId]);
-
-  // Posts: load lazily on first visit to the Posts tab
-  useEffect(() => {
-    if (activeTab !== 'posts' || !dbProfile || postsFetched) return;
-    setPostsLoading(true);
-    getPostsByCreator(dbProfile.id).then(({ data }) => {
-      setCreatorPosts(data ?? []);
-      setPostsLoading(false);
-      setPostsFetched(true);
-    });
-  }, [activeTab, dbProfile, postsFetched]);
 
   // ── Derived data ───────────────────────────────────────────────────
   const creator = useMemo((): MockCreator | null => {
@@ -140,6 +164,10 @@ export default function CreatorProfileVideos() {
 
   // DB videos take priority; fall back to mock if DB returned nothing
   const videos = dbVideos ?? getMockVideos(creatorId);
+  // Real creators use dbPosts (possibly a genuinely empty [] while it loads or once real
+  // posts are confirmed) — only creators outside the DB (dbProfile === null, the small
+  // MOCK_CREATORS set) fall back to the static mock list.
+  const posts = dbProfile ? (dbPosts ?? []) : MOCK_POSTS_FALLBACK;
 
   // ── Follow state ───────────────────────────────────────────────────
   const { isFollowing: isFollowingFn, toggleFollow } = useFollow();
@@ -310,14 +338,16 @@ export default function CreatorProfileVideos() {
                 >
                   {isFollowingCreator ? 'Following' : 'Follow'}
                 </button>
+                {SUBSCRIBE_ENABLED && (
+                  <button
+                    onClick={() => setShowSubscribeModal(true)}
+                    className="px-6 sm:px-8 py-2.5 bg-[#7CFFB2] text-black font-medium text-sm rounded-full hover:bg-[#6EEEA8] transition-colors"
+                  >
+                    Subscribe
+                  </button>
+                )}
                 <button
-                  onClick={() => setShowSubscribeModal(true)}
-                  className="px-6 sm:px-8 py-2.5 bg-[#7CFFB2] text-black font-medium text-sm rounded-full hover:bg-[#6EEEA8] transition-colors"
-                >
-                  Subscribe
-                </button>
-                <button
-                  onClick={() => triggerToast('💬 Messaging coming soon')}
+                  onClick={() => setShowChat(true)}
                   className="px-5 sm:px-6 py-2.5 bg-gray-100 text-black font-medium text-sm rounded-full hover:bg-gray-200 transition-colors"
                 >
                   Message
@@ -360,7 +390,11 @@ export default function CreatorProfileVideos() {
               )}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
                 {videos.map(video => (
-                  <div key={video.id} className="group cursor-pointer" onClick={() => setPreviewVideo(video)}>
+                  <div
+                    key={video.id}
+                    className="group cursor-pointer"
+                    onClick={() => (dbVideos === null ? navigate(`/watch/${video.id}`) : setPreviewVideo(video))}
+                  >
                     <div className="relative aspect-video rounded-xl overflow-hidden mb-3">
                       <div className="absolute inset-0" style={{ background: video.thumbnail }} />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -382,87 +416,103 @@ export default function CreatorProfileVideos() {
 
           {/* ── Posts Tab ── */}
           {activeTab === 'posts' && (
-            postsLoading ? (
-              <div className="space-y-4 max-w-2xl">
-                {[1, 2, 3].map(n => (
-                  <div key={n} className="border border-gray-200 rounded-xl p-5 animate-pulse">
-                    <div className="flex justify-between mb-3">
-                      <div className="h-4 bg-gray-200 rounded w-32" />
-                      <div className="h-4 bg-gray-200 rounded w-20" />
-                    </div>
-                    <div className="space-y-2">
-                      <div className="h-3 bg-gray-200 rounded w-full" />
-                      <div className="h-3 bg-gray-200 rounded w-5/6" />
-                      <div className="h-3 bg-gray-200 rounded w-4/6" />
-                    </div>
+            <>
+              {posts.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-24 text-center">
+                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+                    <VideoLibraryIcon sx={{ fontSize: 40, color: '#d1d5db' }} />
                   </div>
-                ))}
-              </div>
-            ) : creatorPosts.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 text-center">
-                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-                  <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                  </svg>
+                  <h3 className="text-xl font-bold mb-2">No posts yet</h3>
+                  <p className="text-gray-500 text-sm max-w-xs">
+                    {creator.name} hasn't shared any posts yet. Check back later.
+                  </p>
                 </div>
-                <h3 className="text-xl font-bold mb-2">No Posts Yet</h3>
-                <p className="text-gray-600 max-w-sm">This creator hasn't shared any posts yet. Check back later for updates and insights.</p>
-              </div>
-            ) : (
-              <div className="space-y-4 max-w-2xl">
-                {creatorPosts.map(post => (
-                  <div key={post.id} className="border border-gray-200 rounded-xl p-5">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-semibold text-sm">${post.asset}</span>
-                        <span className="text-xs text-gray-400">{post.category}</span>
-                        {post.sentiment && (
-                          <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${sentimentStyle(post.sentiment)}`}>
-                            {post.sentiment}
-                          </span>
-                        )}
+              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {posts.map((post) => (
+                  <div key={post.id} className="p-4 bg-white border border-gray-200 rounded-xl hover:border-gray-300 transition-colors flex flex-col">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
+                        {creator.avatar}
                       </div>
-                      <span className="text-xs text-gray-400 flex-shrink-0 ml-2">{formatDate(post.created_at)}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-semibold text-sm">{creator.name}</span>
+                          {creator.verified && (
+                            <svg className="w-3.5 h-3.5 text-[#00a86b]" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                          <span>{creator.handle}</span><span>·</span><span>{post.time}</span>
+                        </div>
+                      </div>
+                      <span className="text-xs font-medium px-2 py-1 bg-gray-100 rounded-full text-gray-500 flex-shrink-0">{post.tag}</span>
                     </div>
-                    <p className="text-sm text-gray-800 leading-relaxed mb-3">{post.content}</p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex flex-wrap gap-1">
-                        {post.tags?.map(tag => (
-                          <span key={tag} className="text-xs text-[#00a86b] bg-green-50 px-2 py-0.5 rounded-full">{tag}</span>
-                        ))}
-                      </div>
-                      <div className="flex items-center gap-3 text-xs text-gray-500 flex-shrink-0 ml-2">
-                        <span className="flex items-center gap-1">
-                          <FavoriteBorderIcon sx={{ fontSize: 12 }} />{post.like_count}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <ShareIcon sx={{ fontSize: 12 }} />{post.share_count}
-                        </span>
-                      </div>
+                    <p className="text-sm text-gray-800 leading-relaxed flex-1 mb-3">{post.content}</p>
+                    <div className="flex items-center gap-5 text-xs text-gray-400 pt-3 border-t border-gray-100 mt-auto">
+                      <button className="flex items-center gap-1.5 hover:text-[#00a86b] transition-colors text-[14px]">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                        {post.likes.toLocaleString()}
+                      </button>
+                      <button className="flex items-center gap-1.5 hover:text-blue-500 transition-colors text-[14px]">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                        {post.comments}
+                      </button>
+                      <button className="flex items-center gap-1.5 hover:text-[#00a86b] transition-colors text-[14px]">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                        {post.reposts.toLocaleString()}
+                      </button>
+                      <button className="flex items-center gap-1.5 hover:text-gray-600 transition-colors ml-auto">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                      </button>
                     </div>
+                    <ContentDisclaimer />
                   </div>
                 ))}
               </div>
-            )
+            </>
           )}
 
           {/* ── About Tab ── */}
           {activeTab === 'about' && (
-            <div className="max-w-3xl space-y-6">
-              <div>
-                <h2 className="text-xl font-bold mb-3">About {creator.name}</h2>
-                <p className="text-gray-700 leading-relaxed">{creator.bio}</p>
-              </div>
-              {creator.focus && (
-                <div>
-                  <h3 className="font-bold mb-2">Focus Area</h3>
-                  <p className="text-gray-700">{creator.focus}</p>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-5">
+                <div className="p-5 bg-white border border-gray-200 rounded-xl">
+                  <h2 className="text-base font-semibold mb-3">About {creator.name}</h2>
+                  <p className="text-sm text-gray-700 leading-relaxed">{creator.bio}</p>
                 </div>
-              )}
-              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <p className="text-sm text-gray-700">
-                  <strong>Disclaimer:</strong> Content shared is for educational purposes only and not financial advice. Always do your own research.
-                </p>
+                <div className="p-4 border border-amber-200 bg-amber-50 rounded-xl">
+                  <p className="text-xs text-amber-800 leading-relaxed">
+                    <strong>Disclaimer:</strong> Content shared is for educational purposes only and not financial advice. Always do your own research and consult a licensed advisor before making investment decisions.
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-4">
+                {(dbProfile?.tags?.length || creator.focus) && (
+                  <div className="p-5 bg-white border border-gray-200 rounded-xl">
+                    <h3 className="text-base font-semibold mb-3">Focus Areas</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {(dbProfile?.tags?.length ? dbProfile.tags : [creator.focus]).map(tag => (
+                        <span key={tag} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">{tag}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <div className="p-5 bg-white border border-gray-200 rounded-xl space-y-3">
+                  <h3 className="text-base font-semibold">By the numbers</h3>
+                  {[
+                    { label: 'Followers', value: followerCount !== null ? followerCount.toLocaleString() : creator.followers },
+                    { label: 'Videos published', value: String(videos.length) },
+                    { label: 'Joined', value: dbProfile ? new Date(dbProfile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '—' },
+                  ].map(stat => (
+                    <div key={stat.label} className="flex items-center justify-between text-sm">
+                      <span className="text-gray-500">{stat.label}</span>
+                      <span className="font-semibold">{stat.value}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
@@ -512,6 +562,16 @@ export default function CreatorProfileVideos() {
           onClose={() => setShowSubscribeModal(false)}
           creatorId={creatorId}
           creatorName={creator.name}
+        />
+      )}
+
+      {showChat && (
+        <CreatorChatWidget
+          key={creatorId}
+          creatorId={creatorId}
+          creatorName={creator.name}
+          creatorAvatar={creator.avatar}
+          onClose={() => setShowChat(false)}
         />
       )}
     </div>

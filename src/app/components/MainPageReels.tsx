@@ -1,16 +1,12 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
-import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
-import ShareIcon from '@mui/icons-material/Share';
-import BookmarkIcon from '@mui/icons-material/Bookmark';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import AppHeader from './AppHeader';
 import CreateReelModal from './CreateReelModal';
+import ReelEngagementActions from './reels/ReelEngagementActions';
+import type { SavedContentInput } from '../contexts/SavedContentContext';
 import { MOCK_REELS, type Reel } from '../data/reels';
 import { getReels, getReelsByTicker, getReelsByCreatorIds, likeReel, unlikeReel, getUserLikedReelIds } from '../../lib/services/reels.service';
 import type { ReelWithCreator as DbReel } from '../../types/database';
@@ -22,13 +18,9 @@ import type { MarketIndex } from '../data/marketData';
 import { useWatchlist } from '../contexts/WatchlistContext';
 import { getCreator } from '../data/creators';
 import { useSwipePanel } from '../hooks/useSwipePanel';
-import ReportButton from './compliance/ReportButton';
 
 type TimeRange = '1D' | '1W' | '1M' | '3M' | '1Y' | 'ALL';
-
-function formatCount(n: number): string {
-  return n >= 1000 ? `${(n / 1000).toFixed(1)}K` : String(n);
-}
+type SavedItemMeta = Omit<SavedContentInput, 'userId'>;
 
 // Fallback gradients used when the DB reel has no thumbnail_url yet.
 const FALLBACK_GRADIENTS = [
@@ -80,6 +72,11 @@ export default function MainPageReels() {
     } catch { return new Set(); }
   });
   const [activeIndex, setActiveIndex] = useState(0);
+  // Comments now live entirely inside each reel's own container (see ReelInlineCommentsSheet)
+  // rather than a page-level overlay — but the feed's own vertical scroll-snap still needs to
+  // pause while a sheet is open, or swiping/scrolling would advance to the next reel out from
+  // under it.
+  const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeTimeRange, setActiveTimeRange] = useState<TimeRange>('1M');
   const [showToast, setShowToast] = useState(false);
@@ -131,11 +128,11 @@ export default function MainPageReels() {
     fetch.then(({ data, error }) => {
       if (cancelled) return;
       setReelsLoading(false);
-      if (error || !data || data.length === 0) {
-        setDbReels(null); // signal: use mock fallback
+      if (error || !data) {
+        setDbReels(null); // signal: use mock fallback (error / no Supabase config)
         return;
       }
-      setDbReels(data.map(normalizeDbReel));
+      setDbReels(data.map(normalizeDbReel)); // real result, possibly a real empty array
     });
 
     return () => { cancelled = true; };
@@ -386,7 +383,7 @@ export default function MainPageReels() {
           </div>
 
           {/* Right Panel - Reels */}
-          <div className="h-full w-full bg-black relative flex flex-col lg:w-[480px]">
+          <div className="h-full w-full bg-black relative flex flex-col lg:w-[480px] lg:flex-shrink-0">
             {/* Drag handle — mobile only */}
             <button
               onClick={openPanel}
@@ -468,22 +465,26 @@ export default function MainPageReels() {
             ) : activeTab === 'reels' && filteredReels.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center px-8">
                 <p className="text-white/70 text-sm mb-3">
-                  No reels tagged <span className="font-semibold text-white">${ticker}</span> yet.
+                  {ticker
+                    ? <>No reels tagged <span className="font-semibold text-white">${ticker}</span> yet.</>
+                    : 'No reels yet. Check back soon!'}
                 </p>
-                <button
-                  onClick={() => setSearchParams({})}
-                  className="text-sm text-white/70 underline hover:text-white transition-colors"
-                >
-                  Clear filter
-                </button>
+                {ticker && (
+                  <button
+                    onClick={() => setSearchParams({})}
+                    className="text-sm text-white/70 underline hover:text-white transition-colors"
+                  >
+                    Clear filter
+                  </button>
+                )}
               </div>
             ) : (
               <div
                 ref={scrollRef}
                 onScroll={handleScroll}
-                className="h-full overflow-y-scroll snap-y snap-mandatory"
+                className={`h-full ${isCommentsOpen ? 'overflow-hidden' : 'overflow-y-scroll snap-y snap-mandatory'}`}
               >
-                {(activeTab === 'following' ? (followingReels ?? []) : filteredReels).map((reel) => {
+                {(activeTab === 'following' ? (followingReels ?? []) : filteredReels).map((reel, index) => {
                   const isLiked = likedReels.has(getLikeKey(reel));
                   const isSavedReel = isSaved('reel', reel.id);
                   const hasProfile = !!getCreator(reel.creator_id);
@@ -491,6 +492,19 @@ export default function MainPageReels() {
                   // UUID used for follow operations; falls back to undefined for mock reels
                   const followId = reel.creator_db_id;
                   const isReelCreatorFollowed = followId ? isFollowingFn(followId) : false;
+                  const reelTicker = reel.tickers[0] ?? reel.caption.match(/#([A-Za-z]{1,5})\b/)?.[1]?.toUpperCase() ?? null;
+                  const reelRawId = String(reel.db_id ?? reel.id);
+                  const savedItem: SavedItemMeta = {
+                    contentId: `home-reels:${reelRawId}`,
+                    contentType: 'reel',
+                    surface: 'home-reels',
+                    rawId: reelRawId,
+                    title: reel.caption.slice(0, 80),
+                    thumbnail: reel.thumbnail,
+                    creatorName: reel.creator,
+                    creatorId: reel.creator_id,
+                    meta: reel.handle,
+                  };
 
                   return (
                     <div
@@ -566,69 +580,31 @@ export default function MainPageReels() {
                         </div>
                       </div>
 
-                      {/* Interaction buttons */}
-                      <div className="absolute right-3 bottom-24 flex flex-col gap-4 items-center z-20 lg:right-6 lg:bottom-32 lg:gap-6">
-                        <button
-                          onClick={() => toggleLike(reel)}
-                          className="flex flex-col items-center gap-1 text-white hover:scale-110 transition-transform"
-                        >
-                          <div className={`w-12 h-12 rounded-full backdrop-blur-sm flex items-center justify-center ${isLiked ? 'bg-red-500' : 'bg-white/20'}`}>
-                            {isLiked
-                              ? <FavoriteIcon sx={{ fontSize: 24, color: '#fff' }} />
-                              : <FavoriteBorderIcon sx={{ fontSize: 24, color: '#fff' }} />
-                            }
-                          </div>
-                          <span className="text-xs font-medium">{formatCount(likeCount)}</span>
-                        </button>
-                        <button
-                          onClick={() => triggerToast('💬 Comments coming soon')}
-                          className="flex flex-col items-center gap-1 text-white hover:scale-110 transition-transform"
-                        >
-                          <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                            <ChatBubbleOutlineIcon sx={{ fontSize: 24, color: '#ffffff' }} />
-                          </div>
-                          <span className="text-xs font-medium">{formatCount(reel.comments)}</span>
-                        </button>
-                        <button
-                          onClick={() => triggerToast('🔗 Share coming soon')}
-                          className="flex flex-col items-center gap-1 text-white hover:scale-110 transition-transform"
-                        >
-                          <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                            <ShareIcon sx={{ fontSize: 24, color: '#ffffff' }} />
-                          </div>
-                          <span className="text-xs font-medium">{formatCount(reel.shares)}</span>
-                        </button>
-                        <button
-                          onClick={() => handleSaveToWatchlist(reel)}
-                          className="flex flex-col items-center gap-1 text-white hover:scale-110 transition-transform"
-                          title="Save to Watchlist"
-                        >
-                          <div className={`w-12 h-12 rounded-full ${isSavedReel ? 'bg-[#7CFFB2]' : 'bg-white/20'} backdrop-blur-sm flex items-center justify-center`}>
-                            {isSavedReel
-                              ? <BookmarkIcon sx={{ fontSize: 24, color: '#000000' }} />
-                              : <AddCircleOutlineIcon sx={{ fontSize: 24, color: '#ffffff' }} />
-                            }
-                          </div>
-                          {isSavedReel && <span className="text-[10px] font-medium">Saved</span>}
-                        </button>
-                        <button
-                          onClick={() => triggerToast('More options coming soon')}
-                          className="flex flex-col items-center gap-1 text-white hover:scale-110 transition-transform"
-                        >
-                          <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                            <MoreHorizIcon sx={{ fontSize: 24, color: '#ffffff' }} />
-                          </div>
-                        </button>
-                        <div className="flex flex-col items-center gap-1">
-                          <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                            <ReportButton
-                              contentType="reel"
-                              contentId={String(reel.id)}
-                              className="text-white hover:text-white/70"
-                            />
-                          </div>
-                        </div>
-                      </div>
+                      {/* Interaction buttons — ReelEngagementActions positions its own rail
+                          via railClassName; this keeps the comments sheet (a sibling within
+                          the same component) a direct child of this reel card (the
+                          position:relative container), not nested inside a small positioned
+                          wrapper that would wrongly become the sheet's containing block. */}
+                      <ReelEngagementActions
+                        contentId={String(reel.id)}
+                        isLiked={isLiked}
+                        likeCount={likeCount}
+                        onToggleLike={() => toggleLike(reel)}
+                        commentSeed={reel.comments}
+                        commentsContentType="reel"
+                        commentsContentDbId={reel.db_id ?? null}
+                        shareUrl={window.location.href}
+                        shareTitle={reel.caption.slice(0, 80)}
+                        ticker={reelTicker}
+                        isTickerSaved={isSavedReel}
+                        onToggleTickerSave={() => handleSaveToWatchlist(reel)}
+                        onToast={(msg, subtitle) => triggerToast(msg, subtitle)}
+                        isActive={index === activeIndex}
+                        commentsDesktopMode="sheet"
+                        onCommentPanelOpenChange={setIsCommentsOpen}
+                        railClassName="absolute right-3 bottom-24 z-20 lg:right-6 lg:bottom-32"
+                        savedItem={savedItem}
+                      />
                     </div>
                   );
                 })}

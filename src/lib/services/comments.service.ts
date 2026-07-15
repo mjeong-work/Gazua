@@ -34,6 +34,7 @@ export async function getComments(
     .from('post_comments')
     .select(COMMENT_WITH_AUTHOR)
     .eq('post_id', postId)
+    .eq('moderation_status', 'visible')
     .order('created_at', { ascending: true })
     .limit(100)
 
