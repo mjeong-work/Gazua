@@ -1,0 +1,34 @@
+// Generalizes ModerationPage.tsx's STATUS_COLORS map to cover every status/role pill used
+// across the admin section (report status, user status, content moderation status, role).
+const COLORS: Record<string, string> = {
+  // report status
+  pending: 'bg-amber-50 text-amber-700',
+  reviewed: 'bg-blue-50 text-blue-700',
+  actioned: 'bg-green-50 text-green-700',
+  dismissed: 'bg-gray-100 text-gray-500',
+  // user status
+  active: 'bg-green-50 text-green-700',
+  warned: 'bg-amber-50 text-amber-700',
+  suspended: 'bg-red-50 text-red-700',
+  // content moderation status
+  visible: 'bg-green-50 text-green-700',
+  removed: 'bg-red-50 text-red-700',
+  // role
+  admin: 'bg-black text-white',
+  user: 'bg-gray-100 text-gray-500',
+};
+
+interface AdminStatusBadgeProps {
+  status: string;
+  className?: string;
+}
+
+export default function AdminStatusBadge({ status, className = '' }: AdminStatusBadgeProps) {
+  return (
+    <span
+      className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${COLORS[status] ?? 'bg-gray-100 text-gray-500'} ${className}`}
+    >
+      {status}
+    </span>
+  );
+}
