@@ -4,6 +4,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import Footer from './Footer';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import AppHeader from './AppHeader';
+import AIDisclaimerCard from './compliance/AIDisclaimerCard';
 import { useWatchlist } from '../contexts/WatchlistContext';
 import { useOnboarding } from '../contexts/OnboardingContext';
 import { getUserActivity } from '../data/userActivity';
@@ -70,7 +71,7 @@ function LoadingSkeleton() {
         </div>
       </div>
       {/* Cards skeleton */}
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         {[1, 2, 3, 4].map(i => <div key={i} className={`${pulse} h-36 rounded-xl`} />)}
       </div>
     </div>
@@ -272,6 +273,8 @@ export default function InvestmentProfilePage() {
 
           {state.status === 'success' && (
             <div className="space-y-8">
+              <AIDisclaimerCard />
+
               {/* Section 1 — Personality */}
               <PersonalityCard personality={state.insights.personality} />
 
@@ -282,7 +285,7 @@ export default function InvestmentProfilePage() {
               </div>
 
               {/* Sections 3 + 4 side by side */}
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                   <h2 className="text-xl font-bold mb-4">Trending in Your Style</h2>
                   <div className="space-y-3">

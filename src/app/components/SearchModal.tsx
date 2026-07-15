@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router';
+import { useState, useEffect, type KeyboardEvent as ReactKeyboardEvent } from 'react';
+import { useNavigate, useLocation, useSearchParams } from 'react-router';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -7,10 +7,32 @@ interface SearchModalProps {
   onClose: () => void;
 }
 
+const CREATORS_SEARCH_PREFIX = '/creators';
+
 export default function SearchModal({ onClose }: SearchModalProps) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const [query, setQuery] = useState('');
+  const isOnCreatorsPage = pathname.startsWith(CREATORS_SEARCH_PREFIX);
+  const [searchParams, setSearchParams] = useSearchParams();
+  // On the Creators page, this modal's query doubles as that page's live filter (synced to
+  // ?q= below) — so if it's reopened there, pick up whatever filter is already active rather
+  // than starting blank. Every other page is unaffected; query still starts empty there.
+  const [query, setQuery] = useState(() => (isOnCreatorsPage ? searchParams.get('q') ?? '' : ''));
+
+  // Debounced ?q= sync — scoped entirely to the Creators page. Nowhere else reads this param,
+  // so this has no effect on search behavior anywhere else in the app.
+  useEffect(() => {
+    if (!isOnCreatorsPage) return;
+    const id = setTimeout(() => {
+      const next = new URLSearchParams(searchParams);
+      const trimmed = query.trim();
+      if (trimmed) next.set('q', trimmed);
+      else next.delete('q');
+      setSearchParams(next, { replace: true });
+    }, 300);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, isOnCreatorsPage]);
 
   const mockResults = [
     { type: 'creator', name: 'Alex Rodriguez', handle: '@alexrodriguez', avatar: '👨‍💼', verified: true, route: '/profile/alex-rodriguez/investment' },
@@ -43,7 +65,23 @@ export default function SearchModal({ onClose }: SearchModalProps) {
     return () => window.removeEventListener('keydown', handleEscape);
   }, [onClose]);
 
+  // Applies the current query as the Creators page's own filter (?q=, same pathname, no
+  // navigation) instead of following the global search redirect. Shared by both the Enter key
+  // and clicking a result while on /creators, since neither should ever leave this page.
+  const applyCreatorsPageFilter = (term: string) => {
+    const next = new URLSearchParams(searchParams);
+    const trimmed = term.trim();
+    if (trimmed) next.set('q', trimmed);
+    else next.delete('q');
+    setSearchParams(next, { replace: true });
+    onClose();
+  };
+
   const handleResultClick = (result: typeof mockResults[0]) => {
+    if (isOnCreatorsPage) {
+      applyCreatorsPageFilter(result.name);
+      return;
+    }
     if (result.type === 'stock' || result.type === 'crypto') {
       const base = pathname.startsWith('/main') ? pathname.split('?')[0] : '/main';
       navigate(`${base}?ticker=${result.name}`);
@@ -51,6 +89,15 @@ export default function SearchModal({ onClose }: SearchModalProps) {
       navigate(result.route);
     }
     onClose();
+  };
+
+  const handleInputKeyDown = (e: ReactKeyboardEvent<HTMLInputElement>) => {
+    if (e.key !== 'Enter') return;
+    // Every other route keeps its prior behavior exactly — there was no Enter handling before,
+    // so none is added here; only /creators gets submit-to-filter behavior.
+    if (!isOnCreatorsPage) return;
+    e.preventDefault();
+    applyCreatorsPageFilter(query);
   };
 
   return (
@@ -70,6 +117,7 @@ export default function SearchModal({ onClose }: SearchModalProps) {
             placeholder="Search creators, stocks, topics..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleInputKeyDown}
             autoFocus
             className="flex-1 text-lg outline-none"
           />

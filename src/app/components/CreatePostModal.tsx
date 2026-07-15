@@ -4,6 +4,7 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
 import ComplianceReviewModal from './compliance/ComplianceReviewModal';
+import PublishReminder from './compliance/PublishReminder';
 import { screenContent, saveComplianceReview, logAuditEvent } from '../../lib/services/compliance.service';
 import { createPost } from '../../lib/services/posts.service';
 import { useAuth } from '../contexts/AuthContext';
@@ -266,6 +267,8 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
           {submitError && (
             <p className="text-sm text-red-500 text-center">{submitError}</p>
           )}
+
+          <PublishReminder className="mb-2" />
 
           {/* Submit */}
           <button

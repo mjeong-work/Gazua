@@ -3,6 +3,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import UploadIcon from '@mui/icons-material/Upload';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import ComplianceReviewModal from './compliance/ComplianceReviewModal';
+import PublishReminder from './compliance/PublishReminder';
 import { screenContent, saveComplianceReview, logAuditEvent } from '../../lib/services/compliance.service';
 import { useAuth } from '../contexts/AuthContext';
 import type { DisclosureType } from '../../types/compliance';
@@ -153,6 +154,8 @@ export default function CreateReelModal({ onClose, onSuccess }: CreateReelModalP
               <option>News & Updates</option>
             </select>
           </div>
+
+          <PublishReminder />
 
           {/* Submit */}
           <button

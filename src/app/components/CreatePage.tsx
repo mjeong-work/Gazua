@@ -6,10 +6,14 @@ import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
 import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import CloseIcon from '@mui/icons-material/Close';
+import CreatePostModal from './CreatePostModal';
+import CreateReelModal from './CreateReelModal';
 
 export default function CreatePage() {
   const navigate = useNavigate();
   const [selectedType, setSelectedType] = useState<string | null>(null);
+  const [showPostModal, setShowPostModal] = useState(false);
+  const [showReelModal, setShowReelModal] = useState(false);
 
   const contentTypes = [
     {
@@ -47,6 +51,8 @@ export default function CreatePage() {
   ];
 
   const handleCreate = (type: string) => {
+    if (type === 'post') { setShowPostModal(true); return; }
+    if (type === 'reel') { setShowReelModal(true); return; }
     setSelectedType(type);
   };
 
@@ -70,12 +76,12 @@ export default function CreatePage() {
           </div>
 
           {/* Content Type Cards */}
-          <div className="grid grid-cols-2 gap-6 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-12">
             {contentTypes.map((type) => (
               <button
                 key={type.id}
                 onClick={() => handleCreate(type.id)}
-                className="text-left border-2 border-gray-200 rounded-2xl p-8 hover:border-[#00a86b] hover:shadow-lg transition-all bg-white group"
+                className="text-left border-2 border-gray-200 rounded-2xl p-5 sm:p-8 hover:border-[#00a86b] hover:shadow-lg transition-all bg-white group"
               >
                 <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${type.color} flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform`}>
                   {type.icon}
@@ -119,7 +125,21 @@ export default function CreatePage() {
         </div>
       </div>
 
-      {/* Create Modal */}
+      {showPostModal && (
+        <CreatePostModal
+          onClose={() => setShowPostModal(false)}
+          onSuccess={() => { setShowPostModal(false); navigate('/main'); }}
+        />
+      )}
+
+      {showReelModal && (
+        <CreateReelModal
+          onClose={() => setShowReelModal(false)}
+          onSuccess={() => { setShowReelModal(false); navigate('/main/reels'); }}
+        />
+      )}
+
+      {/* Create Modal (Upload Model / Share Idea — not yet built) */}
       {selectedType && (
         <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"

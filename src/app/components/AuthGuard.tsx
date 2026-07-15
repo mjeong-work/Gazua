@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 // Routes that do not require authentication.
 // Any pathname that starts with one of these prefixes is considered public.
-const PUBLIC_PREFIXES = ['/', '/signin', '/onboarding', '/auth', '/pricing'];
+const PUBLIC_PREFIXES = ['/', '/signin', '/onboarding', '/auth', '/pricing', '/legal', '/terms', '/privacy'];
 
 function isPublic(pathname: string): boolean {
   return PUBLIC_PREFIXES.some(prefix =>

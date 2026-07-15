@@ -6,8 +6,9 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import ShareIcon from '@mui/icons-material/Share';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { useOnboarding } from '../contexts/OnboardingContext';
+import { CHART_TOOLTIP_STYLE, chartCurrencyFormatter, showChartLabel } from '../utils/chartTooltip';
 import AppHeader from './AppHeader';
 import CreatePostModal from './CreatePostModal';
 import { MOCK_POSTS, type Post } from '../data/posts';
@@ -284,11 +285,11 @@ export default function MainPagePosting() {
     getPosts({ ticker: ticker ?? undefined, category, limit: 20 }).then(({ data, error }) => {
       if (cancelled) return;
       setPostsLoading(false);
-      if (error || !data || data.length === 0) {
-        setDbPosts(null); // signal: use mock fallback
+      if (error || !data) {
+        setDbPosts(null); // signal: use mock fallback (error / no Supabase config)
         return;
       }
-      setDbPosts(data.map(normalizeDbPost));
+      setDbPosts(data.map(normalizeDbPost)); // real result, possibly a real empty array
     });
 
     return () => { cancelled = true; };
@@ -518,6 +519,7 @@ export default function MainPagePosting() {
                   <LineChart data={chartData}>
                     <XAxis dataKey="time" hide />
                     <YAxis hide domain={['dataMin', 'dataMax']} />
+                    <Tooltip contentStyle={CHART_TOOLTIP_STYLE} formatter={chartCurrencyFormatter('Value')} labelFormatter={showChartLabel} />
                     <Line
                       type="monotone"
                       dataKey="value"
@@ -744,6 +746,12 @@ export default function MainPagePosting() {
                         <button onClick={() => setContentFilter('All')} className="mt-4 text-sm font-medium underline hover:text-black transition-colors">
                           Clear filter
                         </button>
+                      </div>
+                    )}
+                    {!isFollowingTab && !postsLoading && posts.length === 0 && contentFilter === 'All' && !ticker && (
+                      <div className="flex flex-col items-center justify-center py-20 text-center">
+                        <h3 className="text-xl font-bold mb-2">No posts yet</h3>
+                        <p className="text-gray-600 max-w-sm">Check back soon for new investing insights.</p>
                       </div>
                     )}
 

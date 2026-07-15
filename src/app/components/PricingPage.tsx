@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
+import Footer from './Footer';
 
 type StripeTier = 'analyst' | 'educator'
 
@@ -135,12 +136,6 @@ export default function PricingPage() {
               <button onClick={() => navigate('/creators')} className="text-sm hover:opacity-70">Creators</button>
               <button
                 onClick={() => document.getElementById('pricing-plans')?.scrollIntoView({ behavior: 'smooth' })}
-                className="text-sm hover:opacity-70"
-              >
-                Learn
-              </button>
-              <button
-                onClick={() => document.getElementById('pricing-plans')?.scrollIntoView({ behavior: 'smooth' })}
                 className="text-sm font-medium"
               >
                 Pricing
@@ -237,15 +232,11 @@ export default function PricingPage() {
           })}
         </div>
 
-        <div className="mt-20 pt-12 border-t border-gray-200">
+        <div className="mt-20">
           <p className="text-sm text-gray-500 text-center">
             All content on Gazua is for educational purposes only and does not constitute financial advice.
           </p>
-          <p className="text-xs text-gray-400 text-center mt-3">
-            <a href="/terms" className="underline hover:text-gray-500 transition-colors">Terms of Service</a>
-            {' · '}
-            <a href="/privacy" className="underline hover:text-gray-500 transition-colors">Privacy Policy</a>
-          </p>
+          <Footer variant="full" />
         </div>
       </div>
     </div>

@@ -197,7 +197,10 @@ export default function WatchlistPage() {
                       {item.relatedModels > 0 && <span>{item.relatedModels} models</span>}
                     </div>
 
-                    <button className="w-full py-2 border border-gray-200 rounded-full text-sm font-medium hover:bg-gray-50 transition-colors">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setSelectedItem(item); }}
+                      className="w-full py-2 border border-gray-200 rounded-full text-sm font-medium hover:bg-gray-50 transition-colors"
+                    >
                       View Thesis
                     </button>
                   </div>

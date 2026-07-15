@@ -19,3 +19,4 @@ Thumbs.db
 .vite/
 
 .vercel
+.supabase_token

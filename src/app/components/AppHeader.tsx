@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
@@ -10,14 +10,36 @@ import PersonIcon from '@mui/icons-material/Person';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import SettingsIcon from '@mui/icons-material/Settings';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import SearchModal from './SearchModal';
+import RiskBanner from './AppHeader/RiskBanner';
+import { useAuth } from '../contexts/AuthContext';
+import { getUnreadCount, subscribeToNotifications } from '../../lib/services/notifications.service';
 
 export default function AppHeader() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { user, profile } = useAuth();
   const [showSearch, setShowSearch] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const ticker = searchParams.get('ticker')?.toUpperCase() ?? null;
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (!user) {
+      setUnreadCount(0);
+      return;
+    }
+    getUnreadCount(user.id).then(({ data }) => setUnreadCount(data ?? 0));
+
+    const channel = subscribeToNotifications(user.id, () => {
+      setUnreadCount(prev => prev + 1);
+    });
+    return () => { channel.unsubscribe(); };
+  }, [user]);
 
 
   const active = (paths: string[]) =>
@@ -60,6 +82,18 @@ export default function AppHeader() {
             aria-label="Search"
           >
             <SearchIcon sx={{ fontSize: 22 }} />
+          </button>
+          <button
+            onClick={() => navigate('/notifications')}
+            className="relative p-2 hover:bg-gray-100 rounded-full transition-colors"
+            aria-label="Notifications"
+          >
+            {active(['/notifications'])
+              ? <NotificationsIcon sx={{ fontSize: 22 }} />
+              : <NotificationsNoneIcon sx={{ fontSize: 22 }} />}
+            {unreadCount > 0 && (
+              <span className="absolute top-1 right-1 w-2 h-2 bg-[#00a86b] rounded-full" />
+            )}
           </button>
         </div>
       </div>
@@ -115,15 +149,37 @@ export default function AppHeader() {
             <button onClick={() => navigate('/creators')} className={cls(['/creators', '/profile'])}>
               Creators
             </button>
-            <button onClick={() => navigate('/insights')} className={cls(['/insights'])}>
+            <button onClick={() => navigate('/my-profile')} className={cls(['/my-profile'])}>
               My Profile
+            </button>
+            <button onClick={() => navigate('/messages')} className={cls(['/messages'])}>
+              Messages
             </button>
             <button onClick={() => navigate('/account')} className={cls(['/account'])}>
               Account
             </button>
+            {profile?.role === 'admin' && (
+              <button onClick={() => navigate('/admin')} className={cls(['/admin'])}>
+                Admin
+              </button>
+            )}
+            <button
+              onClick={() => navigate('/notifications')}
+              className={`relative p-2 -m-2 rounded-full hover:bg-gray-100 transition-colors ${active(['/notifications']) ? 'text-[#00a86b]' : ''}`}
+              aria-label="Notifications"
+            >
+              {active(['/notifications'])
+                ? <NotificationsIcon sx={{ fontSize: 20 }} />
+                : <NotificationsNoneIcon sx={{ fontSize: 20 }} />}
+              {unreadCount > 0 && (
+                <span className="absolute top-1 right-1 w-2 h-2 bg-[#00a86b] rounded-full" />
+              )}
+            </button>
           </nav>
         </div>
       </header>
+
+      <RiskBanner />
 
       {/* Mobile bottom nav */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30">
@@ -147,13 +203,22 @@ export default function AppHeader() {
             <span className="text-[10px] font-medium">Creators</span>
           </button>
           <button
-            onClick={() => navigate('/insights')}
-            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/insights']) ? 'text-[#00a86b]' : 'text-gray-500'}`}
+            onClick={() => navigate('/my-profile')}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/my-profile']) ? 'text-[#00a86b]' : 'text-gray-500'}`}
           >
-            {active(['/insights'])
+            {active(['/my-profile'])
               ? <PersonIcon sx={{ fontSize: 24 }} />
               : <PersonOutlineIcon sx={{ fontSize: 24 }} />}
             <span className="text-[10px] font-medium">Profile</span>
+          </button>
+          <button
+            onClick={() => navigate('/messages')}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/messages']) ? 'text-[#00a86b]' : 'text-gray-500'}`}
+          >
+            {active(['/messages'])
+              ? <ChatBubbleIcon sx={{ fontSize: 24 }} />
+              : <ChatBubbleOutlineIcon sx={{ fontSize: 24 }} />}
+            <span className="text-[10px] font-medium">Messages</span>
           </button>
           <button
             onClick={() => navigate('/account')}

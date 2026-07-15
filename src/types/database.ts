@@ -13,6 +13,9 @@ export type Json =
   | Json[]
 
 // ── Enum helpers ─────────────────────────────────────────────────
+export type ProfileRole = 'user' | 'admin'
+export type ProfileStatus = 'active' | 'warned' | 'suspended'
+export type ContentModerationStatus = 'visible' | 'removed'
 export type SubscriptionTier = 'free' | 'analyst' | 'educator'
 export type SubscriptionStatus =
   | 'active' | 'trialing' | 'past_due' | 'canceled'
@@ -39,6 +42,18 @@ export type ContentSentiment = 'Bullish' | 'Neutral' | 'Bearish'
 export type RiskLevel = 'Low' | 'Medium' | 'High'
 export type Confidence = 'Low' | 'Medium' | 'High'
 export type PayoutStatus = 'pending' | 'paid' | 'failed' | 'canceled'
+export type ComplianceRiskScore = 'LOW' | 'MEDIUM' | 'HIGH' | 'BLOCKED'
+export type ComplianceOutcome = 'published' | 'blocked' | 'abandoned'
+export type ComplianceContentType = 'post' | 'reel' | 'video' | 'comment' | 'creator_profile'
+export type ReportReason =
+  | 'guaranteed_returns' | 'coordinated_trading' | 'buy_sell_instructions'
+  | 'undisclosed_promotion' | 'fraud_allegation' | 'other'
+export type ReportStatus = 'pending' | 'reviewed' | 'actioned' | 'dismissed'
+export type ModerationActionType =
+  | 'dismissed' | 'warning_sent' | 'content_removed' | 'user_suspended'
+  | 'content_restored' | 'user_reinstated'
+export type SavedContentType = 'reel' | 'video' | 'post'
+export type SavedContentSurface = 'home-reels' | 'creators-reels' | 'video'
 
 // ── Portfolio allocation JSON shape ──────────────────────────────
 // Stored in profiles.portfolio_allocation
@@ -78,6 +93,11 @@ export interface Database {
           onboarding_interests: string[]
           onboarding_risk_style: RiskStyle | null
           onboarding_completed: boolean
+          role: ProfileRole
+          status: ProfileStatus
+          suspended_at: string | null
+          suspended_reason: string | null
+          terms_accepted_at: string | null
           created_at: string
           updated_at: string
         }
@@ -101,6 +121,11 @@ export interface Database {
           onboarding_interests?: string[]
           onboarding_risk_style?: RiskStyle | null
           onboarding_completed?: boolean
+          role?: ProfileRole
+          status?: ProfileStatus
+          suspended_at?: string | null
+          suspended_reason?: string | null
+          terms_accepted_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -124,6 +149,11 @@ export interface Database {
           onboarding_interests?: string[]
           onboarding_risk_style?: RiskStyle | null
           onboarding_completed?: boolean
+          role?: ProfileRole
+          status?: ProfileStatus
+          suspended_at?: string | null
+          suspended_reason?: string | null
+          terms_accepted_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -143,6 +173,7 @@ export interface Database {
           risk_level: RiskLevel | null
           confidence: Confidence | null
           share_count: number
+          moderation_status: ContentModerationStatus
           created_at: string
           updated_at: string
         }
@@ -158,6 +189,7 @@ export interface Database {
           risk_level?: RiskLevel | null
           confidence?: Confidence | null
           share_count?: number
+          moderation_status?: ContentModerationStatus
           created_at?: string
           updated_at?: string
         }
@@ -173,6 +205,7 @@ export interface Database {
           risk_level?: RiskLevel | null
           confidence?: Confidence | null
           share_count?: number
+          moderation_status?: ContentModerationStatus
           created_at?: string
           updated_at?: string
         }
@@ -204,6 +237,7 @@ export interface Database {
           post_id: string
           user_id: string
           content: string
+          moderation_status: ContentModerationStatus
           created_at: string
         }
         Insert: {
@@ -211,6 +245,7 @@ export interface Database {
           post_id: string
           user_id: string
           content: string
+          moderation_status?: ContentModerationStatus
           created_at?: string
         }
         Update: {
@@ -218,6 +253,7 @@ export interface Database {
           post_id?: string
           user_id?: string
           content?: string
+          moderation_status?: ContentModerationStatus
           created_at?: string
         }
       }
@@ -232,6 +268,7 @@ export interface Database {
           storage_path: string | null
           tickers: string[]
           share_count: number
+          moderation_status: ContentModerationStatus
           created_at: string
           updated_at: string
         }
@@ -243,6 +280,7 @@ export interface Database {
           storage_path?: string | null
           tickers?: string[]
           share_count?: number
+          moderation_status?: ContentModerationStatus
           created_at?: string
           updated_at?: string
         }
@@ -254,6 +292,7 @@ export interface Database {
           storage_path?: string | null
           tickers?: string[]
           share_count?: number
+          moderation_status?: ContentModerationStatus
           created_at?: string
           updated_at?: string
         }
@@ -288,6 +327,7 @@ export interface Database {
           storage_path: string | null
           duration_seconds: number | null
           view_count: number
+          moderation_status: ContentModerationStatus
           created_at: string
           updated_at: string
         }
@@ -299,6 +339,7 @@ export interface Database {
           storage_path?: string | null
           duration_seconds?: number | null
           view_count?: number
+          moderation_status?: ContentModerationStatus
           created_at?: string
           updated_at?: string
         }
@@ -310,6 +351,7 @@ export interface Database {
           storage_path?: string | null
           duration_seconds?: number | null
           view_count?: number
+          moderation_status?: ContentModerationStatus
           created_at?: string
           updated_at?: string
         }
@@ -628,6 +670,240 @@ export interface Database {
         }
       }
 
+      // ── compliance_reviews ───────────────────────────────────────
+      compliance_reviews: {
+        Row: {
+          id: string
+          user_id: string | null
+          content_type: ComplianceContentType
+          content_id: string | null
+          original_text: string
+          tickers: string[]
+          risk_score: ComplianceRiskScore
+          risk_reasons: Json
+          disclosures_offered: string[]
+          disclosures_accepted: string[]
+          warnings_shown: string[]
+          outcome: ComplianceOutcome
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          content_type: ComplianceContentType
+          content_id?: string | null
+          original_text: string
+          tickers?: string[]
+          risk_score: ComplianceRiskScore
+          risk_reasons?: Json
+          disclosures_offered?: string[]
+          disclosures_accepted?: string[]
+          warnings_shown?: string[]
+          outcome: ComplianceOutcome
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          content_type?: ComplianceContentType
+          content_id?: string | null
+          original_text?: string
+          tickers?: string[]
+          risk_score?: ComplianceRiskScore
+          risk_reasons?: Json
+          disclosures_offered?: string[]
+          disclosures_accepted?: string[]
+          warnings_shown?: string[]
+          outcome?: ComplianceOutcome
+          created_at?: string
+        }
+      }
+
+      // ── content_reports ───────────────────────────────────────────
+      content_reports: {
+        Row: {
+          id: string
+          reporter_id: string | null
+          content_type: ComplianceContentType
+          content_id: string
+          reason: ReportReason
+          details: string | null
+          status: ReportStatus
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          reporter_id?: string | null
+          content_type: ComplianceContentType
+          content_id: string
+          reason: ReportReason
+          details?: string | null
+          status?: ReportStatus
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          reporter_id?: string | null
+          content_type?: ComplianceContentType
+          content_id?: string
+          reason?: ReportReason
+          details?: string | null
+          status?: ReportStatus
+          created_at?: string
+        }
+      }
+
+      // ── moderation_actions ─────────────────────────────────────────
+      moderation_actions: {
+        Row: {
+          id: string
+          moderator_id: string | null
+          report_id: string | null
+          content_type: ComplianceContentType | 'user'
+          content_id: string
+          action: ModerationActionType
+          notes: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          moderator_id?: string | null
+          report_id?: string | null
+          content_type: ComplianceContentType | 'user'
+          content_id: string
+          action: ModerationActionType
+          notes?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          moderator_id?: string | null
+          report_id?: string | null
+          content_type?: ComplianceContentType | 'user'
+          content_id?: string
+          action?: ModerationActionType
+          notes?: string | null
+          created_at?: string
+        }
+      }
+
+      // ── compliance_audit_logs ───────────────────────────────────────
+      compliance_audit_logs: {
+        Row: {
+          id: string
+          event_type: string
+          user_id: string | null
+          content_type: string | null
+          content_id: string | null
+          review_id: string | null
+          report_id: string | null
+          metadata: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          event_type: string
+          user_id?: string | null
+          content_type?: string | null
+          content_id?: string | null
+          review_id?: string | null
+          report_id?: string | null
+          metadata?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          event_type?: string
+          user_id?: string | null
+          content_type?: string | null
+          content_id?: string | null
+          review_id?: string | null
+          report_id?: string | null
+          metadata?: Json
+          created_at?: string
+        }
+      }
+
+      // ── user_legal_acceptances ──────────────────────────────────────
+      user_legal_acceptances: {
+        Row: {
+          id: string
+          user_id: string | null
+          document_slug: string
+          document_version: string
+          jurisdiction: string
+          locale: string
+          ip_address: string | null
+          accepted_at: string
+        }
+        Insert: {
+          id?: string
+          user_id?: string | null
+          document_slug: string
+          document_version: string
+          jurisdiction?: string
+          locale?: string
+          ip_address?: string | null
+          accepted_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string | null
+          document_slug?: string
+          document_version?: string
+          jurisdiction?: string
+          locale?: string
+          ip_address?: string | null
+          accepted_at?: string
+        }
+      }
+
+      // ── saved_content ────────────────────────────────────────────
+      saved_content: {
+        Row: {
+          id: string
+          user_id: string
+          content_id: string
+          content_type: SavedContentType
+          surface: SavedContentSurface
+          raw_id: string
+          title: string
+          thumbnail: string
+          creator_name: string
+          creator_id: string | null
+          meta: string | null
+          saved_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          content_id: string
+          content_type: SavedContentType
+          surface: SavedContentSurface
+          raw_id: string
+          title: string
+          thumbnail: string
+          creator_name: string
+          creator_id?: string | null
+          meta?: string | null
+          saved_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          content_id?: string
+          content_type?: SavedContentType
+          surface?: SavedContentSurface
+          raw_id?: string
+          title?: string
+          thumbnail?: string
+          creator_name?: string
+          creator_id?: string | null
+          meta?: string | null
+          saved_at?: string
+        }
+      }
+
     }
     Views: Record<string, never>
     Functions: Record<string, never>
@@ -680,6 +956,14 @@ export type Subscription        = Tables<'subscriptions'>['Row']
 export type CreatorMembership   = Tables<'creator_memberships'>['Row']
 export type CreatorPayout       = Tables<'creator_payouts'>['Row']
 
+export type ComplianceReview       = Tables<'compliance_reviews'>['Row']
+export type ContentReport          = Tables<'content_reports'>['Row']
+export type ContentReportInsert    = Tables<'content_reports'>['Insert']
+export type ModerationAction       = Tables<'moderation_actions'>['Row']
+export type ComplianceAuditLog     = Tables<'compliance_audit_logs'>['Row']
+export type UserLegalAcceptance    = Tables<'user_legal_acceptances'>['Row']
+export type UserLegalAcceptanceInsert = Tables<'user_legal_acceptances'>['Insert']
+
 // ── Joined / enriched types returned by service functions ────────
 
 /** Creator info embedded via JOIN on creator_id → profiles */
@@ -699,7 +983,7 @@ export type ReelWithCreator = Reel & {
 }
 
 export type VideoWithCreator = Video & {
-  creator: Pick<Profile, 'id' | 'username' | 'full_name' | 'avatar_url'>
+  creator: Pick<Profile, 'id' | 'username' | 'full_name' | 'avatar_url' | 'is_verified'>
 }
 
 export type ModelWithCreator = Model & {
