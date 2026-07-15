@@ -5,28 +5,66 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import ShareIcon from '@mui/icons-material/Share';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import SubscriptionModal from './SubscriptionModal';
+import CreatorChatWidget from './CreatorChatWidget';
 import AppHeader from './AppHeader';
+import ContentDisclaimer from './compliance/ContentDisclaimer';
+import { CHART_TOOLTIP_STYLE, chartCurrencyFormatter, hideChartLabel } from '../utils/chartTooltip';
 import { getCreator, type MockCreator } from '../data/creators';
 import { getCreatorByUsername, getFollowerCount } from '../../lib/services/profiles.service';
-import { getPostsByCreator, getPostCountByCreator } from '../../lib/services/posts.service';
+import { getPostCountByCreator, getPostsByCreator } from '../../lib/services/posts.service';
+import { getCommentCount } from '../../lib/services/comments.service';
 import { getFollowingCount } from '../../lib/services/follows.service';
 import type { Profile, PostWithCreator } from '../../types/database';
 import { useFollow } from '../contexts/FollowContext';
 import { useAuth } from '../contexts/AuthContext';
-import PortfolioSimulator from './PortfolioSimulator';
 import WatchingTab from './WatchingTab';
+import { SUBSCRIBE_ENABLED, ACTUAL_PORTFOLIO_ENABLED } from '../featureFlags';
 
-// ── Helpers ──────────────────────────────────────────────────────────
-function sentimentStyle(s: string | null) {
-  if (s === 'Bullish') return 'bg-green-100 text-green-700';
-  if (s === 'Bearish') return 'bg-red-100 text-red-700';
-  return 'bg-gray-100 text-gray-600';
+// Same 4-color default palette the hardcoded allocation used, extended for portfolios with
+// more than 4 real slices.
+const ALLOCATION_COLORS = ['#00a86b', '#7CFFB2', '#f43f5e', '#e5e7eb', '#60a5fa', '#a78bfa'];
+
+interface DisplayPost {
+  id: string;
+  time: string;
+  content: string;
+  likes: number;
+  comments: number;
+  reposts: number;
+  tag: string;
 }
 
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+// Fallback content for the small MOCK_CREATORS set (no real posts.service data for them).
+const MOCK_POSTS_FALLBACK: DisplayPost[] = [
+  { id: 'mock-1', time: '2h ago', content: "Just added to my NVDA position. AI infrastructure spending isn't slowing down — data center capex from the hyperscalers is still accelerating. This is a multi-year theme, not a trade.", likes: 1240, comments: 87, reposts: 203, tag: '📈 Portfolio Update' },
+  { id: 'mock-2', time: '1d ago', content: "Reminder: volatility is not risk. Risk is permanent loss of capital. A 20% drawdown in a fundamentally strong company is an opportunity, not a reason to panic sell. Zoom out.", likes: 3421, comments: 142, reposts: 891, tag: '💡 Investing Insight' },
+  { id: 'mock-3', time: '3d ago', content: "Fed held rates steady again. My read: we're in a higher-for-longer environment through at least Q3. Positioning accordingly — overweight value, underweight long-duration growth. Cash is still earning 5%+, don't sleep on it.", likes: 2108, comments: 219, reposts: 445, tag: '🏦 Macro Watch' },
+  { id: 'mock-4', time: '5d ago', content: "Q1 earnings recap: beat on revenue, missed on margins. Management guided conservatively for Q2 which I think is sandbagging. Holding my position. Full breakdown in my latest video — link in bio.", likes: 987, comments: 63, reposts: 134, tag: '📊 Earnings' },
+  { id: 'mock-5', time: '1w ago', content: "New to investing? The single best thing you can do this year: set up automatic contributions to a low-cost index fund and stop watching the daily price. Time in market beats timing the market — every time.", likes: 5832, comments: 314, reposts: 2109, tag: '🎓 Beginner Tips' },
+];
+
+function formatRelativeTime(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const h = Math.floor(diff / 3_600_000);
+  if (h < 1) return `${Math.max(1, Math.floor(diff / 60_000))}m ago`;
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  return d === 1 ? '1d ago' : `${d}d ago`;
+}
+
+async function normalizeDbPost(p: PostWithCreator): Promise<DisplayPost> {
+  const { data: commentCount } = await getCommentCount(p.id);
+  return {
+    id: p.id,
+    time: formatRelativeTime(p.created_at),
+    content: p.content,
+    likes: p.like_count,
+    comments: commentCount ?? 0,
+    reposts: p.share_count,
+    tag: p.category,
+  };
 }
 
 // ── Component ─────────────────────────────────────────────────────────
@@ -43,11 +81,7 @@ export default function CreatorProfileInvestment() {
   const [followerCount, setFollowerCount] = useState<number | null>(null);
   const [followingCount, setFollowingCount] = useState<number | null>(null);
   const [postCount, setPostCount] = useState<number | null>(null);
-
-  // Posts loaded lazily when Posts tab is first opened
-  const [creatorPosts, setCreatorPosts] = useState<PostWithCreator[]>([]);
-  const [postsLoading, setPostsLoading] = useState(false);
-  const [postsFetched, setPostsFetched] = useState(false);
+  const [dbPosts, setDbPosts] = useState<DisplayPost[] | null>(null);
 
   // ── Own-profile detection ──────────────────────────────────────────
   const isOwnProfile = Boolean(authProfile?.username && authProfile.username === creatorId);
@@ -59,12 +93,54 @@ export default function CreatorProfileInvestment() {
     return 'investment';
   });
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
+  const [showChat, setShowChat] = useState(false);
   const [notificationsOn, setNotificationsOn] = useState(() => {
     try { return localStorage.getItem(`gazua:notif:${creatorId}`) === 'true'; } catch { return false; }
   });
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [showMoreMenu, setShowMoreMenu] = useState(false);
+
+  // ── Investment tab (Figma placeholder — TODO: rebuild with real data) ──
+  const [simulatorMode, setSimulatorMode] = useState(true);
+  const [simulationExpanded, setSimulationExpanded] = useState(false);
+  const [showSimulationList, setShowSimulationList] = useState(false);
+  const [holdingsExpanded, setHoldingsExpanded] = useState(false);
+  const [timeRange, setTimeRange] = useState<'1W' | '1M' | '3M' | '1Y' | 'ALL'>('1M');
+
+  const portfolioData = useMemo(() => {
+    const points = { '1W': 7, '1M': 30, '3M': 90, '1Y': 252, 'ALL': 400 }[timeRange];
+    const base = { '1W': 86000, '1M': 82000, '3M': 76000, '1Y': 62000, 'ALL': 45000 }[timeRange];
+    let val = base;
+    return Array.from({ length: points }, (_, i) => {
+      val = val + (Math.random() - 0.45) * 800 + 30;
+      return { time: `t${i}`, value: Math.max(val, base * 0.85) };
+    });
+  }, [timeRange]);
+
+  // Reads the real profiles.portfolio_allocation Json column (shape: {name, value}[], colors
+  // assigned by the frontend) when a creator has one set; falls back to the same default
+  // breakdown shown before, since nothing writes to that column yet (no edit UI exists for
+  // it — wiring one is a separate, larger feature, not part of this read-side connection).
+  const allocationData = useMemo(() => {
+    const raw = dbProfile?.portfolio_allocation;
+    if (Array.isArray(raw) && raw.length > 0) {
+      return raw.map((slice, i) => {
+        const s = slice as { name?: unknown; value?: unknown };
+        return {
+          name: String(s.name ?? 'Other'),
+          value: Number(s.value ?? 0),
+          color: ALLOCATION_COLORS[i % ALLOCATION_COLORS.length],
+        };
+      });
+    }
+    return [
+      { name: 'Stocks', value: 45, color: '#00a86b' },
+      { name: 'ETFs', value: 30, color: '#7CFFB2' },
+      { name: 'Crypto', value: 15, color: '#f43f5e' },
+      { name: 'Cash', value: 10, color: '#e5e7eb' },
+    ];
+  }, [dbProfile]);
 
   // ── Effects ────────────────────────────────────────────────────────
   useEffect(() => {
@@ -76,20 +152,15 @@ export default function CreatorProfileInvestment() {
         getFollowerCount(data.id).then(({ data: n }) => { if (n !== null) setFollowerCount(n); });
         getFollowingCount(data.id).then(({ data: n }) => { if (n !== null) setFollowingCount(n); });
         getPostCountByCreator(data.id).then(({ data: n }) => { if (n !== null) setPostCount(n); });
+        getPostsByCreator(data.id).then(({ data: posts, error }) => {
+          if (error || !posts) return;
+          Promise.all(posts.map(normalizeDbPost)).then(setDbPosts);
+        });
       }
     });
   }, [creatorId]);
 
-  // Posts: load lazily on first visit to the Posts tab
-  useEffect(() => {
-    if (activeTab !== 'posts' || !dbProfile || postsFetched) return;
-    setPostsLoading(true);
-    getPostsByCreator(dbProfile.id).then(({ data }) => {
-      setCreatorPosts(data ?? []);
-      setPostsLoading(false);
-      setPostsFetched(true);
-    });
-  }, [activeTab, dbProfile, postsFetched]);
+  const posts = dbProfile ? (dbPosts ?? []) : MOCK_POSTS_FALLBACK;
 
   // ── Derived data ───────────────────────────────────────────────────
   // Prefer DB data; keep mock values for counts not yet in DB
@@ -281,14 +352,16 @@ export default function CreatorProfileInvestment() {
                   >
                     {isFollowingCreator ? 'Following' : 'Follow'}
                   </button>
+                  {SUBSCRIBE_ENABLED && (
+                    <button
+                      onClick={() => setShowSubscribeModal(true)}
+                      className="px-6 sm:px-8 py-2.5 bg-[#7CFFB2] text-black font-medium text-sm rounded-full hover:bg-[#6EEEA8] transition-colors"
+                    >
+                      Subscribe
+                    </button>
+                  )}
                   <button
-                    onClick={() => setShowSubscribeModal(true)}
-                    className="px-6 sm:px-8 py-2.5 bg-[#7CFFB2] text-black font-medium text-sm rounded-full hover:bg-[#6EEEA8] transition-colors"
-                  >
-                    Subscribe
-                  </button>
-                  <button
-                    onClick={() => triggerToast('💬 Messaging coming soon')}
+                    onClick={() => setShowChat(true)}
                     className="px-5 sm:px-6 py-2.5 bg-gray-100 text-black font-medium text-sm rounded-full hover:bg-gray-200 transition-colors"
                   >
                     Message
@@ -326,95 +399,605 @@ export default function CreatorProfileInvestment() {
               </div>
             </div>
 
-            {/* ── Investment Tab ── */}
-            {activeTab === 'investment' && <PortfolioSimulator />}
+            {/* ── Investment Tab (Figma placeholder — TODO: rebuild with real data) ── */}
+            {activeTab === 'investment' && (
+            <div className="space-y-4">
+              {/* Simulator Toggle */}
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <div>
+                  <h3 className="font-medium text-sm mb-0.5">Portfolio Simulator</h3>
+                  <p className="text-xs text-gray-500">Test hypothetical investment scenarios</p>
+                </div>
+                {ACTUAL_PORTFOLIO_ENABLED && (
+                  <button
+                    onClick={() => setSimulatorMode(!simulatorMode)}
+                    className={`relative w-11 h-6 rounded-full transition-colors ${
+                      simulatorMode ? 'bg-[#00a86b]' : 'bg-gray-300'
+                    }`}
+                  >
+                    <div
+                      className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${
+                        simulatorMode ? 'translate-x-5' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                )}
+              </div>
+
+              {simulatorMode ? (
+                // Simulator View
+                <div className="space-y-4">
+                  {/* Simulation Settings */}
+                  <div
+                    onClick={() => setSimulationExpanded(!simulationExpanded)}
+                    className="p-4 bg-white rounded-lg border border-gray-200 cursor-pointer hover:border-gray-300 transition-colors"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <h2 className="text-base font-semibold">Simulation Setup</h2>
+                      <svg
+                        className={`w-4 h-4 text-gray-500 transition-transform ${simulationExpanded ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </div>
+
+                    {!simulationExpanded ? (
+                      // Collapsed Summary View
+                      <div className="space-y-1">
+                        <p className="text-xs text-gray-600">
+                          <span className="font-medium">Period:</span> Jan 1 - Jun 1, 2026 (5 months)
+                        </p>
+                        <p className="text-xs text-gray-600">
+                          <span className="font-medium">Holdings:</span> 2 stocks (NVDA, TSLA) + Cash
+                        </p>
+                        <p className="text-xs text-gray-600">
+                          <span className="font-medium">Capital:</span> $50,000
+                        </p>
+                      </div>
+                    ) : (
+                      // Expanded Detail View
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1.5">Start Date</label>
+                            <div className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded text-xs">
+                              Jan 1, 2026
+                            </div>
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-600 mb-1.5">Initial Capital</label>
+                            <div className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded text-xs">
+                              $50,000
+                            </div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1.5">Hypothetical Holdings</label>
+                          <div className="space-y-1.5">
+                            <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded text-xs flex items-center justify-between">
+                              <span>NVDA - $30,000 @ $800/share</span>
+                              <span className="text-gray-500">37.5 shares</span>
+                            </div>
+                            <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded text-xs flex items-center justify-between">
+                              <span>TSLA - $15,000 @ $250/share</span>
+                              <span className="text-gray-500">60 shares</span>
+                            </div>
+                            <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded text-xs flex items-center justify-between">
+                              <span>Cash</span>
+                              <span className="text-gray-500">$5,000</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-medium text-gray-600 mb-1.5">Simulation Rationale</label>
+                          <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded">
+                            <ul className="space-y-1 text-xs text-gray-600">
+                              <li>• Testing AI chip sector growth thesis through NVDA exposure</li>
+                              <li>• EV market diversification with TSLA position</li>
+                              <li>• Conservative 10% cash buffer for volatility management</li>
+                              <li>• 5-month timeframe to capture Q1-Q2 earnings cycles</li>
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Performance Comparison */}
+                  <div>
+                    <h2 className="text-base font-semibold mb-3">Hypothesis vs Actual Performance</h2>
+                    <div className="grid grid-cols-3 gap-3 mb-4">
+                      {/* Hypothesis */}
+                      <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                        <p className="text-xs text-gray-600 mb-1">Your Hypothesis</p>
+                        <p className="text-xl font-bold text-purple-700 mb-0.5">+15.0%</p>
+                        <p className="text-xs text-gray-500">$57,500</p>
+                      </div>
+
+                      {/* Actual */}
+                      <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                        <p className="text-xs text-gray-600 mb-1">Actual Performance</p>
+                        <p className="text-xl font-bold text-[#00a86b] mb-0.5">+8.5%</p>
+                        <p className="text-xs text-gray-500">$54,250</p>
+                      </div>
+
+                      {/* Difference */}
+                      <div className="p-3 bg-red-50 rounded-lg border border-red-200">
+                        <p className="text-xs text-gray-600 mb-1">Difference</p>
+                        <p className="text-xl font-bold text-red-700 mb-0.5">-6.5%</p>
+                        <p className="text-xs text-gray-500">-$3,250</p>
+                      </div>
+                    </div>
+
+                    {/* Chart Comparison */}
+                    <div className="bg-gray-50 rounded-lg p-4 w-full">
+                      <div className="h-48 min-h-[192px] w-full min-w-[300px]">
+                        <ResponsiveContainer width="100%" height={192} minWidth={300} minHeight={192} key="simulator-chart-container">
+                          <LineChart id="simulator-chart" key="simulator-line-chart">
+                            <XAxis dataKey="time" hide key="simulator-xaxis" />
+                            <YAxis hide domain={['dataMin', 'dataMax']} key="simulator-yaxis" />
+                            <Tooltip contentStyle={CHART_TOOLTIP_STYLE} formatter={chartCurrencyFormatter('Value')} labelFormatter={hideChartLabel} />
+                            <Line
+                              data={portfolioData}
+                              type="monotone"
+                              dataKey="value"
+                              stroke="#00a86b"
+                              strokeWidth={2}
+                              dot={false}
+                              isAnimationActive={false}
+                              key="simulator-actual-line"
+                              name="Actual"
+                            />
+                            <Line
+                              data={portfolioData.map((d, i) => ({ ...d, value: d.value * 1.06 }))}
+                              type="monotone"
+                              dataKey="value"
+                              stroke="#9333ea"
+                              strokeWidth={2}
+                              strokeDasharray="5 5"
+                              dot={false}
+                              isAnimationActive={false}
+                              key="simulator-hypothesis-line"
+                              name="Hypothesis"
+                            />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <div className="flex items-center justify-center gap-4 mt-3">
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-3 h-0.5 bg-[#00a86b]"></div>
+                          <span className="text-xs font-medium">Actual</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <div className="w-3 h-0.5 bg-purple-700" style={{ borderTop: '2px dashed #9333ea', height: 0 }}></div>
+                          <span className="text-xs font-medium">Hypothesis</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* More Simulations Button */}
+                  <button
+                    onClick={() => setShowSimulationList(!showSimulationList)}
+                    className="w-full p-3 bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-gray-600"
+                  >
+                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    {showSimulationList ? 'Hide Past Simulations' : 'View More Simulations'}
+                  </button>
+
+                  {/* Simulation List */}
+                  {showSimulationList && (
+                    <div className="p-4 bg-white rounded-lg border border-gray-200 space-y-2.5">
+                      <h3 className="font-semibold text-sm mb-3">Past Simulations</h3>
+
+                      {/* Simulation 1 */}
+                      <div className="p-3 bg-gray-50 rounded border border-gray-200 hover:border-gray-300 transition-colors cursor-pointer">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <h4 className="font-medium text-sm">Tech Growth Portfolio</h4>
+                          <span className="text-xs text-gray-500">Dec 1, 2025 - Mar 1, 2026</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-xs text-gray-600 mb-1.5">
+                          <span>3 Holdings</span>
+                          <span>•</span>
+                          <span>$75,000 Capital</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-xs">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-gray-500">Hypothesis:</span>
+                            <span className="font-medium text-purple-700">+22.0%</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-gray-500">Actual:</span>
+                            <span className="font-medium text-[#00a86b]">+18.5%</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-gray-500">Diff:</span>
+                            <span className="font-medium text-red-700">-3.5%</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Simulation 2 */}
+                      <div className="p-3 bg-gray-50 rounded border border-gray-200 hover:border-gray-300 transition-colors cursor-pointer">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <h4 className="font-medium text-sm">Conservative Value Play</h4>
+                          <span className="text-xs text-gray-500">Sep 1, 2025 - Dec 1, 2025</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-xs text-gray-600 mb-1.5">
+                          <span>4 Holdings</span>
+                          <span>•</span>
+                          <span>$100,000 Capital</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-xs">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-gray-500">Hypothesis:</span>
+                            <span className="font-medium text-purple-700">+8.0%</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-gray-500">Actual:</span>
+                            <span className="font-medium text-[#00a86b]">+11.2%</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-gray-500">Diff:</span>
+                            <span className="font-medium text-[#00a86b]">+3.2%</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Simulation 3 */}
+                      <div className="p-3 bg-gray-50 rounded border border-gray-200 hover:border-gray-300 transition-colors cursor-pointer">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <h4 className="font-medium text-sm">Crypto Diversification Test</h4>
+                          <span className="text-xs text-gray-500">Jun 1, 2025 - Sep 1, 2025</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-xs text-gray-600 mb-1.5">
+                          <span>5 Holdings</span>
+                          <span>•</span>
+                          <span>$25,000 Capital</span>
+                        </div>
+                        <div className="flex items-center gap-3 text-xs">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-gray-500">Hypothesis:</span>
+                            <span className="font-medium text-purple-700">+35.0%</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-gray-500">Actual:</span>
+                            <span className="font-medium text-red-700">-5.2%</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-gray-500">Diff:</span>
+                            <span className="font-medium text-red-700">-40.2%</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Insights */}
+                </div>
+              ) : (
+                // Real Portfolio View
+                <div className="space-y-4">
+
+              {/* Actual Portfolio Badge */}
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#00a86b]/10 text-[#00a86b] text-xs font-semibold rounded-full border border-[#00a86b]/20">
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Actual Portfolio
+                </span>
+                <span className="text-xs text-gray-400">Real positions · Updated daily</span>
+              </div>
+
+              {/* Top Holding Chart */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-base font-semibold">Performance Chart</h2>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-base font-medium text-[#00a86b]">+2.66%</p>
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 rounded-lg p-4 w-full">
+                  <div className="h-48 min-h-[192px] w-full min-w-[300px]">
+                    <ResponsiveContainer width="100%" height={192} minWidth={300} minHeight={192} key="portfolio-chart-container">
+                      <LineChart data={portfolioData} id="portfolio-chart" key="portfolio-line-chart">
+                        <XAxis dataKey="time" hide key="portfolio-xaxis" />
+                        <YAxis hide domain={['dataMin', 'dataMax']} key="portfolio-yaxis" />
+                        <Tooltip contentStyle={CHART_TOOLTIP_STYLE} formatter={chartCurrencyFormatter('Value')} labelFormatter={hideChartLabel} />
+                        <Line
+                          type="monotone"
+                          dataKey="value"
+                          stroke="#00a86b"
+                          strokeWidth={2}
+                          dot={false}
+                          isAnimationActive={false}
+                          key="portfolio-line"
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="flex items-center justify-center gap-3 mt-3 text-xs font-medium">
+                    {(['1W', '1M', '3M', '1Y', 'ALL'] as const).map((r) => (
+                      <button
+                        key={r}
+                        onClick={() => setTimeRange(r)}
+                        className={`px-2.5 py-1 rounded transition-colors ${
+                          timeRange === r ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:bg-white hover:text-black'
+                        }`}
+                      >
+                        {r}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Portfolio Allocation */}
+              <div>
+                <h2 className="text-base font-semibold mb-3">Portfolio Allocation</h2>
+                <div className="flex items-center gap-8">
+                  {/* Donut Chart */}
+                  <div className="w-48 h-48 min-w-48 min-h-48">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={192} minHeight={192} key="allocation-chart-container">
+                      <PieChart id="allocation-chart" key="allocation-pie-chart">
+                        <Pie
+                          data={allocationData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={52}
+                          outerRadius={90}
+                          paddingAngle={2}
+                          dataKey="value"
+                          isAnimationActive={false}
+                          key="allocation-pie"
+                        >
+                          {allocationData.map((entry, index) => (
+                            <Cell key={`allocation-cell-${entry.name}-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  {/* Legend */}
+                  <div className="flex-1 space-y-3">
+                    {allocationData.map((item) => (
+                      <div key={item.name} className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-3 h-3 rounded-full"
+                            style={{ backgroundColor: item.color }}
+                          />
+                          <span className="text-sm font-medium">{item.name}</span>
+                        </div>
+                        <span className="text-lg font-bold">{item.value}%</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* My Holdings */}
+              <div>
+                {holdingsExpanded && (
+                  <div className="bg-white rounded-lg border border-gray-200">
+                    {/* Stock Item 1 */}
+                    <div className="flex items-center justify-between p-3 border-b border-gray-200">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-purple-600 rounded flex items-center justify-center text-white font-bold text-xs">
+                          NV
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">NVDA</p>
+                          <p className="text-xs text-gray-500">Nvidia Corp.</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium">$41,820.00</p>
+                        <p className="text-xs text-[#00a86b]">+2.66%</p>
+                      </div>
+                    </div>
+
+                    {/* Stock Item 2 */}
+                    <div className="flex items-center justify-between p-3 border-b border-gray-200">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-blue-500 rounded flex items-center justify-center text-white font-bold text-xs">
+                          GO
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">GOOG</p>
+                          <p className="text-xs text-gray-500">Alphabet, Inc.</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium">$18,340.50</p>
+                        <p className="text-xs text-[#00a86b]">+0.88%</p>
+                      </div>
+                    </div>
+
+                    {/* Stock Item 3 */}
+                    <div className="flex items-center justify-between p-3 border-b border-gray-200">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-yellow-500 rounded flex items-center justify-center text-white font-bold text-xs">
+                          MS
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">MSFT</p>
+                          <p className="text-xs text-gray-500">Microsoft Corp.</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium">$12,910.00</p>
+                        <p className="text-xs text-red-600">-0.88%</p>
+                      </div>
+                    </div>
+
+                    {/* Stock Item 4 */}
+                    <div className="flex items-center justify-between p-3 border-b border-gray-200">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-pink-500 rounded flex items-center justify-center text-white font-bold text-xs">
+                          MT
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">META</p>
+                          <p className="text-xs text-gray-500">Meta Platforms, Inc.</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium">$9,560.00</p>
+                        <p className="text-xs text-red-600">-1.24%</p>
+                      </div>
+                    </div>
+
+                    {/* Stock Item 5 */}
+                    <div className="flex items-center justify-between p-3 border-b border-gray-200">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-red-600 rounded flex items-center justify-center text-white font-bold text-xs">
+                          TS
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">TSLA</p>
+                          <p className="text-xs text-gray-500">Tesla, Inc.</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium">$4,230.00</p>
+                        <p className="text-xs text-[#00a86b]">+0.52%</p>
+                      </div>
+                    </div>
+
+                    {/* Stock Item 6 */}
+                    <div className="flex items-center justify-between p-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-gray-800 rounded flex items-center justify-center text-white font-bold text-xs">
+                          AM
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium">AMZN</p>
+                          <p className="text-xs text-gray-500">Amazon.com, Inc.</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium">$1,860.00</p>
+                        <p className="text-xs text-red-600">-2.10%</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Investment Philosophy */}
+                </div>
+              )}
+            </div>
+            )}
 
             {/* ── Watching Tab (own profile only) ── */}
             {activeTab === 'watching' && isOwnProfile && <WatchingTab />}
 
             {/* ── Posts Tab ── */}
             {activeTab === 'posts' && (
-              postsLoading ? (
-                <div className="space-y-4 max-w-2xl">
-                  {[1, 2, 3].map(n => (
-                    <div key={n} className="border border-gray-200 rounded-xl p-5 animate-pulse">
-                      <div className="flex justify-between mb-3">
-                        <div className="h-4 bg-gray-200 rounded w-32" />
-                        <div className="h-4 bg-gray-200 rounded w-20" />
-                      </div>
-                      <div className="space-y-2">
-                        <div className="h-3 bg-gray-200 rounded w-full" />
-                        <div className="h-3 bg-gray-200 rounded w-5/6" />
-                        <div className="h-3 bg-gray-200 rounded w-4/6" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : creatorPosts.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 text-center">
-                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-                    <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-                    </svg>
+              <>
+                {posts.length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-24 text-center">
+                    <h3 className="text-xl font-bold mb-2">No posts yet</h3>
+                    <p className="text-gray-500 text-sm max-w-xs">
+                      {creator.name} hasn't shared any posts yet. Check back later.
+                    </p>
                   </div>
-                  <h3 className="text-xl font-bold mb-2">No Posts Yet</h3>
-                  <p className="text-gray-600 max-w-sm">This creator hasn't shared any posts yet. Check back later for updates and insights.</p>
-                </div>
-              ) : (
-                <div className="space-y-4 max-w-2xl">
-                  {creatorPosts.map(post => (
-                    <div key={post.id} className="border border-gray-200 rounded-xl p-5">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-semibold text-sm">${post.asset}</span>
-                          <span className="text-xs text-gray-400">{post.category}</span>
-                          {post.sentiment && (
-                            <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${sentimentStyle(post.sentiment)}`}>
-                              {post.sentiment}
-                            </span>
-                          )}
+                )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {posts.map((post) => (
+                    <div key={post.id} className="p-4 bg-white border border-gray-200 rounded-xl hover:border-gray-300 transition-colors">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm flex-shrink-0">{creator.avatar}</div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-semibold text-sm">{creator.name}</span>
+                            {creator.verified && (
+                              <svg className="w-4 h-4 text-[#00a86b]" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-gray-500">
+                            <span>{creator.handle}</span><span>·</span><span>{post.time}</span>
+                          </div>
                         </div>
-                        <span className="text-xs text-gray-400 flex-shrink-0 ml-2">{formatDate(post.created_at)}</span>
+                        <span className="text-xs font-medium px-2 py-1 bg-gray-100 rounded-full text-gray-600 flex-shrink-0">{post.tag}</span>
                       </div>
                       <p className="text-sm text-gray-800 leading-relaxed mb-3">{post.content}</p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex flex-wrap gap-1">
-                          {post.tags?.map(tag => (
-                            <span key={tag} className="text-xs text-[#00a86b] bg-green-50 px-2 py-0.5 rounded-full">{tag}</span>
-                          ))}
-                        </div>
-                        <div className="flex items-center gap-3 text-xs text-gray-500 flex-shrink-0 ml-2">
-                          <span className="flex items-center gap-1">
-                            <FavoriteBorderIcon sx={{ fontSize: 12 }} />{post.like_count}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <ShareIcon sx={{ fontSize: 12 }} />{post.share_count}
-                          </span>
-                        </div>
+                      <div className="flex items-center gap-6 text-xs text-gray-500">
+                        <button className="flex items-center gap-1.5 hover:text-[#00a86b] transition-colors">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+                          {post.likes.toLocaleString()}
+                        </button>
+                        <button className="flex items-center gap-1.5 hover:text-blue-500 transition-colors">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+                          {post.comments}
+                        </button>
+                        <button className="flex items-center gap-1.5 hover:text-green-500 transition-colors">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                          {post.reposts.toLocaleString()}
+                        </button>
+                        <button className="flex items-center gap-1.5 hover:text-gray-700 transition-colors ml-auto">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                        </button>
                       </div>
+                      <ContentDisclaimer />
                     </div>
                   ))}
                 </div>
-              )
+              </>
             )}
 
             {/* ── About Tab ── */}
             {activeTab === 'about' && (
-              <div className="max-w-3xl space-y-6">
-                <div>
-                  <h2 className="text-xl font-bold mb-3">About {creator.name}</h2>
-                  <p className="text-gray-700 leading-relaxed">{creator.bio}</p>
-                </div>
-                {creator.focus && (
-                  <div>
-                    <h3 className="font-bold mb-2">Focus Area</h3>
-                    <p className="text-gray-700">{creator.focus}</p>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 space-y-5">
+                  <div className="p-5 bg-white border border-gray-200 rounded-xl">
+                    <h2 className="text-base font-semibold mb-3">About {creator.name}</h2>
+                    <p className="text-sm text-gray-700 leading-relaxed">{creator.bio}</p>
                   </div>
-                )}
-                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <p className="text-sm text-gray-700">
-                    <strong>Disclaimer:</strong> Content shared is for educational purposes only and not financial advice. Always do your own research.
-                  </p>
+                  <div className="p-4 border border-amber-200 bg-amber-50 rounded-xl">
+                    <p className="text-xs text-amber-800 leading-relaxed">
+                      <strong>Disclaimer:</strong> Content shared is for educational purposes only and not financial advice. Always do your own research and consult a licensed advisor before making investment decisions.
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  {(dbProfile?.tags?.length || creator.focus) && (
+                    <div className="p-5 bg-white border border-gray-200 rounded-xl">
+                      <h3 className="text-base font-semibold mb-3">Focus Areas</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {(dbProfile?.tags?.length ? dbProfile.tags : [creator.focus]).map(tag => (
+                          <span key={tag} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">{tag}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  <div className="p-5 bg-white border border-gray-200 rounded-xl space-y-3">
+                    <h3 className="text-base font-semibold">By the numbers</h3>
+                    {[
+                      { label: 'Followers', value: followerCount !== null ? followerCount.toLocaleString() : creator.followers },
+                      { label: 'Posts', value: postCount !== null ? postCount.toLocaleString() : creator.posts },
+                      { label: 'Joined', value: dbProfile ? new Date(dbProfile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '—' },
+                    ].map(stat => (
+                      <div key={stat.label} className="flex items-center justify-between text-sm">
+                        <span className="text-gray-500">{stat.label}</span>
+                        <span className="font-semibold">{stat.value}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}
@@ -428,6 +1011,16 @@ export default function CreatorProfileInvestment() {
           onClose={() => setShowSubscribeModal(false)}
           creatorId={creatorId}
           creatorName={creator.name}
+        />
+      )}
+
+      {showChat && (
+        <CreatorChatWidget
+          key={creatorId}
+          creatorId={creatorId}
+          creatorName={creator.name}
+          creatorAvatar={creator.avatar}
+          onClose={() => setShowChat(false)}
         />
       )}
 

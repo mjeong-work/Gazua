@@ -1,3 +1,5 @@
+export type CreatorTier = 'Explorer' | 'Analyst' | 'Educator';
+
 export interface MockCreator {
   id: string;
   name: string;
@@ -9,6 +11,7 @@ export interface MockCreator {
   following: string;
   posts: string;
   focus: string;
+  tier: CreatorTier;
 }
 
 export const MOCK_CREATORS: Record<string, MockCreator> = {
@@ -23,6 +26,7 @@ export const MOCK_CREATORS: Record<string, MockCreator> = {
     following: '342',
     posts: '1.2K',
     focus: 'Value Investing',
+    tier: 'Educator',
   },
   'sarah-chen': {
     id: 'sarah-chen',
@@ -35,6 +39,7 @@ export const MOCK_CREATORS: Record<string, MockCreator> = {
     following: '218',
     posts: '847',
     focus: 'Growth Stocks',
+    tier: 'Analyst',
   },
   'mike-ross': {
     id: 'mike-ross',
@@ -47,6 +52,7 @@ export const MOCK_CREATORS: Record<string, MockCreator> = {
     following: '134',
     posts: '423',
     focus: 'Quant & Models',
+    tier: 'Analyst',
   },
   'emma-wilson': {
     id: 'emma-wilson',
@@ -59,6 +65,7 @@ export const MOCK_CREATORS: Record<string, MockCreator> = {
     following: '301',
     posts: '612',
     focus: 'Crypto',
+    tier: 'Explorer',
   },
   'david-park': {
     id: 'david-park',
@@ -71,6 +78,7 @@ export const MOCK_CREATORS: Record<string, MockCreator> = {
     following: '89',
     posts: '934',
     focus: 'Index Funds',
+    tier: 'Educator',
   },
   'lisa-zhang': {
     id: 'lisa-zhang',
@@ -83,6 +91,7 @@ export const MOCK_CREATORS: Record<string, MockCreator> = {
     following: '178',
     posts: '712',
     focus: 'Options Trading',
+    tier: 'Analyst',
   },
   'james-lee': {
     id: 'james-lee',
@@ -95,6 +104,7 @@ export const MOCK_CREATORS: Record<string, MockCreator> = {
     following: '204',
     posts: '1.1K',
     focus: 'Beginner Education',
+    tier: 'Educator',
   },
 };
 
@@ -107,7 +117,8 @@ export function nameToCreatorId(name: string): string {
 }
 
 export interface CreatorCard {
-  id: number;
+  /** number for the mock catalog below; a real profile UUID string for DB-backed creators. */
+  id: number | string;
   name: string;
   avatar: string;
   tagline: string;

@@ -139,3 +139,25 @@ export async function getFollowingCount(
   if (error) return { data: null, error: error.message }
   return { data: count ?? 0, error: null }
 }
+
+// ── getFollowerCounts ────────────────────────────────────────────
+/** Follower counts for a batch of creators in one query. Used by creator directory/list
+ * views that need to show a real count per card without N+1 queries. */
+export async function getFollowerCounts(
+  creatorIds: string[]
+): Promise<ServiceResult<Record<string, number>>> {
+  if (!creatorIds.length) return { data: {}, error: null }
+
+  const { data, error } = await supabase
+    .from('follows')
+    .select('creator_id')
+    .in('creator_id', creatorIds)
+
+  if (error) return { data: null, error: error.message }
+
+  const counts: Record<string, number> = {}
+  for (const row of data ?? []) {
+    counts[row.creator_id] = (counts[row.creator_id] ?? 0) + 1
+  }
+  return { data: counts, error: null }
+}

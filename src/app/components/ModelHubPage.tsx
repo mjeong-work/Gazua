@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import SearchIcon from '@mui/icons-material/Search';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
@@ -13,6 +13,28 @@ import { useOnboarding } from '../contexts/OnboardingContext';
 import AppHeader from './AppHeader';
 import { type Model, MOCK_MODELS } from '../data/models';
 import { useWatchlist } from '../contexts/WatchlistContext';
+import { getModels } from '../../lib/services/models.service';
+import type { ModelWithCreator } from '../../types/database';
+
+function normalizeDbModel(m: ModelWithCreator, index: number): Model {
+  const initial = (m.creator?.full_name?.[0] ?? '?').toUpperCase();
+  return {
+    id: index,
+    db_id: m.id,
+    title: m.title,
+    creator: m.creator?.full_name ?? 'Unknown',
+    creator_id: m.creator?.username ?? '',
+    creatorAvatar: initial,
+    difficulty: m.difficulty,
+    fileType: m.file_type,
+    category: m.category,
+    description: m.description ?? '',
+    learnings: m.learnings ?? [],
+    downloads: m.download_count,
+    remixes: m.remix_count,
+    access: m.access_level,
+  };
+}
 
 export default function ModelHubPage() {
   const navigate = useNavigate();
@@ -34,6 +56,27 @@ export default function ModelHubPage() {
 
   const isExpert = onboardingData.level === 'confident';
 
+  // Supabase-backed model data. null = not yet resolved (use mock fallback).
+  const [dbModels, setDbModels] = useState<Model[] | null>(null);
+  const [modelsLoading, setModelsLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setModelsLoading(true);
+
+    getModels({ limit: 50 }).then(({ data, error }) => {
+      if (cancelled) return;
+      setModelsLoading(false);
+      if (error || !data) {
+        setDbModels(null); // signal: use mock fallback (error / no Supabase config)
+        return;
+      }
+      setDbModels(data.map(normalizeDbModel)); // real result, possibly a real empty array
+    });
+
+    return () => { cancelled = true; };
+  }, []);
+
   const triggerToast = (message: string, subtitle = '') => {
     setToastMessage(message);
     setToastSubtitle(subtitle);
@@ -42,7 +85,8 @@ export default function ModelHubPage() {
   };
 
   const filteredModels = useMemo(() => {
-    return MOCK_MODELS.filter(model => {
+    const models = dbModels !== null ? dbModels : MOCK_MODELS;
+    return models.filter(model => {
       const matchesSearch = model.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            model.description.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesDifficulty = filters.difficulty === 'All' || model.difficulty === filters.difficulty;
@@ -52,7 +96,7 @@ export default function ModelHubPage() {
 
       return matchesSearch && matchesDifficulty && matchesFileType && matchesCategory && matchesAccess;
     });
-  }, [searchQuery, filters]);
+  }, [dbModels, searchQuery, filters]);
 
   const handleSave = (model: Model) => {
     if (!isSaved('model', model.id)) {
@@ -61,7 +105,7 @@ export default function ModelHubPage() {
         name: model.title,
         assetType: 'Strategy',
         source_type: 'model',
-        source_content_id: model.id,
+        source_content_id: model.db_id ?? String(model.id),
         source: `Saved from model: ${model.title}`,
       });
       triggerToast('Saved to Watchlist', 'Build your thesis in the Watchlist tab');
@@ -218,9 +262,25 @@ export default function ModelHubPage() {
             </p>
           </div>
 
-          {/* Model Cards Grid */}
-          {filteredModels.length > 0 ? (
-            <div className="grid grid-cols-2 gap-6">
+          {/* Loading Skeleton */}
+          {modelsLoading && dbModels === null ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {[1, 2, 3, 4].map(n => (
+                <div key={n} className="border border-gray-200 rounded-xl p-6 animate-pulse">
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <div className="h-4 bg-gray-200 rounded w-3/4" />
+                      <div className="h-3 bg-gray-200 rounded w-1/2" />
+                    </div>
+                  </div>
+                  <div className="h-3 bg-gray-200 rounded w-full mb-2" />
+                  <div className="h-3 bg-gray-200 rounded w-5/6" />
+                </div>
+              ))}
+            </div>
+          ) : filteredModels.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {filteredModels.map((model) => {
                 const isLocked = model.access === 'Expert Only' && !isExpert;
                 const isModelSaved = isSaved('model', model.id);
@@ -405,7 +465,7 @@ export default function ModelHubPage() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-bold text-gray-700 mb-2">Category</label>
                       <select className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]">

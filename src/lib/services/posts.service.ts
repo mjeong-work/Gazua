@@ -46,6 +46,7 @@ export async function getPosts(options?: {
   let query = supabase
     .from('posts')
     .select(POST_WITH_CREATOR_AND_LIKES)
+    .eq('moderation_status', 'visible')
     .order('created_at', { ascending: false })
     .limit(options?.limit ?? 20)
 
@@ -78,6 +79,7 @@ export async function getPostsByCreator(
     .from('posts')
     .select(POST_WITH_CREATOR_AND_LIKES)
     .eq('creator_id', creatorId)
+    .eq('moderation_status', 'visible')
     .order('created_at', { ascending: false })
     .limit(limit)
 
@@ -103,6 +105,7 @@ export async function getPostsByCreatorIds(
     .from('posts')
     .select(POST_WITH_CREATOR_AND_LIKES)
     .in('creator_id', creatorIds)
+    .eq('moderation_status', 'visible')
     .order('created_at', { ascending: false })
     .limit(limit)
 
@@ -123,6 +126,7 @@ export async function getPostsByTicker(
     .from('posts')
     .select(POST_WITH_CREATOR_AND_LIKES)
     .eq('asset', ticker.toUpperCase())
+    .eq('moderation_status', 'visible')
     .order('created_at', { ascending: false })
     .limit(limit)
 

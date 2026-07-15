@@ -1,5 +1,6 @@
 export interface Model {
   id: number;
+  db_id?: string; // real Supabase UUID, when backed by a live record
   title: string;
   creator: string;
   creator_id: string;

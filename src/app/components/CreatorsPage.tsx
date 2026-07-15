@@ -1,18 +1,34 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useEffect, useMemo, useRef, useState, type TouchEvent, type WheelEvent } from 'react';
+import { useNavigate, useSearchParams } from 'react-router';
+import { toast } from 'sonner';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import CloseIcon from '@mui/icons-material/Close';
 import AppHeader from './AppHeader';
-
-interface Creator {
-  id: number;
-  name: string;
-  avatar: string;
-  tagline: string;
-  focus: string;
-  followers: string;
-  tags: string[];
-  verified: boolean;
-}
+import CreatorsSidebar from './CreatorsSidebar';
+import ReelEngagementActions from './reels/ReelEngagementActions';
+import { seedFromId } from './reels/format';
+import {
+  getCreator,
+  nameToCreatorId,
+  type CreatorCard as Creator,
+  FEATURED_CREATORS,
+  TRENDING_CREATORS,
+  BEGINNER_EDUCATORS,
+  QUANT_BUILDERS,
+  STOCK_PICKERS,
+  CRYPTO_VOICES,
+  RETIREMENT_EXPERTS,
+} from '../data/creators';
+import { CREATOR_VIDEOS } from '../data/reels';
+import { useFollow, isUUID } from '../contexts/FollowContext';
+import { useAuth } from '../contexts/AuthContext';
+import { useDebouncedValue } from '../hooks/useDebouncedValue';
+import { searchCreators, matchesCreatorSearch } from '../utils/creatorSearch';
+import type { SavedContentInput } from '../contexts/SavedContentContext';
+import { getCreators } from '../../lib/services/profiles.service';
+import { getFollowerCounts } from '../../lib/services/follows.service';
+import { formatCount } from './reels/format';
+import type { Profile, FeaturedCategory } from '../../types/database';
 
 interface ContentItem {
   id: number;
@@ -24,61 +40,142 @@ interface ContentItem {
   duration?: string;
 }
 
-interface Video {
-  id: number;
-  thumbnail: string;
-  title: string;
-  creator: string;
-  creatorAvatar: string;
-  views: string;
-  uploadedAt: string;
-  duration: string;
-  verified: boolean;
-}
+type SavedItemMeta = Omit<SavedContentInput, 'userId'>;
 
 export default function CreatorsPage() {
   const navigate = useNavigate();
-  const [followedCreators, setFollowedCreators] = useState<Set<number>>(new Set());
-  const [selectedFilter, setSelectedFilter] = useState<'All' | 'Beginner' | 'Intermediate' | 'Advanced'>('All');
+  const { user } = useAuth();
+  const { followedIds, isFollowing: isFollowingFn, toggleFollow } = useFollow();
+  const [selectedFilter, setSelectedFilter] = useState<'All' | 'Beginner' | 'Intermediate' | 'Advanced' | 'My Following'>('All');
 
-  const handleFollow = (creatorId: number) => {
-    setFollowedCreators(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(creatorId)) {
-        newSet.delete(creatorId);
-      } else {
-        newSet.add(creatorId);
-      }
-      return newSet;
-    });
+  // Search — driven by the top search bar (SearchModal), which syncs ?q= here while the user
+  // is on this page. Debounced locally too so re-filtering doesn't run on every keystroke.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const searchQuery = searchParams.get('q') ?? '';
+  const debouncedSearchQuery = useDebouncedValue(searchQuery, 200);
+  const clearSearch = () => {
+    const next = new URLSearchParams(searchParams);
+    next.delete('q');
+    setSearchParams(next, { replace: true });
   };
 
-  const featuredCreators: Creator[] = [
-    { id: 1, name: 'Alex Rodriguez', avatar: '👨‍💼', tagline: 'Helping everyday investors build wealth', focus: 'Value Investing', followers: '127K', tags: ['Stocks', 'ETFs', 'Beginner'], verified: true },
-    { id: 2, name: 'Sarah Chen', avatar: '👩‍💼', tagline: 'Tech stock analysis and growth investing', focus: 'Growth Stocks', followers: '89K', tags: ['Stocks', 'Tech', 'Analysis'], verified: true },
-    { id: 3, name: 'Mike Ross', avatar: '👨‍💻', tagline: 'Quant strategies and algorithmic trading', focus: 'Quant & Models', followers: '56K', tags: ['Python', 'Quant', 'Models'], verified: true },
-    { id: 4, name: 'Emma Wilson', avatar: '👩‍🔬', tagline: 'Crypto fundamentals and blockchain tech', focus: 'Crypto', followers: '94K', tags: ['Crypto', 'Bitcoin', 'Blockchain'], verified: false },
-  ];
+  const [playingReelIndex, setPlayingReelIndex] = useState<number | null>(null);
+  const wheelLockRef = useRef(false);
+  // Mock like state, keyed by reel id — this preview modal's reel items have no db_id to
+  // persist against (they're a page-local content list, not the shared Reel/Video models).
+  const [likedReelIds, setLikedReelIds] = useState<Set<number>>(new Set());
+  // Desktop adjacent comments panel — a real flex sibling next to the reel card (not an
+  // overlay). Only one reel plays at a time in this modal, so no "active index" bookkeeping
+  // is needed here the way MainPageReels needs it for its scrolling feed.
+  const [commentsPortalEl, setCommentsPortalEl] = useState<HTMLDivElement | null>(null);
+  const [isCommentsOpen, setIsCommentsOpen] = useState(false);
 
-  const beginnerEducators: Creator[] = [
-    { id: 7, name: 'James Lee', avatar: '👨‍💼', tagline: 'Making investing simple for everyone', focus: 'Beginner Education', followers: '143K', tags: ['Beginner', 'Basics', 'Education'], verified: true },
-    { id: 8, name: 'Anna Martinez', avatar: '👩‍🎓', tagline: 'First-time investor guides', focus: 'Beginner Basics', followers: '78K', tags: ['Beginner', 'Guides', 'Tips'], verified: false },
-    { id: 9, name: 'Robert Kim', avatar: '👨‍💻', tagline: 'Finance explained with simple examples', focus: 'Education', followers: '91K', tags: ['Beginner', 'Finance', 'Simple'], verified: true },
-    { id: 10, name: 'Sophie Turner', avatar: '👩‍💼', tagline: 'Investment basics for young professionals', focus: 'Career Finance', followers: '65K', tags: ['Beginner', 'Career', 'Millennials'], verified: true },
-  ];
+  // Skill-level groupings built from the shared creator dataset (src/app/data/creators.ts)
+  // so this page routes to real profiles and matches the rest of the app.
+  const sectionTitle = debouncedSearchQuery.trim()
+    ? 'Search Results'
+    : {
+        All: 'Featured Creators',
+        Beginner: 'Beginner Educators',
+        Intermediate: 'Popular Creators',
+        Advanced: 'Advanced & Specialized',
+        'My Following': 'My Following',
+      }[selectedFilter];
 
-  const quantBuilders: Creator[] = [
-    { id: 12, name: 'Rachel Green', avatar: '👩‍💼', tagline: 'Python quant models and backtesting', focus: 'Quant Development', followers: '45K', tags: ['Python', 'Quant', 'Backtesting'], verified: true },
-    { id: 13, name: 'Tom Anderson', avatar: '👨‍💼', tagline: 'Statistical arbitrage strategies', focus: 'Advanced Quant', followers: '38K', tags: ['Stats', 'Arbitrage', 'Advanced'], verified: false },
-    { id: 14, name: 'Lisa Zhang', avatar: '👩‍💼', tagline: 'Options strategies and risk models', focus: 'Options Quant', followers: '67K', tags: ['Options', 'Risk', 'Models'], verified: true },
-    { id: 15, name: 'Brian Park', avatar: '👨‍💻', tagline: 'Machine learning for trading signals', focus: 'ML Trading', followers: '52K', tags: ['ML', 'Python', 'Signals'], verified: true },
-  ];
+  // Real Supabase creator directory. null = not yet resolved / error (use mock fallback);
+  // [] is a legitimate real empty result and is NOT treated as a fallback signal.
+  const [dbProfiles, setDbProfiles] = useState<Profile[] | null>(null);
+  const [followerCounts, setFollowerCounts] = useState<Record<string, number>>({});
+  // Gates the initial render so real data doesn't flash-replace mock data a moment after
+  // paint — mirrors the reelsLoading/postsLoading pattern in MainPageReels/MainPagePosting.
+  const [creatorsLoading, setCreatorsLoading] = useState(true);
 
-  const cryptoVoices: Creator[] = [
-    { id: 16, name: 'Crypto Katie', avatar: '👩‍💻', tagline: 'DeFi protocols and yield farming', focus: 'DeFi', followers: '103K', tags: ['DeFi', 'Crypto', 'Yield'], verified: false },
-    { id: 17, name: 'Bitcoin Brian', avatar: '👨‍💻', tagline: 'Bitcoin fundamentals and macro', focus: 'Bitcoin', followers: '127K', tags: ['Bitcoin', 'Macro', 'Crypto'], verified: true },
-    { id: 18, name: 'Ethereum Eva', avatar: '👩‍💼', tagline: 'Smart contracts and ETH ecosystem', focus: 'Ethereum', followers: '89K', tags: ['Ethereum', 'Smart Contracts', 'Web3'], verified: true },
-  ];
+  useEffect(() => {
+    let cancelled = false;
+    getCreators({ limit: 100 }).then(({ data, error }) => {
+      if (cancelled) return;
+      if (error || !data) { setDbProfiles(null); setCreatorsLoading(false); return; }
+      setDbProfiles(data);
+      getFollowerCounts(data.map(p => p.id)).then(({ data: counts }) => {
+        if (cancelled) return;
+        setFollowerCounts(counts ?? {});
+        setCreatorsLoading(false);
+      });
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  // Maps a real profile row onto the same CreatorCard shape every card/search/follow
+  // helper already consumes, so none of that logic needs to know whether it's looking at
+  // real or mock data.
+  const profileToCreatorCard = (p: Profile): Creator => ({
+    id: p.id,
+    name: p.full_name,
+    avatar: p.avatar_url ?? '👤',
+    tagline: p.tagline || (p.bio ? p.bio.slice(0, 100) : ''),
+    focus: p.focus ?? '',
+    followers: formatCount(followerCounts[p.id] ?? 0),
+    tags: p.tags,
+    verified: p.is_verified,
+  });
+
+  // Real UUID when this card is DB-backed (so Follow persists to Supabase via FollowContext's
+  // isUUID branch), else the slug scheme mock creators have always used.
+  const followTargetId = (creator: Creator): string =>
+    typeof creator.id === 'string' && isUUID(creator.id) ? creator.id : nameToCreatorId(creator.name);
+
+  const creatorsByCategory = (categories: FeaturedCategory[]): Creator[] =>
+    (dbProfiles ?? [])
+      .filter(p => p.featured_category && categories.includes(p.featured_category))
+      .map(profileToCreatorCard);
+
+  const allCreators: Creator[] = useMemo(() => {
+    if (dbProfiles !== null) return dbProfiles.map(profileToCreatorCard);
+    return [
+      ...FEATURED_CREATORS,
+      ...TRENDING_CREATORS,
+      ...BEGINNER_EDUCATORS,
+      ...QUANT_BUILDERS,
+      ...STOCK_PICKERS,
+      ...CRYPTO_VOICES,
+      ...RETIREMENT_EXPERTS,
+    ];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dbProfiles, followerCounts]);
+
+  // Same follow data as the sidebar's "My Creators" section (FollowContext) — a creator
+  // counts as followed here if its real UUID (or, for mock creators, slugified name) is in
+  // the shared followedIds set.
+  const myFollowingCreators: Creator[] = useMemo(
+    () => allCreators.filter(c => followedIds.has(followTargetId(c))),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [allCreators, followedIds],
+  );
+
+  const isSearching = debouncedSearchQuery.trim().length > 0;
+
+  const displayedCreators: Creator[] = useMemo(() => {
+    // An active search takes priority over the tab filter (but doesn't change which tab is
+    // selected — clearing the search returns you to it).
+    if (isSearching) return searchCreators(allCreators, debouncedSearchQuery);
+    switch (selectedFilter) {
+      case 'Beginner':
+        return dbProfiles !== null ? creatorsByCategory(['beginner_educator']) : BEGINNER_EDUCATORS;
+      case 'Intermediate':
+        return dbProfiles !== null
+          ? creatorsByCategory(['featured', 'trending', 'stock_picker', 'retirement_expert'])
+          : [...FEATURED_CREATORS, ...TRENDING_CREATORS, ...STOCK_PICKERS, ...RETIREMENT_EXPERTS];
+      case 'Advanced':
+        return dbProfiles !== null
+          ? creatorsByCategory(['quant_builder', 'crypto_voice'])
+          : [...QUANT_BUILDERS, ...CRYPTO_VOICES];
+      case 'My Following':
+        return myFollowingCreators;
+      default:
+        return allCreators;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSearching, debouncedSearchQuery, selectedFilter, myFollowingCreators, allCreators, dbProfiles, followerCounts]);
 
   const featuredContent: ContentItem[] = [
     { id: 1, type: 'reel', thumbnail: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', title: 'Top 5 Stocks for 2026', creator: 'Alex Rodriguez', views: '24.5K', duration: '0:58' },
@@ -88,25 +185,138 @@ export default function CreatorsPage() {
     { id: 5, type: 'reel', thumbnail: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)', title: 'Market Analysis: Tech Sector', creator: 'Sarah Chen', views: '21.3K', duration: '1:28' },
   ];
 
-  const videos: Video[] = [
-    { id: 1, thumbnail: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', title: 'Stock Market Basics for Complete Beginners', creator: 'James Lee', creatorAvatar: '👨‍💼', views: '234K', uploadedAt: '2 weeks ago', duration: '12:34', verified: true },
-    { id: 2, thumbnail: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', title: 'How to Build Your First Investment Portfolio', creator: 'Anna Martinez', creatorAvatar: '👩‍🎓', views: '189K', uploadedAt: '1 month ago', duration: '15:22', verified: false },
-    { id: 3, thumbnail: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', title: 'Understanding ETFs: The Ultimate Guide', creator: 'Robert Kim', creatorAvatar: '👨‍💻', views: '421K', uploadedAt: '3 weeks ago', duration: '18:45', verified: true },
-    { id: 4, thumbnail: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', title: 'Dividend Investing 101: Passive Income Strategy', creator: 'Sophie Turner', creatorAvatar: '👩‍💼', views: '312K', uploadedAt: '1 week ago', duration: '14:56', verified: true },
-  ];
+  const displayedContent: ContentItem[] = useMemo(() => {
+    if (isSearching) {
+      return featuredContent.filter(item =>
+        matchesCreatorSearch({ title: item.title, creatorName: item.creator }, debouncedSearchQuery),
+      );
+    }
+    if (selectedFilter !== 'My Following') return featuredContent;
+    return featuredContent.filter(item => followedIds.has(nameToCreatorId(item.creator)));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSearching, debouncedSearchQuery, selectedFilter, followedIds]);
+
+  // Shared canonical video catalog (src/app/data/reels.ts) — same source the watch page and
+  // creator profile pages use, so video ids and creator links stay consistent across the app.
+  const videos = useMemo(() => {
+    if (!isSearching) return CREATOR_VIDEOS.slice(0, 4);
+    return CREATOR_VIDEOS.filter(video =>
+      matchesCreatorSearch(
+        { title: video.title, creatorName: getCreator(video.creator_id)?.name ?? video.creator_id },
+        debouncedSearchQuery,
+      ),
+    ).slice(0, 4);
+  }, [isSearching, debouncedSearchQuery]);
+
+  const hasAnySearchResults = displayedCreators.length > 0 || displayedContent.length > 0 || videos.length > 0;
+
+  const reelItems = featuredContent.filter(i => i.type === 'reel');
+
+  // Deep-link support for My Profile's Saved tab: ?openReel=<id> auto-opens that reel in this
+  // page's own player, then strips the param so it doesn't re-trigger on subsequent navigation
+  // (e.g. Up/Down browsing to a different reel, or closing and reopening the player).
+  useEffect(() => {
+    const openReelId = searchParams.get('openReel');
+    if (!openReelId) return;
+    const index = reelItems.findIndex(i => String(i.id) === openReelId);
+    if (index !== -1) setPlayingReelIndex(index);
+    const next = new URLSearchParams(searchParams);
+    next.delete('openReel');
+    setSearchParams(next, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
+  // First-time "Scroll for more" hint — replaces the old dedicated up/down nav buttons.
+  // Wheel/touch/keyboard navigation already exist below; the hint is just a one-time nudge
+  // so the affordance isn't lost when the buttons are removed.
+  const [showScrollHint, setShowScrollHint] = useState(false);
+  const touchStartYRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (playingReelIndex !== 0) return;
+    try {
+      if (localStorage.getItem('gazua:seen_reel_nav_hint')) return;
+    } catch {}
+    setShowScrollHint(true);
+    const timer = setTimeout(() => setShowScrollHint(false), 2500);
+    return () => clearTimeout(timer);
+  }, [playingReelIndex]);
+
+  const dismissScrollHint = () => {
+    if (!showScrollHint) return;
+    setShowScrollHint(false);
+    try { localStorage.setItem('gazua:seen_reel_nav_hint', '1'); } catch {}
+  };
+
+  // Advances to the next/previous reel, wrapping around in both directions for a true infinite loop.
+  // Driven by JS (not native scroll-snap) so it works reliably no matter where the cursor is over the modal.
+  const advanceReel = (direction: 1 | -1) => {
+    dismissScrollHint();
+    setPlayingReelIndex(prev => {
+      if (prev === null) return prev;
+      return (prev + direction + reelItems.length) % reelItems.length;
+    });
+  };
+
+  // Keyboard navigation (Up/Down to advance, Escape to close) — the direct replacement for
+  // the removed dedicated nav buttons on desktop.
+  useEffect(() => {
+    if (playingReelIndex === null) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowUp') { e.preventDefault(); advanceReel(-1); }
+      else if (e.key === 'ArrowDown') { e.preventDefault(); advanceReel(1); }
+      else if (e.key === 'Escape') { setPlayingReelIndex(null); }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playingReelIndex]);
+
+  const handleReelTouchStart = (e: TouchEvent) => {
+    touchStartYRef.current = e.touches[0].clientY;
+  };
+
+  const handleReelTouchEnd = (e: TouchEvent) => {
+    if (touchStartYRef.current === null) return;
+    const delta = touchStartYRef.current - e.changedTouches[0].clientY;
+    touchStartYRef.current = null;
+    if (Math.abs(delta) < 40) return;
+    advanceReel(delta > 0 ? 1 : -1);
+  };
+
+  const handleReelWheel = (e: WheelEvent) => {
+    e.preventDefault();
+    if (wheelLockRef.current || Math.abs(e.deltaY) < 10) return;
+    wheelLockRef.current = true;
+    advanceReel(e.deltaY > 0 ? 1 : -1);
+    setTimeout(() => { wheelLockRef.current = false; }, 500);
+  };
 
   const renderCreatorCard = (creator: Creator) => {
-    const isFollowing = followedCreators.has(creator.id);
+    const creatorSlug = nameToCreatorId(creator.name);
+    const followId = followTargetId(creator);
+    const isFollowing = isFollowingFn(followId);
+    // DB-backed creators always have a real profile route (getCreatorByUsername will find
+    // them); mock fallback creators only have one if they're in the small MOCK_CREATORS set.
+    const hasProfile = dbProfiles !== null ? true : !!getCreator(creatorSlug);
 
     return (
-      <div key={creator.id} className="flex-shrink-0 w-80 border border-gray-200 rounded-xl p-6 hover:border-gray-300 transition-colors bg-white">
+      <div key={creator.id} className="flex-shrink-0 w-[min(78vw,300px)] sm:w-80 border border-gray-200 rounded-xl p-6 hover:border-gray-300 transition-colors bg-white">
         <div className="flex items-start gap-4 mb-4">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-3xl flex-shrink-0">
+          <div
+            onClick={hasProfile ? () => navigate(`/profile/${creatorSlug}/investment`) : undefined}
+            className={`w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-3xl flex-shrink-0 ${hasProfile ? 'cursor-pointer hover:opacity-80 transition-opacity' : ''}`}
+          >
             {creator.avatar}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-bold text-lg truncate">{creator.name}</h3>
+              <h3
+                onClick={hasProfile ? () => navigate(`/profile/${creatorSlug}/investment`) : undefined}
+                className={`font-bold text-lg truncate ${hasProfile ? 'cursor-pointer hover:underline' : ''}`}
+              >
+                {creator.name}
+              </h3>
               {creator.verified && (
                 <svg className="w-5 h-5 text-[#00a86b] flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -131,8 +341,8 @@ export default function CreatorsPage() {
 
         <div className="flex items-center gap-2">
           <button
-            onClick={() => handleFollow(creator.id)}
-            className={`flex-1 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            onClick={() => toggleFollow(followId)}
+            className={`${hasProfile ? 'flex-1' : 'w-full'} px-4 py-2 rounded-full text-sm font-medium transition-colors ${
               isFollowing
                 ? 'bg-gray-200 text-black hover:bg-gray-300'
                 : 'bg-black text-white hover:bg-black/80'
@@ -140,20 +350,31 @@ export default function CreatorsPage() {
           >
             {isFollowing ? 'Following' : 'Follow'}
           </button>
-          <button
-            onClick={() => navigate('/profile/investment')}
-            className="flex-1 px-4 py-2 border border-gray-200 rounded-full text-sm font-medium hover:bg-gray-50 transition-colors"
-          >
-            View
-          </button>
+          {hasProfile && (
+            <button
+              onClick={() => navigate(`/profile/${creatorSlug}/investment`)}
+              className="flex-1 px-4 py-2 border border-gray-200 rounded-full text-sm font-medium hover:bg-gray-50 transition-colors"
+            >
+              View
+            </button>
+          )}
         </div>
       </div>
     );
   };
 
+  const handleContentClick = (item: ContentItem) => {
+    if (item.type === 'reel') setPlayingReelIndex(reelItems.findIndex(i => i.id === item.id));
+    else if (item.type === 'model') navigate('/models');
+    else navigate('/main');
+  };
+
   const renderContentCard = (item: ContentItem) => {
+    const contentCreatorSlug = nameToCreatorId(item.creator);
+    const contentHasProfile = !!getCreator(contentCreatorSlug);
+
     return (
-      <div key={item.id} className="flex-shrink-0 w-64 group cursor-pointer">
+      <div key={item.id} onClick={() => handleContentClick(item)} className="flex-shrink-0 w-[min(48vw,220px)] sm:w-64 group cursor-pointer">
         <div className="relative aspect-[9/16] rounded-xl overflow-hidden mb-3">
           <div
             className="absolute inset-0"
@@ -182,16 +403,21 @@ export default function CreatorsPage() {
         <h3 className="font-medium text-sm mb-1 group-hover:text-[#00a86b] transition-colors line-clamp-2">
           {item.title}
         </h3>
-        <p className="text-xs text-gray-600">
+        <p
+          onClick={contentHasProfile ? (e) => { e.stopPropagation(); navigate(`/profile/${contentCreatorSlug}/investment`); } : undefined}
+          className={`text-xs text-gray-600 ${contentHasProfile ? 'cursor-pointer hover:underline hover:text-black' : ''}`}
+        >
           {item.creator}
         </p>
       </div>
     );
   };
 
-  const renderVideoCard = (video: Video) => {
+  const renderVideoCard = (video: (typeof CREATOR_VIDEOS)[number]) => {
+    const videoCreator = getCreator(video.creator_id);
+
     return (
-      <div key={video.id} className="flex-shrink-0 w-80 group cursor-pointer">
+      <div key={video.id} onClick={() => navigate(`/watch/${video.id}`)} className="flex-shrink-0 w-[min(78vw,300px)] sm:w-80 group cursor-pointer">
         <div className="relative aspect-video rounded-xl overflow-hidden mb-3">
           <div
             className="absolute inset-0"
@@ -211,7 +437,7 @@ export default function CreatorsPage() {
 
         <div className="flex gap-3">
           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-lg flex-shrink-0">
-            {video.creatorAvatar}
+            {videoCreator?.avatar ?? '👤'}
           </div>
 
           <div className="flex-1 min-w-0">
@@ -219,15 +445,20 @@ export default function CreatorsPage() {
               {video.title}
             </h3>
             <div className="flex items-center gap-1 mb-0.5">
-              <p className="text-xs text-gray-600">{video.creator}</p>
-              {video.verified && (
+              <p
+                onClick={(e) => { e.stopPropagation(); navigate(`/profile/${video.creator_id}/videos`); }}
+                className="text-xs text-gray-600 cursor-pointer hover:underline hover:text-black"
+              >
+                {videoCreator?.name ?? video.creator_id}
+              </p>
+              {videoCreator?.verified && (
                 <svg className="w-3 h-3 text-gray-600" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               )}
             </div>
             <p className="text-xs text-gray-600">
-              {video.views} views • {video.uploadedAt}
+              {video.views} views • {video.uploaded_at}
             </p>
           </div>
         </div>
@@ -236,12 +467,15 @@ export default function CreatorsPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    <div className="h-screen flex flex-col bg-white">
       <AppHeader />
 
-      {/* Main Content */}
-      <div className="flex-1 overflow-y-auto bg-white">
-        <div className="max-w-[1600px] mx-auto px-6 py-12">
+      <div className="flex flex-1 min-h-0 items-stretch">
+        <CreatorsSidebar />
+
+        {/* Main Content */}
+        <div className={`flex-1 min-w-0 bg-white ${playingReelIndex !== null ? 'overflow-hidden' : 'overflow-y-auto'}`}>
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-12 max-sm:pb-28">
           {/* Hero */}
           <div className="text-center mb-8">
             <h1 className="text-5xl font-bold mb-4">Discover Finance Creators</h1>
@@ -250,12 +484,12 @@ export default function CreatorsPage() {
             </p>
 
             {/* Filter Tabs */}
-            <div className="flex items-center justify-center gap-3">
-              {(['All', 'Beginner', 'Intermediate', 'Advanced'] as const).map((filter) => (
+            <div className="flex items-center justify-center gap-3 max-sm:justify-start max-sm:overflow-x-auto max-sm:no-scrollbar max-sm:-mx-4 max-sm:px-4">
+              {(['All', 'Beginner', 'Intermediate', 'Advanced', 'My Following'] as const).map((filter) => (
                 <button
                   key={filter}
                   onClick={() => setSelectedFilter(filter)}
-                  className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all ${
+                  className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all shrink-0 ${
                     selectedFilter === filter
                       ? 'bg-black text-white'
                       : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300'
@@ -265,40 +499,228 @@ export default function CreatorsPage() {
                 </button>
               ))}
             </div>
+
+            {isSearching && (
+              <p className="text-sm text-gray-500 mt-4">
+                Showing results for <span className="font-medium text-black">"{debouncedSearchQuery}"</span>
+                {' · '}
+                <button onClick={clearSearch} className="text-[#00a86b] hover:underline">Clear</button>
+              </p>
+            )}
           </div>
 
-          {/* Featured Creators */}
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-center">Featured Creators</h2>
-            <div className="flex justify-center">
-              <div className="flex gap-4">
-                {featuredCreators.map(renderCreatorCard)}
-              </div>
-            </div>
-          </section>
+          {isSearching && !hasAnySearchResults ? (
+            <p className="text-center text-gray-500 text-sm py-12">
+              No results found for "{debouncedSearchQuery}"
+            </p>
+          ) : (
+            <>
+              {/* Featured Creators */}
+              {(!isSearching || displayedCreators.length > 0) && (
+                <section className="mb-12">
+                  <h2 className="text-2xl font-bold mb-6 text-center">{sectionTitle}</h2>
+                  {creatorsLoading ? (
+                    <div className="max-w-[1328px] mx-auto flex gap-4 overflow-x-auto pb-2 max-sm:-mx-4 max-sm:px-4" style={{ justifyContent: 'safe center' }}>
+                      {[1, 2, 3].map(n => (
+                        <div key={n} className="flex-shrink-0 w-[min(78vw,300px)] sm:w-80 border border-gray-200 rounded-xl p-6 animate-pulse">
+                          <div className="flex items-start gap-4 mb-4">
+                            <div className="w-16 h-16 rounded-full bg-gray-200 flex-shrink-0" />
+                            <div className="flex-1 space-y-2 pt-1">
+                              <div className="h-4 bg-gray-200 rounded w-2/3" />
+                              <div className="h-3 bg-gray-200 rounded w-full" />
+                            </div>
+                          </div>
+                          <div className="h-9 bg-gray-200 rounded-full" />
+                        </div>
+                      ))}
+                    </div>
+                  ) : selectedFilter === 'My Following' && !user && !isSearching ? (
+                    <p className="text-center text-gray-500 text-sm">Sign in to see your followed creators</p>
+                  ) : selectedFilter === 'My Following' && displayedCreators.length === 0 && !isSearching ? (
+                    <p className="text-center text-gray-500 text-sm">Follow creators to see them here</p>
+                  ) : (
+                    <div className="max-w-[1328px] mx-auto flex gap-4 overflow-x-auto pb-2 max-sm:-mx-4 max-sm:px-4" style={{ justifyContent: 'safe center' }}>
+                      {displayedCreators.map(renderCreatorCard)}
+                    </div>
+                  )}
+                </section>
+              )}
 
-          {/* Featured Content */}
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-center">Featured Content</h2>
-            <div className="flex justify-center">
-              <div className="flex gap-4">
-                {featuredContent.map(renderContentCard)}
-              </div>
-            </div>
-          </section>
+              {/* Featured Content */}
+              {(!isSearching || displayedContent.length > 0) && (
+                <section className="mb-12">
+                  <h2 className="text-2xl font-bold mb-6 text-center">Featured Content</h2>
+                  {selectedFilter === 'My Following' && !user && !isSearching ? (
+                    <p className="text-center text-gray-500 text-sm">Sign in to see your followed creators</p>
+                  ) : selectedFilter === 'My Following' && displayedContent.length === 0 && !isSearching ? (
+                    <p className="text-center text-gray-500 text-sm">Follow creators to see them here</p>
+                  ) : (
+                    <div className="max-w-[1344px] mx-auto flex gap-4 overflow-x-auto pb-2 max-sm:-mx-4 max-sm:px-4" style={{ justifyContent: 'safe center' }}>
+                      {displayedContent.map(renderContentCard)}
+                    </div>
+                  )}
+                </section>
+              )}
 
-          {/* Videos */}
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold mb-6 text-center">Videos</h2>
-            <div className="flex justify-center">
-              <div className="flex gap-4">
-                {videos.map(renderVideoCard)}
-              </div>
-            </div>
-          </section>
+              {/* Videos */}
+              {(!isSearching || videos.length > 0) && (
+                <section className="mb-12">
+                  <h2 className="text-2xl font-bold mb-6 text-center">Videos</h2>
+                  <div className="max-w-[1328px] mx-auto flex gap-4 overflow-x-auto pb-2 max-sm:-mx-4 max-sm:px-4" style={{ justifyContent: 'safe center' }}>
+                    {videos.map(renderVideoCard)}
+                  </div>
+                </section>
+              )}
+            </>
+          )}
+        </div>
         </div>
       </div>
 
+      {/* ── Reel Player — plays in-place on this page as a scrollable, YouTube-Shorts-style feed ── */}
+      {playingReelIndex !== null && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          onClick={() => setPlayingReelIndex(null)}
+          onWheel={handleReelWheel}
+          onTouchStart={handleReelTouchStart}
+          onTouchEnd={handleReelTouchEnd}
+        >
+          {(() => {
+            const reel = reelItems[playingReelIndex];
+            const reelCreatorSlug = nameToCreatorId(reel.creator);
+            const reelHasProfile = !!getCreator(reelCreatorSlug);
+            const isReelFollowed = isFollowingFn(reelCreatorSlug);
+            const isReelLiked = likedReelIds.has(reel.id);
+            const likeCount = seedFromId(reel.id, 800, 4000) + (isReelLiked ? 1 : 0);
+            const toggleReelLike = () => {
+              setLikedReelIds(prev => {
+                const next = new Set(prev);
+                next.has(reel.id) ? next.delete(reel.id) : next.add(reel.id);
+                return next;
+              });
+            };
+            const savedItem: SavedItemMeta = {
+              contentId: `creators-reels:${reel.id}`,
+              contentType: 'reel',
+              surface: 'creators-reels',
+              rawId: String(reel.id),
+              title: reel.title,
+              thumbnail: reel.thumbnail,
+              creatorName: reel.creator,
+              creatorId: reelHasProfile ? reelCreatorSlug : undefined,
+              meta: reel.views ? `${reel.views} views` : undefined,
+            };
+
+            return (
+              <>
+              <div
+                className="relative w-[min(24rem,calc(100vw-2rem))] h-[85vh] rounded-2xl overflow-hidden"
+                style={{ background: reel.thumbnail }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div key={reel.id} className="absolute inset-0">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
+
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                      <PlayArrowIcon sx={{ fontSize: 40, color: '#ffffff' }} />
+                    </div>
+                  </div>
+
+                  {reel.duration && (
+                    <div className="absolute top-3 left-3 bg-black/50 text-white text-xs font-medium px-2 py-1 rounded">
+                      {reel.duration}
+                    </div>
+                  )}
+
+                  <div className="absolute bottom-5 left-4 right-16 z-10">
+                    <h3 className="text-white font-bold text-base mb-1">{reel.title}</h3>
+                    <div className="flex items-center gap-2 mb-2">
+                      <button
+                        onClick={reelHasProfile ? () => { setPlayingReelIndex(null); navigate(`/profile/${reelCreatorSlug}/investment`); } : undefined}
+                        className={`text-white/90 text-sm font-medium ${reelHasProfile ? 'hover:underline' : ''}`}
+                      >
+                        {reel.creator}
+                      </button>
+                      {reelHasProfile && (
+                        <button
+                          onClick={() => toggleFollow(reelCreatorSlug)}
+                          className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                            isReelFollowed ? 'bg-white/20 text-white' : 'bg-white text-black hover:bg-white/90'
+                          }`}
+                        >
+                          {isReelFollowed ? 'Following' : 'Follow'}
+                        </button>
+                      )}
+                    </div>
+                    {reel.views && <p className="text-white/70 text-xs mb-2">{reel.views} views</p>}
+                    <p className="text-white/60 text-xs">🎬 Reel playback coming soon</p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setPlayingReelIndex(null)}
+                  className="absolute top-3 right-3 z-20 w-9 h-9 bg-black/50 rounded-full flex items-center justify-center hover:bg-black/70 transition-colors"
+                >
+                  <CloseIcon sx={{ fontSize: 18, color: '#ffffff' }} />
+                </button>
+
+                {/* First-time nudge — replaces the old dedicated up/down nav buttons, which
+                    were removed since wheel/touch/keyboard navigation already cover this. */}
+                {playingReelIndex === 0 && (
+                  <div
+                    className={`absolute inset-x-0 top-1/2 -translate-y-1/2 z-10 flex justify-center pointer-events-none transition-opacity duration-500 ${
+                      showScrollHint ? 'opacity-100' : 'opacity-0'
+                    }`}
+                  >
+                    <span className="px-3 py-1.5 bg-black/50 rounded-full text-white/90 text-xs font-medium">
+                      Scroll for more
+                    </span>
+                  </div>
+                )}
+
+                {/* Engagement rail — same shared components/state pattern as the main Reels
+                    feed and the video watch page. All local/mock: this preview modal's reel
+                    items have no db_id or ticker field to back real Like/Watchlist actions. */}
+                <ReelEngagementActions
+                  contentId={String(reel.id)}
+                  isLiked={isReelLiked}
+                  likeCount={likeCount}
+                  onToggleLike={toggleReelLike}
+                  commentSeed={seedFromId(reel.id, 5, 60)}
+                  commentsContentType="reel"
+                  commentsContentDbId={null}
+                  shareUrl={window.location.href}
+                  shareTitle={reel.title}
+                  onToast={(msg, subtitle) => toast(msg, subtitle ? { description: subtitle } : undefined)}
+                  commentsPortalTarget={commentsPortalEl}
+                  onCommentPanelOpenChange={setIsCommentsOpen}
+                  railClassName="absolute right-3 top-1/2 -translate-y-1/2 z-20"
+                  savedItem={savedItem}
+                />
+              </div>
+
+              {/* Desktop adjacent comments panel slot. Deliberately position:absolute and
+                  positioned via a calc() anchored to viewport-center — NOT a flex sibling of
+                  the reel card. The reel above is centered purely by the backdrop's own
+                  flex centering, so it never shifts regardless of whether this panel is
+                  open, closed, or changes size; this panel independently places itself in
+                  the empty space to the reel's right. */}
+              <div
+                ref={setCommentsPortalEl}
+                className={
+                  isCommentsOpen
+                    ? 'hidden lg:block absolute top-1/2 -translate-y-1/2 left-[calc(50%+13rem)] z-10 w-[360px] h-[85vh]'
+                    : 'hidden'
+                }
+                onClick={(e) => e.stopPropagation()}
+              />
+              </>
+            );
+          })()}
+        </div>
+      )}
     </div>
   );
 }
