@@ -1,0 +1,173 @@
+import { useState } from 'react';
+import { useNavigate, useLocation, useSearchParams } from 'react-router';
+import SearchIcon from '@mui/icons-material/Search';
+import CloseIcon from '@mui/icons-material/Close';
+import HomeIcon from '@mui/icons-material/Home';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import PeopleIcon from '@mui/icons-material/People';
+import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
+import PersonIcon from '@mui/icons-material/Person';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import SettingsIcon from '@mui/icons-material/Settings';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import SearchModal from './SearchModal';
+
+export default function AppHeader() {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const ticker = searchParams.get('ticker')?.toUpperCase() ?? null;
+
+
+  const active = (paths: string[]) =>
+    paths.some(p => pathname === p || pathname.startsWith(p + '/'));
+
+  const cls = (paths: string[]) =>
+    `hover:opacity-70 transition-opacity ${active(paths) ? 'text-[#00a86b]' : ''}`;
+
+  return (
+    <>
+      {/* Announcement banner — desktop only */}
+      <div className="hidden lg:block bg-[#7CFFB2] py-2 px-4 text-center text-sm font-medium border-b border-black/10 shrink-0">
+        Learn from verified creators, track your investment thesis, and build real conviction.
+      </div>
+
+      {/* Mobile top bar */}
+      <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 shrink-0">
+        <h1
+          onClick={() => navigate('/main')}
+          className="text-xl font-bold tracking-tight cursor-pointer"
+        >
+          Gazua
+        </h1>
+        <div className="flex items-center gap-2">
+          {ticker && (
+            <div className="flex items-center gap-1 px-2.5 py-1 bg-blue-50 border border-blue-200 text-blue-700 text-sm font-semibold rounded-full">
+              <span>${ticker}</span>
+              <button
+                onClick={() => setSearchParams({})}
+                className="flex items-center hover:text-blue-900"
+                aria-label="Clear ticker filter"
+              >
+                <CloseIcon sx={{ fontSize: 14 }} />
+              </button>
+            </div>
+          )}
+          <button
+            onClick={() => setShowSearch(true)}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            aria-label="Search"
+          >
+            <SearchIcon sx={{ fontSize: 22 }} />
+          </button>
+        </div>
+      </div>
+
+      {/* Desktop header */}
+      <header className="hidden lg:block border-b border-gray-200 bg-white shrink-0">
+        <div className="px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-8">
+            <h1
+              onClick={() => navigate('/main')}
+              className="text-2xl font-bold tracking-tight cursor-pointer"
+            >
+              Gazua
+            </h1>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowSearch(true)}
+                className="relative flex items-center w-80"
+              >
+                <SearchIcon
+                  sx={{
+                    position: 'absolute',
+                    left: 12,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    fontSize: 16,
+                    color: '#9ca3af',
+                  }}
+                />
+                <div className="pl-10 pr-4 py-2 w-full border border-gray-200 rounded-full text-sm text-left text-gray-500 hover:border-gray-300 transition-colors cursor-pointer">
+                  Search
+                </div>
+              </button>
+              {ticker && (
+                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 border border-blue-200 text-blue-700 text-sm font-semibold rounded-full whitespace-nowrap">
+                  <span>${ticker}</span>
+                  <button
+                    onClick={() => setSearchParams({})}
+                    className="ml-0.5 hover:text-blue-900 flex items-center"
+                    aria-label="Clear ticker filter"
+                  >
+                    <CloseIcon sx={{ fontSize: 14 }} />
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <nav className="flex items-center gap-6 text-sm font-medium">
+            <button onClick={() => navigate('/main')} className={cls(['/main', '/home'])}>
+              Home
+            </button>
+            <button onClick={() => navigate('/creators')} className={cls(['/creators', '/profile'])}>
+              Creators
+            </button>
+            <button onClick={() => navigate('/insights')} className={cls(['/insights'])}>
+              My Profile
+            </button>
+            <button onClick={() => navigate('/account')} className={cls(['/account'])}>
+              Account
+            </button>
+          </nav>
+        </div>
+      </header>
+
+      {/* Mobile bottom nav */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30">
+        <div className="flex items-center justify-around h-16">
+          <button
+            onClick={() => navigate('/main')}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/main', '/home']) ? 'text-[#00a86b]' : 'text-gray-500'}`}
+          >
+            {active(['/main', '/home'])
+              ? <HomeIcon sx={{ fontSize: 24 }} />
+              : <HomeOutlinedIcon sx={{ fontSize: 24 }} />}
+            <span className="text-[10px] font-medium">Home</span>
+          </button>
+          <button
+            onClick={() => navigate('/creators')}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/creators', '/profile']) ? 'text-[#00a86b]' : 'text-gray-500'}`}
+          >
+            {active(['/creators', '/profile'])
+              ? <PeopleIcon sx={{ fontSize: 24 }} />
+              : <PeopleOutlinedIcon sx={{ fontSize: 24 }} />}
+            <span className="text-[10px] font-medium">Creators</span>
+          </button>
+          <button
+            onClick={() => navigate('/insights')}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/insights']) ? 'text-[#00a86b]' : 'text-gray-500'}`}
+          >
+            {active(['/insights'])
+              ? <PersonIcon sx={{ fontSize: 24 }} />
+              : <PersonOutlineIcon sx={{ fontSize: 24 }} />}
+            <span className="text-[10px] font-medium">Profile</span>
+          </button>
+          <button
+            onClick={() => navigate('/account')}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/account']) ? 'text-[#00a86b]' : 'text-gray-500'}`}
+          >
+            {active(['/account'])
+              ? <SettingsIcon sx={{ fontSize: 24 }} />
+              : <SettingsOutlinedIcon sx={{ fontSize: 24 }} />}
+            <span className="text-[10px] font-medium">Account</span>
+          </button>
+        </div>
+      </nav>
+
+      {showSearch && <SearchModal onClose={() => setShowSearch(false)} />}
+    </>
+  );
+}

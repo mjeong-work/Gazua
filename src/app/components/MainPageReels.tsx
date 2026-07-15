@@ -1,0 +1,671 @@
+import { useState, useMemo, useRef, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router';
+import FavoriteIcon from '@mui/icons-material/Favorite';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import ShareIcon from '@mui/icons-material/Share';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+import AppHeader from './AppHeader';
+import CreateReelModal from './CreateReelModal';
+import { MOCK_REELS, type Reel } from '../data/reels';
+import { getReels, getReelsByTicker, getReelsByCreatorIds, likeReel, unlikeReel, getUserLikedReelIds } from '../../lib/services/reels.service';
+import type { ReelWithCreator as DbReel } from '../../types/database';
+import { useFollow, isUUID } from '../contexts/FollowContext';
+import { useAuth } from '../contexts/AuthContext';
+import { MARKET_INDICES, TICKER_CHART_DATA } from '../data/marketData';
+import { getMarketIndices, getTickerInfo, getTickerChart, type LiveTickerInfo } from '../../lib/market.service';
+import type { MarketIndex } from '../data/marketData';
+import { useWatchlist } from '../contexts/WatchlistContext';
+import { getCreator } from '../data/creators';
+import { useSwipePanel } from '../hooks/useSwipePanel';
+import ReportButton from './compliance/ReportButton';
+
+type TimeRange = '1D' | '1W' | '1M' | '3M' | '1Y' | 'ALL';
+
+function formatCount(n: number): string {
+  return n >= 1000 ? `${(n / 1000).toFixed(1)}K` : String(n);
+}
+
+// Fallback gradients used when the DB reel has no thumbnail_url yet.
+const FALLBACK_GRADIENTS = [
+  'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+  'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+  'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+  'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+];
+
+function normalizeDbReel(r: DbReel, index: number): Reel {
+  return {
+    id: index,
+    db_id: r.id,   // preserve Supabase UUID for like persistence
+    creator: r.creator.full_name,
+    creator_id: r.creator.username,          // used for navigation
+    creator_db_id: r.creator.id,             // UUID — used for follow operations
+    handle: r.creator.handle ? `@${r.creator.handle}` : `@${r.creator.username}`,
+    avatar: (r.creator.full_name?.[0] ?? '?').toUpperCase(),
+    verified: r.creator.is_verified,
+    caption: r.caption,
+    thumbnail: r.thumbnail_url ?? FALLBACK_GRADIENTS[index % FALLBACK_GRADIENTS.length],
+    likes: r.like_count,
+    comments: 0,
+    shares: r.share_count,
+    tickers: r.tickers,
+  };
+}
+
+export default function MainPageReels() {
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const ticker = searchParams.get('ticker')?.toUpperCase() ?? null;
+
+  const [activeTab, setActiveTab] = useState<'posting' | 'reels' | 'following'>('reels');
+  const { addToWatchlist, removeBySource, isSaved } = useWatchlist();
+
+  const { user } = useAuth();
+  // ── Follow state ───────────────────────────────────────────────────
+  const { followedIds, isFollowing: isFollowingFn, toggleFollow, isLoading: followLoading } = useFollow();
+  const [followingReels, setFollowingReels] = useState<Reel[] | null>(null);
+  const [followingReelsLoading, setFollowingReelsLoading] = useState(false);
+
+  // Like state — keyed by db_id (UUID) for DB reels, or 'local-{id}' for mock reels.
+  const [likedReels, setLikedReels] = useState<Set<string>>(() => {
+    try {
+      const saved = localStorage.getItem('gazua:local_reel_likes');
+      return new Set(saved ? (JSON.parse(saved) as string[]) : []);
+    } catch { return new Set(); }
+  });
+  const [activeIndex, setActiveIndex] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [activeTimeRange, setActiveTimeRange] = useState<TimeRange>('1M');
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastSubtitle, setToastSubtitle] = useState('');
+  const [showCreateReel, setShowCreateReel] = useState(false);
+  const { isPanelOpen, openPanel, closePanel, swipeHandlers } = useSwipePanel();
+
+  const [liveIndices, setLiveIndices] = useState<MarketIndex[]>(MARKET_INDICES);
+  const [indicesLoading, setIndicesLoading] = useState(true);
+  const [defaultInfo, setDefaultInfo] = useState<LiveTickerInfo | null>(null);
+  const [defaultChartData, setDefaultChartData] = useState<{ time: string; value: number }[] | null>(null);
+  const [liveTickerInfo, setLiveTickerInfo] = useState<LiveTickerInfo | null>(null);
+  const [liveChartData, setLiveChartData] = useState<{ time: string; value: number }[] | null>(null);
+
+  useEffect(() => {
+    setIndicesLoading(true);
+    getMarketIndices().then(d => { setLiveIndices(d); setIndicesLoading(false); });
+    getTickerInfo('SPY').then(setDefaultInfo);
+  }, []);
+
+  useEffect(() => {
+    if (!ticker) { setLiveTickerInfo(null); return; }
+    getTickerInfo(ticker).then(setLiveTickerInfo);
+  }, [ticker]);
+
+  useEffect(() => {
+    const target = ticker ?? 'SPY';
+    getTickerChart(target, activeTimeRange).then(data => {
+      if (ticker) setLiveChartData(data);
+      else setDefaultChartData(data);
+    });
+  }, [ticker, activeTimeRange]);
+
+  const tickerInfo = liveTickerInfo ?? defaultInfo;
+
+  // Supabase-backed reel data. null = not yet resolved (use mock fallback).
+  const [dbReels, setDbReels] = useState<Reel[] | null>(null);
+  const [reelsLoading, setReelsLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setReelsLoading(true);
+
+    const fetch = ticker
+      ? getReelsByTicker(ticker, 20)
+      : getReels({ limit: 20 });
+
+    fetch.then(({ data, error }) => {
+      if (cancelled) return;
+      setReelsLoading(false);
+      if (error || !data || data.length === 0) {
+        setDbReels(null); // signal: use mock fallback
+        return;
+      }
+      setDbReels(data.map(normalizeDbReel));
+    });
+
+    return () => { cancelled = true; };
+  }, [ticker]);
+
+  // ── Load reels for the Following tab ──────────────────────────────
+  // Re-runs when the user switches to the following tab or changes their follow list.
+  const followedIdsKey = Array.from(followedIds).sort().join(',');
+  useEffect(() => {
+    if (activeTab !== 'following') return;
+    if (followLoading) return;
+
+    // Only pass valid Supabase UUIDs — local mock-creator slugs/IDs are not
+    // stored in the reels table and would cause a Supabase type error.
+    const dbCreatorIds = Array.from(followedIds).filter(isUUID);
+    if (!dbCreatorIds.length) {
+      setFollowingReels([]);
+      return;
+    }
+
+    let cancelled = false;
+    setFollowingReelsLoading(true);
+
+    getReelsByCreatorIds(dbCreatorIds).then(({ data }) => {
+      if (cancelled) return;
+      setFollowingReels(data ? data.map(normalizeDbReel) : []);
+      setFollowingReelsLoading(false);
+    });
+
+    return () => { cancelled = true; };
+  }, [activeTab, followedIdsKey, followLoading]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const filteredReels = useMemo((): Reel[] => {
+    // Supabase returned real data — already filtered at the DB level.
+    if (dbReels !== null) return dbReels;
+
+    // Fallback: client-side filter over mock data.
+    if (!ticker) return MOCK_REELS;
+    return MOCK_REELS.filter(reel =>
+      reel.tickers.map(t => t.toUpperCase()).includes(ticker)
+    );
+  }, [dbReels, ticker]);
+
+  const triggerToast = (message: string, subtitle = '') => {
+    setToastMessage(message);
+    setToastSubtitle(subtitle);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
+
+  const handleScroll = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const idx = Math.round(el.scrollTop / el.clientHeight);
+    if (idx !== activeIndex) setActiveIndex(idx);
+  };
+
+  // Helper: stable key per reel
+  const getLikeKey = (reel: Reel) => reel.db_id ?? `local-${reel.id}`;
+
+  // On login: hydrate liked reels from Supabase
+  useEffect(() => {
+    if (!user) return;
+    getUserLikedReelIds(user.id).then(({ data }) => {
+      if (!data?.length) return;
+      setLikedReels(prev => new Set([...prev, ...data]));
+    });
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Keep localStorage in sync (only non-UUID keys)
+  useEffect(() => {
+    try {
+      const local = [...likedReels].filter(k => !isUUID(k));
+      localStorage.setItem('gazua:local_reel_likes', JSON.stringify(local));
+    } catch {}
+  }, [likedReels]);
+
+  const toggleLike = async (reel: Reel) => {
+    const key = getLikeKey(reel);
+    const wasLiked = likedReels.has(key);
+
+    // Optimistic update
+    setLikedReels(prev => {
+      const next = new Set(prev);
+      wasLiked ? next.delete(key) : next.add(key);
+      return next;
+    });
+
+    // Persist to Supabase for DB-backed reels
+    if (reel.db_id && user) {
+      const { error } = wasLiked
+        ? await unlikeReel(reel.db_id, user.id)
+        : await likeReel(reel.db_id, user.id);
+      if (error) {
+        console.error('[Like] reel toggle failed:', error);
+        setLikedReels(prev => {
+          const next = new Set(prev);
+          wasLiked ? next.add(key) : next.delete(key);
+          return next;
+        });
+      }
+    }
+  };
+
+  const handleSaveToWatchlist = (reel: Reel) => {
+    if (!isSaved('reel', reel.id)) {
+      const ticker = reel.tickers[0] ?? reel.caption.match(/#([A-Za-z]{1,5})\b/)?.[1]?.toUpperCase() ?? '';
+      if (!ticker) {
+        triggerToast('Could not identify a ticker in this reel');
+        return;
+      }
+      addToWatchlist({
+        ticker,
+        name: reel.caption.substring(0, 60),
+        assetType: 'Strategy',
+        source_type: 'reel',
+        source_content_id: reel.id,
+        source: `Saved from reel by ${reel.creator}`,
+      });
+      triggerToast('Saved to Watchlist', 'Build your thesis in the Watchlist tab');
+    } else {
+      removeBySource('reel', reel.id);
+      triggerToast('Removed from Watchlist');
+    }
+  };
+
+  const chartData = useMemo(() => {
+    if (liveChartData) return liveChartData;
+    if (defaultChartData) return defaultChartData;
+    if (tickerInfo && 'chartData' in tickerInfo) return (tickerInfo as typeof TICKER_CHART_DATA[string]).chartData;
+    return Array.from({ length: 30 }, (_, i) => ({
+      time: `t${i}`,
+      value: 4800 + Math.random() * 400 + i * 10,
+    }));
+  }, [liveChartData, defaultChartData, tickerInfo]);
+
+  const timeRanges: TimeRange[] = ['1D', '1W', '1M', '3M', '1Y', 'ALL'];
+
+  const postingPath = ticker ? `/main?ticker=${ticker}` : '/main';
+
+  return (
+    <div className="h-[100dvh] flex flex-col bg-white">
+      <AppHeader />
+
+      <div
+        className="flex-1 overflow-hidden relative"
+        {...swipeHandlers}
+      >
+        {/* Mobile backdrop */}
+        <div
+          className={`absolute inset-0 z-10 transition-opacity duration-300 lg:hidden ${
+            isPanelOpen ? 'bg-black/40 pointer-events-auto' : 'bg-transparent pointer-events-none opacity-0'
+          }`}
+          onClick={closePanel}
+        />
+
+        <div className="h-full lg:max-w-[1600px] lg:mx-auto lg:flex lg:px-6">
+          {/* Left Panel - Market Overview */}
+          {/* Mobile: absolute overlay sliding in from left. Desktop: static flex child. */}
+          <div
+            className={[
+              'absolute inset-y-0 left-0 w-[85vw] z-20 bg-white overflow-y-auto',
+              'border-r border-gray-200 px-6 pt-4 pb-20',
+              'transition-transform duration-300 ease-in-out',
+              isPanelOpen ? 'translate-x-0' : '-translate-x-full',
+              'lg:static lg:inset-auto lg:z-auto lg:flex-1 lg:translate-x-0 lg:pb-6',
+            ].join(' ')}
+          >
+            <div className="mb-6">
+              <div className="flex items-baseline gap-2 mb-1">
+                <h2 className="text-3xl font-bold">
+                  {tickerInfo?.price ?? '—'}
+                </h2>
+                <span className={`text-sm font-medium ${tickerInfo ? (tickerInfo.positive ? 'text-[#00a86b]' : 'text-red-500') : 'text-gray-400'}`}>
+                  {tickerInfo ? `${tickerInfo.changeAmt} (${tickerInfo.change})` : ''}
+                </span>
+              </div>
+              <p className="text-sm text-gray-600">
+                {ticker ? `$${ticker}` : 'S&P 500'}
+              </p>
+            </div>
+
+            {/* Chart */}
+            <div className="mb-6 bg-white rounded-xl w-full">
+              <div className="h-64 w-full">
+                <ResponsiveContainer width="100%" height={256}>
+                  <LineChart data={chartData}>
+                    <XAxis dataKey="time" hide />
+                    <YAxis hide domain={['dataMin', 'dataMax']} />
+                    <Line
+                      type="monotone"
+                      dataKey="value"
+                      stroke={tickerInfo && !tickerInfo.positive ? '#ef4444' : '#00a86b'}
+                      strokeWidth={2}
+                      dot={false}
+                      isAnimationActive={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="flex items-center justify-center gap-4 py-4 text-xs">
+                {timeRanges.map(range => (
+                  <button
+                    key={range}
+                    onClick={() => setActiveTimeRange(range)}
+                    className={`px-3 py-1 rounded transition-colors ${
+                      activeTimeRange === range
+                        ? 'bg-black text-white'
+                        : 'hover:bg-gray-100 text-gray-600'
+                    }`}
+                  >
+                    {range}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* KPI Cards */}
+            <div className="space-y-3">
+              {indicesLoading
+                ? [1, 2, 3, 4].map(n => (
+                    <div key={n} className="p-4 bg-gray-50 rounded-lg animate-pulse">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="h-3 bg-gray-200 rounded w-20" />
+                        <div className="h-3 bg-gray-200 rounded w-12" />
+                      </div>
+                      <div className="h-5 bg-gray-200 rounded w-24" />
+                    </div>
+                  ))
+                : liveIndices.map(index => (
+                    <div key={index.id} className="p-4 bg-gray-50 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">{index.name}</span>
+                        <span className={`text-xs font-medium ${index.positive ? 'text-[#00a86b]' : 'text-red-500'}`}>{index.change}</span>
+                      </div>
+                      <p className="text-xl font-bold mt-1">{index.value}</p>
+                    </div>
+                  ))
+              }
+            </div>
+
+            {/* Ad Banner */}
+            <div className="mt-6 p-4 bg-[#7CFFB2] rounded-lg">
+              <h3 className="font-bold mb-1">Get more out of Gazua</h3>
+              <p className="text-sm mb-3">Options let you hedge, generate income, or trade based on your market outlook.</p>
+              <button className="text-sm font-medium underline">Learn More</button>
+            </div>
+          </div>
+
+          {/* Right Panel - Reels */}
+          <div className="h-full w-full bg-black relative flex flex-col lg:w-[480px]">
+            {/* Drag handle — mobile only */}
+            <button
+              onClick={openPanel}
+              aria-label="Show market chart"
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-30 lg:hidden
+                         w-5 h-14 bg-white/20 rounded-r-full border border-l-0 border-white/20
+                         flex flex-col items-center justify-center gap-1"
+            >
+              <span className="block w-0.5 h-3 bg-white/60 rounded-full" />
+              <span className="block w-0.5 h-3 bg-white/60 rounded-full" />
+              <span className="block w-0.5 h-3 bg-white/60 rounded-full" />
+            </button>
+
+            {/* Tabs — fixed above the scroll container */}
+            <div className="absolute top-0 left-0 right-0 bg-gradient-to-b from-black/60 to-transparent px-6 pt-6 pb-12 z-30 pointer-events-none">
+              <div className="flex gap-4 pointer-events-auto">
+                <button
+                  onClick={() => { setActiveTab('posting'); navigate(postingPath); }}
+                  className={`pb-3 px-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'posting' ? 'border-white text-white' : 'border-transparent text-white/70 hover:text-white'}`}
+                >
+                  Posting
+                </button>
+                <button
+                  onClick={() => setActiveTab('reels')}
+                  className={`pb-3 px-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'reels' ? 'border-white text-white' : 'border-transparent text-white/70 hover:text-white'}`}
+                >
+                  Reels
+                </button>
+                <button
+                  onClick={() => setActiveTab('following')}
+                  className={`pb-3 px-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'following' ? 'border-white text-white' : 'border-transparent text-white/70 hover:text-white'}`}
+                >
+                  Following
+                </button>
+              </div>
+            </div>
+
+            {/* Vertical scroll container */}
+            {/* ── Following tab: no followed creators yet ─────────── */}
+            {activeTab === 'following' && !followLoading && followedIds.size === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-center px-8">
+                <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mb-6">
+                  <svg className="w-10 h-10 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Follow Creators to See Their Reels</h3>
+                <p className="text-white/60 text-sm mb-6 max-w-xs">When you follow creators, their reels will appear here.</p>
+                <button
+                  onClick={() => setActiveTab('reels')}
+                  className="px-6 py-2.5 bg-white text-black font-bold text-sm rounded-full hover:bg-white/90 transition-colors"
+                >
+                  Explore All Reels
+                </button>
+              </div>
+            ) : (activeTab === 'following' ? followLoading || followingReelsLoading : reelsLoading) ? (
+              <div className="h-full flex items-center justify-center">
+                <div className="flex flex-col items-center gap-3 text-white/60">
+                  <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span className="text-sm">Loading reels…</span>
+                </div>
+              </div>
+            ) : activeTab === 'following' && followingReels !== null && followingReels.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-center px-8">
+                <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mb-6">
+                  <svg className="w-10 h-10 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.069A1 1 0 0121 8.82v6.36a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">No Reels Yet</h3>
+                <p className="text-white/60 text-sm mb-6 max-w-xs">The creators you follow haven't posted any reels yet. Check back soon!</p>
+                <button
+                  onClick={() => setActiveTab('reels')}
+                  className="px-6 py-2.5 bg-white text-black font-bold text-sm rounded-full hover:bg-white/90 transition-colors"
+                >
+                  Explore All Reels
+                </button>
+              </div>
+            ) : activeTab === 'reels' && filteredReels.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-center px-8">
+                <p className="text-white/70 text-sm mb-3">
+                  No reels tagged <span className="font-semibold text-white">${ticker}</span> yet.
+                </p>
+                <button
+                  onClick={() => setSearchParams({})}
+                  className="text-sm text-white/70 underline hover:text-white transition-colors"
+                >
+                  Clear filter
+                </button>
+              </div>
+            ) : (
+              <div
+                ref={scrollRef}
+                onScroll={handleScroll}
+                className="h-full overflow-y-scroll snap-y snap-mandatory"
+              >
+                {(activeTab === 'following' ? (followingReels ?? []) : filteredReels).map((reel) => {
+                  const isLiked = likedReels.has(getLikeKey(reel));
+                  const isSavedReel = isSaved('reel', reel.id);
+                  const hasProfile = !!getCreator(reel.creator_id);
+                  const likeCount = reel.likes + (isLiked ? 1 : 0);
+                  // UUID used for follow operations; falls back to undefined for mock reels
+                  const followId = reel.creator_db_id;
+                  const isReelCreatorFollowed = followId ? isFollowingFn(followId) : false;
+
+                  return (
+                    <div
+                      key={reel.id}
+                      className="relative h-full w-full overflow-hidden snap-start flex items-center justify-center"
+                    >
+                      {/* Thumbnail background */}
+                      <div className="absolute inset-0" style={{ background: reel.thumbnail }}>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40" />
+                      </div>
+
+                      {/* Play icon placeholder */}
+                      <div className="relative z-10 text-white text-center">
+                        <div className="w-32 h-32 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mb-4 mx-auto">
+                          <VideoLibraryIcon sx={{ fontSize: 64, color: '#ffffff' }} />
+                        </div>
+                        <p className="text-sm opacity-70">Investment Education Reel</p>
+                      </div>
+
+                      {/* Creator info overlay — bottom-20 clears the 64px mobile bottom nav */}
+                      <div className="absolute bottom-20 left-3 right-16 z-20 lg:bottom-10 lg:left-8 lg:right-24">
+                        <div className="max-w-md">
+                          <div className="flex items-center gap-3 mb-3">
+                            <button
+                              onClick={() => navigate(`/profile/${reel.creator_id}/videos`)}
+                              className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-2xl hover:opacity-80"
+                            >
+                              {reel.avatar}
+                            </button>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => navigate(`/profile/${reel.creator_id}/videos`)}
+                                  className="font-bold text-white hover:underline"
+                                >
+                                  {reel.creator}
+                                </button>
+                                {reel.verified && (
+                                  <span title="Portfolio allocation verified by Gazua" className="inline-flex">
+                                    <svg className="w-4 h-4 text-[#7CFFB2]" viewBox="0 0 24 24" fill="currentColor">
+                                      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                  </span>
+                                )}
+                              </div>
+                              <button
+                                onClick={() => navigate(`/profile/${reel.creator_id}/videos`)}
+                                className="text-sm text-white/70 hover:underline text-left"
+                              >
+                                {reel.handle}
+                              </button>
+                            </div>
+                            <button
+                              onClick={() => followId && toggleFollow(followId)}
+                              className={`px-6 py-2 font-bold text-sm rounded-full transition-colors ${
+                                isReelCreatorFollowed
+                                  ? 'bg-white/20 text-white border border-white/40 hover:bg-white/30'
+                                  : 'bg-white text-black hover:bg-white/90'
+                              }`}
+                            >
+                              {isReelCreatorFollowed ? 'Following' : 'Follow'}
+                            </button>
+                          </div>
+                          <p className="text-white text-sm leading-relaxed">{reel.caption}</p>
+                          {hasProfile && (
+                            <button
+                              onClick={() => navigate(`/profile/${reel.creator_id}/investment`)}
+                              className="text-xs text-[#7CFFB2] hover:underline mt-2 block"
+                            >
+                              See {reel.creator}'s portfolio →
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Interaction buttons */}
+                      <div className="absolute right-3 bottom-24 flex flex-col gap-4 items-center z-20 lg:right-6 lg:bottom-32 lg:gap-6">
+                        <button
+                          onClick={() => toggleLike(reel)}
+                          className="flex flex-col items-center gap-1 text-white hover:scale-110 transition-transform"
+                        >
+                          <div className={`w-12 h-12 rounded-full backdrop-blur-sm flex items-center justify-center ${isLiked ? 'bg-red-500' : 'bg-white/20'}`}>
+                            {isLiked
+                              ? <FavoriteIcon sx={{ fontSize: 24, color: '#fff' }} />
+                              : <FavoriteBorderIcon sx={{ fontSize: 24, color: '#fff' }} />
+                            }
+                          </div>
+                          <span className="text-xs font-medium">{formatCount(likeCount)}</span>
+                        </button>
+                        <button
+                          onClick={() => triggerToast('💬 Comments coming soon')}
+                          className="flex flex-col items-center gap-1 text-white hover:scale-110 transition-transform"
+                        >
+                          <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                            <ChatBubbleOutlineIcon sx={{ fontSize: 24, color: '#ffffff' }} />
+                          </div>
+                          <span className="text-xs font-medium">{formatCount(reel.comments)}</span>
+                        </button>
+                        <button
+                          onClick={() => triggerToast('🔗 Share coming soon')}
+                          className="flex flex-col items-center gap-1 text-white hover:scale-110 transition-transform"
+                        >
+                          <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                            <ShareIcon sx={{ fontSize: 24, color: '#ffffff' }} />
+                          </div>
+                          <span className="text-xs font-medium">{formatCount(reel.shares)}</span>
+                        </button>
+                        <button
+                          onClick={() => handleSaveToWatchlist(reel)}
+                          className="flex flex-col items-center gap-1 text-white hover:scale-110 transition-transform"
+                          title="Save to Watchlist"
+                        >
+                          <div className={`w-12 h-12 rounded-full ${isSavedReel ? 'bg-[#7CFFB2]' : 'bg-white/20'} backdrop-blur-sm flex items-center justify-center`}>
+                            {isSavedReel
+                              ? <BookmarkIcon sx={{ fontSize: 24, color: '#000000' }} />
+                              : <AddCircleOutlineIcon sx={{ fontSize: 24, color: '#ffffff' }} />
+                            }
+                          </div>
+                          {isSavedReel && <span className="text-[10px] font-medium">Saved</span>}
+                        </button>
+                        <button
+                          onClick={() => triggerToast('More options coming soon')}
+                          className="flex flex-col items-center gap-1 text-white hover:scale-110 transition-transform"
+                        >
+                          <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                            <MoreHorizIcon sx={{ fontSize: 24, color: '#ffffff' }} />
+                          </div>
+                        </button>
+                        <div className="flex flex-col items-center gap-1">
+                          <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                            <ReportButton
+                              contentType="reel"
+                              contentId={String(reel.id)}
+                              className="text-white hover:text-white/70"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {showCreateReel && (
+        <CreateReelModal
+          onClose={() => setShowCreateReel(false)}
+          onSuccess={(msg) => triggerToast(msg)}
+        />
+      )}
+
+      {/* Floating Create Button */}
+      <button
+        onClick={() => setShowCreateReel(true)}
+        className="fixed bottom-24 right-4 lg:bottom-8 lg:right-8 w-14 h-14 bg-[#7CFFB2] text-black rounded-full shadow-lg hover:bg-[#6EEEA8] transition-all hover:scale-110 flex items-center justify-center z-40 group"
+        title="Create Reel"
+      >
+        <AddCircleOutlineIcon sx={{ fontSize: 28 }} />
+        <span className="absolute bottom-full right-0 mb-2 px-3 py-1 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+          Create Reel
+        </span>
+      </button>
+
+      {/* Toast */}
+      {showToast && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 lg:bottom-8 bg-[#00a86b] text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3 z-50 animate-slide-up pointer-events-none">
+          <div>
+            <p className="font-bold">{toastMessage}</p>
+            {toastSubtitle && <p className="text-sm opacity-90">{toastSubtitle}</p>}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
