@@ -175,6 +175,23 @@ export async function unlikeReel(
   return { data: null, error: null }
 }
 
+// ── getVideos ────────────────────────────────────────────────────
+/** Long-form videos across all creators, for the Creators page's Videos rail. */
+export async function getVideos(options?: {
+  limit?: number
+  offset?: number
+}): Promise<ServiceResult<VideoWithCreator[]>> {
+  const { data, error } = await supabase
+    .from('videos')
+    .select(VIDEO_WITH_CREATOR)
+    .eq('moderation_status', 'visible')
+    .order('created_at', { ascending: false })
+    .limit(options?.limit ?? 20)
+
+  if (error) return { data: null, error: error.message }
+  return { data: data as unknown as VideoWithCreator[], error: null }
+}
+
 // ── getVideosByCreator ───────────────────────────────────────────
 /**
  * Long-form videos for a creator's Videos tab.

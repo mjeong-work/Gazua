@@ -29,10 +29,24 @@ import { searchCreators, matchesCreatorSearch } from '../utils/creatorSearch';
 import type { SavedContentInput } from '../contexts/SavedContentContext';
 import { getCreators } from '../../lib/services/profiles.service';
 import { getFollowerCounts } from '../../lib/services/follows.service';
-import { getReels } from '../../lib/services/reels.service';
-import { formatCount } from './reels/format';
-import type { Profile, FeaturedCategory, ReelWithCreator } from '../../types/database';
+import { getReels, getVideos } from '../../lib/services/reels.service';
+import { formatCount, formatDurationSeconds } from './reels/format';
+import type { Profile, FeaturedCategory, ReelWithCreator, VideoWithCreator } from '../../types/database';
 import { BUCKETS, getPublicUrl } from '../../lib/storage';
+
+interface VideoItem {
+  id: string;
+  title: string;
+  creator: string;
+  creatorRouteSlug: string;
+  creatorAvatar: string;
+  creatorVerified: boolean;
+  hasProfile: boolean;
+  thumbnail: string;
+  duration: string;
+  views: string;
+  uploadedAt: string;
+}
 
 interface ContentItem {
   id: number;
@@ -130,6 +144,19 @@ export default function CreatorsPage() {
       if (cancelled) return;
       if (error) { setDbReels(null); return; }
       setDbReels(data ?? []);
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  // Real long-form videos for the "Videos" rail. Same null/[] convention as dbReels above.
+  const [dbVideos, setDbVideos] = useState<VideoWithCreator[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    getVideos({ limit: 20 }).then(({ data, error }) => {
+      if (cancelled) return;
+      if (error) { setDbVideos(null); return; }
+      setDbVideos(data ?? []);
     });
     return () => { cancelled = true; };
   }, []);
@@ -238,17 +265,50 @@ export default function CreatorsPage() {
     return featuredContent.filter(item => followedIds.has(nameToCreatorId(item.creator)));
   }, [isSearching, debouncedSearchQuery, selectedFilter, followedIds, featuredContent]);
 
-  // Shared canonical video catalog (src/app/data/reels.ts) — same source the watch page and
+  // Real DB videos when available (null = fetch failed, use mock; [] = genuinely none yet,
+  // shown as-is — same convention as dbReels/featuredContent above). Falls back to the shared
+  // canonical CREATOR_VIDEOS catalog (src/app/data/reels.ts), same source the watch page and
   // creator profile pages use, so video ids and creator links stay consistent across the app.
-  const videos = useMemo(() => {
-    if (!isSearching) return CREATOR_VIDEOS.slice(0, 4);
-    return CREATOR_VIDEOS.filter(video =>
-      matchesCreatorSearch(
-        { title: video.title, creatorName: getCreator(video.creator_id)?.name ?? video.creator_id },
-        debouncedSearchQuery,
-      ),
-    ).slice(0, 4);
-  }, [isSearching, debouncedSearchQuery]);
+  const allVideoItems: VideoItem[] = useMemo(() => {
+    if (dbVideos !== null) {
+      return dbVideos.map((v, i): VideoItem => ({
+        id: v.id,
+        title: v.title,
+        creator: v.creator.full_name,
+        creatorRouteSlug: v.creator.username,
+        creatorAvatar: v.creator.avatar_url ?? '👤',
+        creatorVerified: v.creator.is_verified,
+        hasProfile: true,
+        thumbnail: v.thumbnail_url ?? FEATURED_REEL_FALLBACK_GRADIENTS[i % FEATURED_REEL_FALLBACK_GRADIENTS.length],
+        duration: formatDurationSeconds(v.duration_seconds ?? 0),
+        views: formatCount(v.view_count),
+        uploadedAt: new Date(v.created_at).toLocaleDateString(),
+      }));
+    }
+    return CREATOR_VIDEOS.map((v): VideoItem => {
+      const c = getCreator(v.creator_id);
+      return {
+        id: String(v.id),
+        title: v.title,
+        creator: c?.name ?? v.creator_id,
+        creatorRouteSlug: v.creator_id,
+        creatorAvatar: c?.avatar ?? '👤',
+        creatorVerified: c?.verified ?? false,
+        hasProfile: !!c,
+        thumbnail: v.thumbnail,
+        duration: v.duration,
+        views: v.views,
+        uploadedAt: v.uploaded_at,
+      };
+    });
+  }, [dbVideos]);
+
+  const videos: VideoItem[] = useMemo(() => {
+    if (!isSearching) return allVideoItems.slice(0, 4);
+    return allVideoItems
+      .filter(video => matchesCreatorSearch({ title: video.title, creatorName: video.creator }, debouncedSearchQuery))
+      .slice(0, 4);
+  }, [isSearching, debouncedSearchQuery, allVideoItems]);
 
   const hasAnySearchResults = displayedCreators.length > 0 || displayedContent.length > 0 || videos.length > 0;
 
@@ -455,15 +515,13 @@ export default function CreatorsPage() {
     );
   };
 
-  const renderVideoCard = (video: (typeof CREATOR_VIDEOS)[number]) => {
-    const videoCreator = getCreator(video.creator_id);
-
+  const renderVideoCard = (video: VideoItem) => {
     return (
       <div key={video.id} onClick={() => navigate(`/watch/${video.id}`)} className="flex-shrink-0 w-[min(78vw,300px)] sm:w-80 group cursor-pointer">
         <div className="relative aspect-video rounded-xl overflow-hidden mb-3">
           <div
             className="absolute inset-0"
-            style={{ background: video.thumbnail }}
+            style={{ background: video.thumbnail.startsWith('http') ? `url(${video.thumbnail})` : video.thumbnail, backgroundSize: 'cover', backgroundPosition: 'center' }}
           />
 
           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -479,7 +537,7 @@ export default function CreatorsPage() {
 
         <div className="flex gap-3">
           <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-lg flex-shrink-0">
-            {videoCreator?.avatar ?? '👤'}
+            {video.creatorAvatar}
           </div>
 
           <div className="flex-1 min-w-0">
@@ -488,19 +546,19 @@ export default function CreatorsPage() {
             </h3>
             <div className="flex items-center gap-1 mb-0.5">
               <p
-                onClick={(e) => { e.stopPropagation(); navigate(`/profile/${video.creator_id}/videos`); }}
-                className="text-xs text-gray-600 cursor-pointer hover:underline hover:text-black"
+                onClick={video.hasProfile ? (e) => { e.stopPropagation(); navigate(`/profile/${video.creatorRouteSlug}/videos`); } : undefined}
+                className={`text-xs text-gray-600 ${video.hasProfile ? 'cursor-pointer hover:underline hover:text-black' : ''}`}
               >
-                {videoCreator?.name ?? video.creator_id}
+                {video.creator}
               </p>
-              {videoCreator?.verified && (
+              {video.creatorVerified && (
                 <svg className="w-3 h-3 text-gray-600" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               )}
             </div>
             <p className="text-xs text-gray-600">
-              {video.views} views • {video.uploaded_at}
+              {video.views} views • {video.uploadedAt}
             </p>
           </div>
         </div>
@@ -517,11 +575,11 @@ export default function CreatorsPage() {
 
         {/* Main Content */}
         <div className={`flex-1 min-w-0 bg-white ${playingReelIndex !== null ? 'overflow-hidden' : 'overflow-y-auto'}`}>
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-12 max-sm:pb-28">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-12 max-sm:pt-6 max-sm:pb-28">
           {/* Hero */}
-          <div className="text-center mb-8">
-            <h1 className="text-5xl font-bold mb-4">Discover Finance Creators</h1>
-            <p className="text-xl text-gray-600 mb-8">
+          <div className="text-center mb-8 max-sm:mb-4">
+            <h1 className="text-5xl font-bold mb-4 max-sm:hidden">Discover Finance Creators</h1>
+            <p className="text-xl text-gray-600 mb-8 max-sm:hidden">
               Learn from expert investors, traders, and educators sharing real strategies and market insights.
             </p>
 
@@ -610,9 +668,13 @@ export default function CreatorsPage() {
               {(!isSearching || videos.length > 0) && (
                 <section className="mb-12">
                   <h2 className="text-2xl font-bold mb-6 text-center">Videos</h2>
-                  <div className="max-w-[1328px] mx-auto flex gap-4 overflow-x-auto pb-2 max-sm:-mx-4 max-sm:px-4" style={{ justifyContent: 'safe center' }}>
-                    {videos.map(renderVideoCard)}
-                  </div>
+                  {videos.length === 0 ? (
+                    <p className="text-center text-gray-500 text-sm">No videos yet. Check back soon!</p>
+                  ) : (
+                    <div className="max-w-[1328px] mx-auto flex gap-4 overflow-x-auto pb-2 max-sm:-mx-4 max-sm:px-4" style={{ justifyContent: 'safe center' }}>
+                      {videos.map(renderVideoCard)}
+                    </div>
+                  )}
                 </section>
               )}
             </>
