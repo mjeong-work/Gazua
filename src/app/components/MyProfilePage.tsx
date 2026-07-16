@@ -525,32 +525,32 @@ export default function MyProfilePage() {
                 <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
               </div>
 
-              <div className="flex-1 pt-1">
-                <div className="flex items-start justify-between">
-                  <div>
+              <div className="flex-1 pt-1 min-w-0">
+                <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
+                  <div className="min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
-                      <h1 className="text-2xl font-bold tracking-tight">{displayName}</h1>
-                      <svg className="w-5 h-5 text-[#00a86b]" viewBox="0 0 24 24" fill="currentColor">
+                      <h1 className="text-2xl font-bold tracking-tight break-words">{displayName}</h1>
+                      <svg className="w-5 h-5 text-[#00a86b] flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
                     <p className="text-gray-500 text-sm mb-3">{displayHandle}</p>
-                    <div className="flex items-center gap-5 text-sm">
-                      <div><span className="font-bold">127K</span><span className="text-gray-500 ml-1">followers</span></div>
-                      <div><span className="font-bold">342</span><span className="text-gray-500 ml-1">following</span></div>
-                      <div><span className="font-bold">{posts.filter(p => !p.draft).length + videos.length}</span><span className="text-gray-500 ml-1">posts</span></div>
+                    <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm">
+                      <div className="whitespace-nowrap"><span className="font-bold">127K</span><span className="text-gray-500 ml-1">followers</span></div>
+                      <div className="whitespace-nowrap"><span className="font-bold">342</span><span className="text-gray-500 ml-1">following</span></div>
+                      <div className="whitespace-nowrap"><span className="font-bold">{posts.filter(p => !p.draft).length + videos.length}</span><span className="text-gray-500 ml-1">posts</span></div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     <button
                       onClick={handleShare}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${shareCopied ? 'bg-[#00a86b]/10 text-[#00a86b]' : 'hover:bg-gray-100 text-gray-500'}`}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${shareCopied ? 'bg-[#00a86b]/10 text-[#00a86b]' : 'hover:bg-gray-100 text-gray-500'}`}
                       title="Share profile"
                     >
                       {shareCopied ? <CheckIcon sx={{ fontSize: 15 }} /> : <ShareIcon sx={{ fontSize: 15 }} />}
                       {shareCopied ? 'Copied!' : 'Share'}
                     </button>
-                    <button onClick={() => navigate('/account')} className="p-2 hover:bg-gray-100 rounded-full transition-colors" title="Settings">
+                    <button onClick={() => navigate('/account')} className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0" title="Settings">
                       <SettingsIcon sx={{ fontSize: 20, color: '#6b7280' }} />
                     </button>
                   </div>
@@ -564,22 +564,22 @@ export default function MyProfilePage() {
             </p>
 
             {/* Private Stats Bar */}
-            <div className="flex items-center gap-4 mb-5 p-3 bg-gray-50 rounded-xl border border-gray-200">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-5 p-3 bg-gray-50 rounded-xl border border-gray-200">
               <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#00a86b]" />
-                <span className="text-xs text-gray-500">Visible to you only</span>
+                <div className="w-1.5 h-1.5 rounded-full bg-[#00a86b] flex-shrink-0" />
+                <span className="text-xs text-gray-500 whitespace-nowrap">Visible to you only</span>
               </div>
-              <div className="h-3 w-px bg-gray-300" />
-              <div className="flex items-center gap-5 text-xs">
-                <div><span className="font-semibold text-black">$2,340</span><span className="text-gray-500 ml-1">earned this month</span></div>
-                <div><span className="font-semibold text-black">1.2K</span><span className="text-gray-500 ml-1">subscribers</span></div>
-                <div><span className="font-semibold text-black">8,432</span><span className="text-gray-500 ml-1">profile views</span></div>
-                <div><span className="font-semibold text-black">4.8%</span><span className="text-gray-500 ml-1">engagement rate</span></div>
+              <div className="h-3 w-px bg-gray-300 hidden sm:block" />
+              <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs">
+                <div className="whitespace-nowrap"><span className="font-semibold text-black">$2,340</span><span className="text-gray-500 ml-1">earned this month</span></div>
+                <div className="whitespace-nowrap"><span className="font-semibold text-black">1.2K</span><span className="text-gray-500 ml-1">subscribers</span></div>
+                <div className="whitespace-nowrap"><span className="font-semibold text-black">8,432</span><span className="text-gray-500 ml-1">profile views</span></div>
+                <div className="whitespace-nowrap"><span className="font-semibold text-black">4.8%</span><span className="text-gray-500 ml-1">engagement rate</span></div>
               </div>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex items-center gap-2 mb-8">
+            <div className="flex flex-wrap items-center gap-2 mb-8">
               <button
                 onClick={() => { setEditName(displayName); setEditHandle(displayHandle); setProfileSaveError(null); setShowEditProfile(true); }}
                 className="px-6 py-2 bg-black text-white font-medium text-sm rounded-full hover:bg-black/80 transition-colors flex items-center gap-2"
@@ -597,12 +597,12 @@ export default function MyProfilePage() {
 
             {/* Tabs */}
             <div className="border-b border-gray-200 mb-8">
-              <div className="flex gap-8">
+              <div className="flex gap-8 overflow-x-auto no-scrollbar">
                 {(['investment', 'videos', 'posts', 'saved', 'about', 'analytics'] as Tab[]).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`pb-3 px-1 font-medium text-sm border-b-2 transition-colors capitalize ${activeTab === tab ? 'border-black text-black' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                    className={`flex-shrink-0 whitespace-nowrap pb-3 px-1 font-medium text-sm border-b-2 transition-colors capitalize ${activeTab === tab ? 'border-black text-black' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
                   >
                     {tab}
                   </button>
