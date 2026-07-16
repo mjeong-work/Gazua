@@ -180,7 +180,7 @@ export default function CreateReelModal({ onClose, onSuccess }: CreateReelModalP
               ref={fileInputRef}
               type="file"
               accept="video/mp4,video/quicktime,video/webm"
-              className="hidden"
+              className="absolute w-px h-px opacity-0 overflow-hidden pointer-events-none -z-10"
               onChange={(e) => handleFileSelected(e.target.files?.[0])}
             />
             <div
