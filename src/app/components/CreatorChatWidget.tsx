@@ -2,37 +2,38 @@ import { useEffect, useRef, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import RemoveIcon from '@mui/icons-material/Remove';
 import SendIcon from '@mui/icons-material/Send';
+import { useAuth } from '../contexts/AuthContext';
 import { useMessages } from '../contexts/MessagesContext';
 
 interface CreatorChatWidgetProps {
   creatorId: string;
   creatorName: string;
-  creatorAvatar: string;
+  creatorAvatarUrl: string | null;
   onClose: () => void;
 }
 
 /**
- * Floating chat widget — UI only for now (no real backend), but conversations persist via
- * MessagesContext (localStorage-backed) so they survive closing the widget and are visible
- * from the /messages inbox. Reusable so it can be triggered from anywhere a creator is known
- * (e.g. the profile page's Message button today, the sidebar's My Creators list later):
- * render `<CreatorChatWidget key={creatorId} .../>` keyed by creator so switching creators
- * shows that creator's own thread.
+ * Floating chat widget, real-backend (Supabase `messages` table) via MessagesContext.
+ * `creatorId` must be the creator's real profile UUID — callers only render this widget
+ * when a real (DB-backed) profile is available, since there's nothing real to message
+ * for a mock/demo creator.
  */
-export default function CreatorChatWidget({ creatorId, creatorName, creatorAvatar, onClose }: CreatorChatWidgetProps) {
-  const { conversations, startConversation, sendMessage } = useMessages();
+export default function CreatorChatWidget({ creatorId, creatorName, creatorAvatarUrl, onClose }: CreatorChatWidgetProps) {
+  const { user } = useAuth();
+  const { activeThread, openThreadWith, sendMessage, markRead } = useMessages();
   const [isMinimized, setIsMinimized] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const threadEndRef = useRef<HTMLDivElement>(null);
 
-  const messages = conversations[creatorId]?.messages ?? [];
+  const messages = activeThread?.partner.id === creatorId ? activeThread.messages : [];
 
-  // Seeds the conversation with the creator's opener the first time it's opened — a no-op if
-  // this creator's thread already exists (e.g. re-opening a chat you'd already started).
+  // Opens (or resumes) this creator's thread the first time the widget is shown.
   useEffect(() => {
-    startConversation(creatorId, creatorName, creatorAvatar);
-  }, [creatorId, creatorName, creatorAvatar, startConversation]);
+    openThreadWith({ id: creatorId, name: creatorName, avatarUrl: creatorAvatarUrl });
+    markRead(creatorId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [creatorId, creatorName, creatorAvatarUrl]);
 
   // Mount-then-animate so the enter transition actually plays (starting at the "open" state
   // would skip straight past it — the transition needs a frame at the "closed" state first).
@@ -47,7 +48,7 @@ export default function CreatorChatWidget({ creatorId, creatorName, creatorAvata
 
   const handleSend = () => {
     if (!inputValue.trim()) return;
-    sendMessage(creatorId, inputValue.trim());
+    sendMessage(inputValue.trim());
     setInputValue('');
   };
 
@@ -61,9 +62,13 @@ export default function CreatorChatWidget({ creatorId, creatorName, creatorAvata
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 flex-shrink-0">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-9 h-9 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-lg flex-shrink-0">
-            {creatorAvatar}
-          </div>
+          {creatorAvatarUrl ? (
+            <img src={creatorAvatarUrl} alt={creatorName} className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
+          ) : (
+            <div className="w-9 h-9 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-sm font-semibold text-gray-600 flex-shrink-0">
+              {(creatorName[0] ?? '?').toUpperCase()}
+            </div>
+          )}
           <span className="text-sm font-semibold truncate">Chat with {creatorName}</span>
         </div>
         <div className="flex items-center gap-1 flex-shrink-0">
@@ -80,13 +85,19 @@ export default function CreatorChatWidget({ creatorId, creatorName, creatorAvata
         <>
           {/* Thread */}
           <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2.5">
-            {messages.map(m => (
-              <div key={m.id} className={`flex ${m.from === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm ${m.from === 'user' ? 'bg-black text-white' : 'bg-gray-100 text-gray-800'}`}>
-                  {m.text}
+            {messages.length === 0 && (
+              <p className="text-sm text-gray-500 text-center mt-4">No messages yet — say hello!</p>
+            )}
+            {messages.map(m => {
+              const isMine = m.sender_id === user?.id;
+              return (
+                <div key={m.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm ${isMine ? 'bg-black text-white' : 'bg-gray-100 text-gray-800'}`}>
+                    {m.content}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             <div ref={threadEndRef} />
           </div>
 

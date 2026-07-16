@@ -1,71 +1,138 @@
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
-import { MOCK_CONVERSATIONS, type ChatMessage, type Conversation } from '../data/messages';
+import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
+import { useAuth } from './AuthContext';
+import { isUUID } from './FollowContext';
+import {
+  getConversations,
+  getThread,
+  sendMessage as sendMessageService,
+  markThreadRead,
+  subscribeToMessages,
+  type ConversationSummary,
+} from '../../lib/services/messages.service';
+import type { Message } from '../../types/database';
 
-export type { ChatMessage, Conversation };
+export type { ConversationSummary };
 
-const MESSAGES_KEY = 'gazua:messages';
-
-function readConversations(): Record<string, Conversation> {
-  try {
-    const raw = localStorage.getItem(MESSAGES_KEY);
-    // No saved state yet (first visit) — seed with the mock conversations so /messages
-    // isn't empty; once the user sends/receives anything, their real state takes over.
-    return raw ? (JSON.parse(raw) as Record<string, Conversation>) : MOCK_CONVERSATIONS;
-  } catch {
-    return MOCK_CONVERSATIONS;
-  }
+export interface ConversationPartner {
+  id: string;
+  name: string;
+  avatarUrl: string | null;
 }
 
-function writeConversations(data: Record<string, Conversation>): void {
-  try {
-    localStorage.setItem(MESSAGES_KEY, JSON.stringify(data));
-  } catch {
-    // storage quota exceeded or private-browsing restriction — ignore
-  }
+interface ActiveThread {
+  partner: ConversationPartner;
+  messages: Message[];
+  isLoading: boolean;
 }
 
 interface MessagesContextType {
-  /** All conversations, keyed by creator id (slug). */
-  conversations: Record<string, Conversation>;
-  /** Ensures a conversation exists for this creator, seeding it with their opener message the first time. Safe to call every time a chat is opened — a no-op if the conversation already exists. */
-  startConversation: (creatorId: string, creatorName: string, creatorAvatar: string) => void;
-  /** Appends a message the user sent to the given creator's thread. */
-  sendMessage: (creatorId: string, text: string) => void;
+  conversations: ConversationSummary[];
+  isLoadingConversations: boolean;
+  activeThread: ActiveThread | null;
+  /** Opens (or resumes) a thread with this partner. A no-op for mock/demo
+   * creators (non-UUID ids) — real messaging only ever targets real accounts. */
+  openThreadWith: (partner: ConversationPartner) => void;
+  closeThread: () => void;
+  sendMessage: (text: string) => void;
+  markRead: (partnerId: string) => void;
 }
 
 const MessagesContext = createContext<MessagesContextType | undefined>(undefined);
 
 export function MessagesProvider({ children }: { children: ReactNode }) {
-  const [conversations, setConversations] = useState<Record<string, Conversation>>(() => readConversations());
+  const { user } = useAuth();
+  const [conversations, setConversations] = useState<ConversationSummary[]>([]);
+  const [isLoadingConversations, setIsLoadingConversations] = useState(false);
+  const [activeThread, setActiveThread] = useState<ActiveThread | null>(null);
+  const userIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    writeConversations(conversations);
-  }, [conversations]);
+    const uid = user?.id ?? null;
+    userIdRef.current = uid;
+    setActiveThread(null);
+    setConversations([]);
 
-  const startConversation = useCallback((creatorId: string, creatorName: string, creatorAvatar: string) => {
-    setConversations(prev => {
-      if (prev[creatorId]) return prev;
-      const opener: ChatMessage = {
-        id: `${Date.now()}`,
-        from: 'creator',
-        text: `Hi! I'm ${creatorName}. Ask me anything about my investment approach.`,
-        timestamp: new Date().toISOString(),
-      };
-      return { ...prev, [creatorId]: { creatorId, creatorName, creatorAvatar, messages: [opener] } };
+    if (!uid) return;
+
+    setIsLoadingConversations(true);
+    getConversations(uid).then(({ data }) => {
+      setIsLoadingConversations(false);
+      if (data) setConversations(data);
+    });
+
+    const channel = subscribeToMessages(uid, (message) => {
+      const partnerId = message.sender_id === uid ? message.recipient_id : message.sender_id;
+      const isIncomingUnread = message.recipient_id === uid && !message.read_at;
+
+      setConversations(prev => {
+        const idx = prev.findIndex(c => c.partnerId === partnerId);
+        if (idx === -1) {
+          // A new counterpart we have no profile snippet for yet (they only just
+          // messaged us for the first time) — re-fetch the full list to pick up
+          // their profile info rather than fabricating a partial entry.
+          getConversations(uid).then(({ data }) => { if (data) setConversations(data); });
+          return prev;
+        }
+        const updated = [...prev];
+        const [entry] = updated.splice(idx, 1);
+        return [{ ...entry, lastMessage: message, unreadCount: entry.unreadCount + (isIncomingUnread ? 1 : 0) }, ...updated];
+      });
+
+      setActiveThread(prev => (prev && prev.partner.id === partnerId ? { ...prev, messages: [...prev.messages, message] } : prev));
+    }, 'inbox');
+
+    return () => { channel.unsubscribe(); };
+  }, [user?.id]);
+
+  const openThreadWith = useCallback((partner: ConversationPartner) => {
+    if (!isUUID(partner.id)) return;
+    setActiveThread({ partner, messages: [], isLoading: true });
+
+    const uid = userIdRef.current;
+    if (!uid) return;
+    getThread(uid, partner.id).then(({ data }) => {
+      setActiveThread(prev => (prev && prev.partner.id === partner.id ? { ...prev, messages: data ?? [], isLoading: false } : prev));
     });
   }, []);
 
-  const sendMessage = useCallback((creatorId: string, text: string) => {
-    setConversations(prev => {
-      const existing = prev[creatorId];
-      if (!existing) return prev;
-      const message: ChatMessage = { id: `${Date.now()}`, from: 'user', text, timestamp: new Date().toISOString() };
-      return { ...prev, [creatorId]: { ...existing, messages: [...existing.messages, message] } };
+  const closeThread = useCallback(() => setActiveThread(null), []);
+
+  const sendMessage = useCallback((text: string) => {
+    const uid = userIdRef.current;
+    const trimmed = text.trim();
+    setActiveThread(current => {
+      const partner = current?.partner;
+      if (!uid || !partner || !trimmed) return current;
+
+      sendMessageService(uid, partner.id, trimmed).then(({ data }) => {
+        if (!data) return;
+        setActiveThread(prev => (prev && prev.partner.id === partner.id ? { ...prev, messages: [...prev.messages, data] } : prev));
+        setConversations(prev => {
+          const idx = prev.findIndex(c => c.partnerId === partner.id);
+          if (idx === -1) {
+            return [{ partnerId: partner.id, partnerName: partner.name, partnerUsername: partner.name, partnerAvatarUrl: partner.avatarUrl, lastMessage: data, unreadCount: 0 }, ...prev];
+          }
+          const updated = [...prev];
+          const [entry] = updated.splice(idx, 1);
+          return [{ ...entry, lastMessage: data }, ...updated];
+        });
+      });
+
+      return current;
     });
+  }, []);
+
+  const markRead = useCallback((partnerId: string) => {
+    const uid = userIdRef.current;
+    if (!uid) return;
+    setConversations(prev => prev.map(c => (c.partnerId === partnerId ? { ...c, unreadCount: 0 } : c)));
+    markThreadRead(uid, partnerId).catch(() => {});
   }, []);
 
   return (
-    <MessagesContext.Provider value={{ conversations, startConversation, sendMessage }}>
+    <MessagesContext.Provider
+      value={{ conversations, isLoadingConversations, activeThread, openThreadWith, closeThread, sendMessage, markRead }}
+    >
       {children}
     </MessagesContext.Provider>
   );

@@ -160,6 +160,16 @@ export default function PricingPage() {
           Learn from trusted creators, track real portfolios, and grow your investment knowledge.
         </p>
 
+        {/* Beta Notice */}
+        <div className="mb-8 rounded-2xl border border-[#7CFFB2]/40 bg-[#7CFFB2]/10 px-6 py-5 text-left">
+          <p className="font-bold text-black">🚧 Gazua is currently in Beta</p>
+          <p className="mt-1 text-sm text-gray-600">
+            During the beta testing period, all premium features are available through the Free plan.
+            Feel free to continue with the Free option while we gather feedback and improve the platform.
+          </p>
+          <p className="mt-1 text-xs text-gray-500">Paid plans will become available in a future release.</p>
+        </div>
+
         {/* Pricing Cards */}
         <div id="pricing-plans" className="grid md:grid-cols-3 gap-6">
           {tiers.map((tier) => {

@@ -13,3 +13,10 @@ export function formatCount(n: number): string {
 export function seedFromId(id: number, base: number, spread: number): number {
   return base + ((id * 4111) % spread);
 }
+
+/** Formats a duration in seconds as "m:ss" (e.g. 125 -> "2:05"). */
+export function formatDurationSeconds(secs: number): string {
+  const mm = String(Math.floor(secs / 60)).padStart(1, '0');
+  const ss = String(secs % 60).padStart(2, '0');
+  return `${mm}:${ss}`;
+}

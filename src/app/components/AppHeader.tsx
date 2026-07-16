@@ -18,6 +18,7 @@ import SearchModal from './SearchModal';
 import RiskBanner from './AppHeader/RiskBanner';
 import { useAuth } from '../contexts/AuthContext';
 import { getUnreadCount, subscribeToNotifications } from '../../lib/services/notifications.service';
+import { getUnreadMessageCount, subscribeToMessages } from '../../lib/services/messages.service';
 
 export default function AppHeader() {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ export default function AppHeader() {
   const [searchParams, setSearchParams] = useSearchParams();
   const ticker = searchParams.get('ticker')?.toUpperCase() ?? null;
   const [unreadCount, setUnreadCount] = useState(0);
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
 
   useEffect(() => {
     if (!user) {
@@ -38,6 +40,19 @@ export default function AppHeader() {
     const channel = subscribeToNotifications(user.id, () => {
       setUnreadCount(prev => prev + 1);
     });
+    return () => { channel.unsubscribe(); };
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) {
+      setUnreadMessageCount(0);
+      return;
+    }
+    getUnreadMessageCount(user.id).then(({ data }) => setUnreadMessageCount(data ?? 0));
+
+    const channel = subscribeToMessages(user.id, () => {
+      setUnreadMessageCount(prev => prev + 1);
+    }, 'badge');
     return () => { channel.unsubscribe(); };
   }, [user]);
 
@@ -152,8 +167,11 @@ export default function AppHeader() {
             <button onClick={() => navigate('/my-profile')} className={cls(['/my-profile'])}>
               My Profile
             </button>
-            <button onClick={() => navigate('/messages')} className={cls(['/messages'])}>
+            <button onClick={() => navigate('/messages')} className={`relative ${cls(['/messages'])}`}>
               Messages
+              {unreadMessageCount > 0 && (
+                <span className="absolute -top-1 -right-2.5 w-2 h-2 bg-[#00a86b] rounded-full" />
+              )}
             </button>
             <button onClick={() => navigate('/account')} className={cls(['/account'])}>
               Account
@@ -213,11 +231,14 @@ export default function AppHeader() {
           </button>
           <button
             onClick={() => navigate('/messages')}
-            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/messages']) ? 'text-[#00a86b]' : 'text-gray-500'}`}
+            className={`relative flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/messages']) ? 'text-[#00a86b]' : 'text-gray-500'}`}
           >
             {active(['/messages'])
               ? <ChatBubbleIcon sx={{ fontSize: 24 }} />
               : <ChatBubbleOutlineIcon sx={{ fontSize: 24 }} />}
+            {unreadMessageCount > 0 && (
+              <span className="absolute top-0 right-4 w-2 h-2 bg-[#00a86b] rounded-full" />
+            )}
             <span className="text-[10px] font-medium">Messages</span>
           </button>
           <button

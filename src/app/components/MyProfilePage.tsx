@@ -1,5 +1,11 @@
-import { useState, useMemo, useRef, type ChangeEvent, type ReactNode } from 'react';
+import { useState, useMemo, useRef, useEffect, type ChangeEvent, type ReactNode } from 'react';
 import { useNavigate } from 'react-router';
+import { useAuth } from '../contexts/AuthContext';
+import { getVideosByCreator, createVideo } from '../../lib/services/reels.service';
+import { updateProfile } from '../../lib/services/profiles.service';
+import { formatDurationSeconds, formatCount } from './reels/format';
+import { BUCKETS, buildOwnerPath, uploadToBucket } from '../../lib/storage';
+import { validateVideoFile, loadVideoMetadata, captureThumbnail, LONGFORM_LIMITS } from '../../lib/videoMedia';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ShareIcon from '@mui/icons-material/Share';
@@ -29,14 +35,21 @@ const INIT_POSTS = [
   { id: 5, time: 'Draft', content: "New to investing? The single best thing you can do this year: set up automatic contributions to a low-cost index fund and stop watching the daily price.", likes: 0, comments: 0, reposts: 0, tag: '🎓 Beginner Tips', draft: true },
 ];
 
-const INIT_VIDEOS = [
-  { id: 1, title: "5 Stocks I'm Buying in 2026", thumbnail: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', duration: '12:34', views: '234K', uploadedAt: '2 days ago' },
-  { id: 2, title: 'Bitcoin Bull Run? My Analysis', thumbnail: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', duration: '8:45', views: '189K', uploadedAt: '5 days ago' },
-  { id: 3, title: 'Portfolio Update: March 2026', thumbnail: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', duration: '15:22', views: '421K', uploadedAt: '1 week ago' },
-  { id: 4, title: 'Why I Sold All My Tesla Stock', thumbnail: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', duration: '10:18', views: '567K', uploadedAt: '2 weeks ago' },
-  { id: 5, title: 'Dividend Investing 101', thumbnail: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)', duration: '14:56', views: '312K', uploadedAt: '3 weeks ago' },
-  { id: 6, title: 'ETFs vs Individual Stocks', thumbnail: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)', duration: '11:03', views: '298K', uploadedAt: '1 month ago' },
+const VIDEO_FALLBACK_GRADIENTS = [
+  'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+  'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+  'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
 ];
+
+interface VideoListItem {
+  id: string;
+  title: string;
+  thumbnail: string;
+  duration: string;
+  views: string;
+  uploadedAt: string;
+}
 
 const INIT_EXPERIENCE = [
   { role: 'Portfolio Manager', org: 'Major Investment Firm', years: '2012 – 2020' },
@@ -111,6 +124,7 @@ export default function MyProfilePage() {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { savedItems, removeSavedContent } = useSavedContent();
+  const { profile, refreshProfile } = useAuth();
 
   // Core UI state
   const [activeTab, setActiveTab] = useState<Tab>('investment');
@@ -129,14 +143,20 @@ export default function MyProfilePage() {
   const [newSimHoldings, setNewSimHoldings] = useState([{ symbol: '', amount: '' }]);
   const [newSimRationale, setNewSimRationale] = useState('');
 
-  // Profile state
-  const [profileName, setProfileName] = useState('Alex Rodriguez');
-  const [profileHandle, setProfileHandle] = useState('@alexrodriguez');
+  // Profile state — identity (name/handle/avatar) comes from the real authenticated
+  // profile, not local mock state; avatarImageUrl is a local-only preview override
+  // until avatar upload is wired to real Storage (see MyProfilePage's video-upload
+  // pattern for the model to follow when that's done).
+  const displayName = profile?.full_name || '';
+  const displayHandle = profile?.handle ? `@${profile.handle}` : profile?.username ? `@${profile.username}` : '';
   const avatarGradient = 'from-blue-500 to-purple-600';
   const [avatarImageUrl, setAvatarImageUrl] = useState<string | null>(null);
+  const displayAvatarUrl = avatarImageUrl ?? profile?.avatar_url ?? null;
   const [showEditProfile, setShowEditProfile] = useState(false);
-  const [editName, setEditName] = useState(profileName);
-  const [editHandle, setEditHandle] = useState(profileHandle);
+  const [editName, setEditName] = useState(displayName);
+  const [editHandle, setEditHandle] = useState(displayHandle);
+  const [profileSaveError, setProfileSaveError] = useState<string | null>(null);
+  const [savingProfile, setSavingProfile] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
 
   // About state
@@ -151,18 +171,36 @@ export default function MyProfilePage() {
   const [newFocusArea, setNewFocusArea] = useState('');
 
   // Video state
-  const [videos, setVideos] = useState(INIT_VIDEOS);
-  const [editingVideoId, setEditingVideoId] = useState<number | null>(null);
+  const [videos, setVideos] = useState<VideoListItem[]>([]);
+  const [editingVideoId, setEditingVideoId] = useState<string | null>(null);
   const [editingVideoTitle, setEditingVideoTitle] = useState('');
-  const [analyticsVideoId, setAnalyticsVideoId] = useState<number | null>(null);
-  const [deleteVideoId, setDeleteVideoId] = useState<number | null>(null);
+  const [analyticsVideoId, setAnalyticsVideoId] = useState<string | null>(null);
+  const [deleteVideoId, setDeleteVideoId] = useState<string | null>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadTitle, setUploadTitle] = useState('');
-  const [uploadDesc, setUploadDesc] = useState('');
-  const [uploadCategory, setUploadCategory] = useState('📈 Portfolio Update');
   const [uploadFileName, setUploadFileName] = useState<string | null>(null);
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadDuration, setUploadDuration] = useState<number | null>(null);
+  const [uploadThumbnailBlob, setUploadThumbnailBlob] = useState<Blob | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [processingUpload, setProcessingUpload] = useState(false);
   const [isDraggingVideo, setIsDraggingVideo] = useState(false);
   const videoFileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!profile?.id) return;
+    getVideosByCreator(profile.id).then(({ data }) => {
+      if (!data) return;
+      setVideos(data.map((v, i) => ({
+        id: v.id,
+        title: v.title,
+        thumbnail: v.thumbnail_url ?? VIDEO_FALLBACK_GRADIENTS[i % VIDEO_FALLBACK_GRADIENTS.length],
+        duration: formatDurationSeconds(v.duration_seconds ?? 0),
+        views: formatCount(v.view_count),
+        uploadedAt: new Date(v.created_at).toLocaleDateString(),
+      })));
+    });
+  }, [profile?.id]);
 
   // Post state
   const [posts, setPosts] = useState(INIT_POSTS);
@@ -172,7 +210,7 @@ export default function MyProfilePage() {
   const [editingPostId, setEditingPostId] = useState<number | null>(null);
   const [deletePostId, setDeletePostId] = useState<number | null>(null);
 
-  const initials = useMemo(() => getInitials(profileName), [profileName]);
+  const initials = useMemo(() => getInitials(displayName), [displayName]);
 
   const portfolioData = useMemo(() => {
     const points = { '1W': 7, '1M': 30, '3M': 90, '1Y': 252, 'ALL': 400 }[timeRange];
@@ -247,9 +285,24 @@ export default function MyProfilePage() {
     setTimeout(() => setShareCopied(false), 2000);
   };
 
-  const handleSaveProfile = () => {
-    setProfileName(editName);
-    setProfileHandle(editHandle);
+  const handleSaveProfile = async () => {
+    if (!profile?.id) return;
+    setSavingProfile(true);
+    setProfileSaveError(null);
+
+    const { error } = await updateProfile(profile.id, {
+      full_name: editName.trim(),
+      handle: editHandle.trim().replace(/^@/, '') || null,
+    });
+
+    setSavingProfile(false);
+
+    if (error) {
+      setProfileSaveError(error);
+      return;
+    }
+
+    await refreshProfile();
     setShowEditProfile(false);
   };
 
@@ -265,60 +318,113 @@ export default function MyProfilePage() {
   };
 
   // Video handlers
-  const handleStartEditVideo = (video: typeof INIT_VIDEOS[0]) => {
+  const handleStartEditVideo = (video: VideoListItem) => {
     setEditingVideoId(video.id);
     setEditingVideoTitle(video.title);
     setAnalyticsVideoId(null);
     setDeleteVideoId(null);
   };
 
-  const handleSaveVideoTitle = (id: number) => {
+  const handleSaveVideoTitle = (id: string) => {
     if (editingVideoTitle.trim()) {
       setVideos(prev => prev.map(v => v.id === id ? { ...v, title: editingVideoTitle.trim() } : v));
     }
     setEditingVideoId(null);
   };
 
-  const handleToggleAnalytics = (id: number) => {
+  const handleToggleAnalytics = (id: string) => {
     setAnalyticsVideoId(prev => prev === id ? null : id);
     setEditingVideoId(null);
     setDeleteVideoId(null);
   };
 
-  const handleConfirmDeleteVideo = (id: number) => {
+  const handleConfirmDeleteVideo = (id: string) => {
     setVideos(prev => prev.filter(v => v.id !== id));
     setDeleteVideoId(null);
   };
 
-  const handleUploadVideo = () => {
-    if (!uploadTitle.trim()) return;
-    const gradients = ['linear-gradient(135deg, #667eea 0%, #764ba2 100%)', 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)'];
-    setVideos(prev => [{
-      id: Date.now(),
+  const handleUploadVideo = async () => {
+    if (!uploadTitle.trim() || !uploadFile || !profile?.id) return;
+    setProcessingUpload(true);
+    setUploadError(null);
+
+    const ext = uploadFile.name.split('.').pop() || 'mp4';
+    const videoUpload = await uploadToBucket(BUCKETS.videos, buildOwnerPath(profile.id, ext), uploadFile);
+    if (videoUpload.error || !videoUpload.data) {
+      setUploadError(videoUpload.error ?? 'Failed to upload video. Please try again.');
+      setProcessingUpload(false);
+      return;
+    }
+
+    let thumbnailUrl: string | null = null;
+    if (uploadThumbnailBlob) {
+      const thumbUpload = await uploadToBucket(BUCKETS.thumbnails, buildOwnerPath(profile.id, 'jpg'), uploadThumbnailBlob);
+      if (thumbUpload.data) thumbnailUrl = thumbUpload.data.publicUrl;
+    }
+
+    const { data: newVideo, error } = await createVideo({
+      creator_id: profile.id,
       title: uploadTitle.trim(),
-      thumbnail: gradients[Math.floor(Math.random() * gradients.length)],
-      duration: '0:00',
+      storage_path: videoUpload.data.path,
+      thumbnail_url: thumbnailUrl,
+      duration_seconds: uploadDuration ? Math.round(uploadDuration) : null,
+    });
+
+    setProcessingUpload(false);
+
+    if (error || !newVideo) {
+      setUploadError(error ?? 'Failed to publish. Please try again.');
+      return;
+    }
+
+    setVideos(prev => [{
+      id: newVideo.id,
+      title: newVideo.title,
+      thumbnail: newVideo.thumbnail_url ?? VIDEO_FALLBACK_GRADIENTS[0],
+      duration: formatDurationSeconds(newVideo.duration_seconds ?? 0),
       views: '0',
       uploadedAt: 'Just now',
     }, ...prev]);
-    setUploadTitle('');
-    setUploadDesc('');
-    setUploadFileName(null);
-    setShowUploadModal(false);
+    handleCloseUploadModal();
   };
 
   const handleCloseUploadModal = () => {
     setShowUploadModal(false);
     setUploadTitle('');
-    setUploadDesc('');
     setUploadFileName(null);
+    setUploadFile(null);
+    setUploadDuration(null);
+    setUploadThumbnailBlob(null);
+    setUploadError(null);
   };
 
-  const handleVideoFileSelected = (file: File | null | undefined) => {
+  const handleVideoFileSelected = async (file: File | null | undefined) => {
     if (!file) return;
+
+    const validationError = validateVideoFile(file, LONGFORM_LIMITS);
+    if (validationError) {
+      setUploadError(validationError);
+      return;
+    }
+
     setUploadFileName(file.name);
     if (!uploadTitle.trim()) {
       setUploadTitle(file.name.replace(/\.[^/.]+$/, ''));
+    }
+
+    setProcessingUpload(true);
+    setUploadError(null);
+    try {
+      const { duration, objectUrl } = await loadVideoMetadata(file);
+      const thumbBlob = await captureThumbnail(objectUrl);
+      URL.revokeObjectURL(objectUrl);
+      setUploadFile(file);
+      setUploadDuration(duration);
+      setUploadThumbnailBlob(thumbBlob);
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : 'Could not process this video.');
+    } finally {
+      setProcessingUpload(false);
     }
   };
 
@@ -410,8 +516,8 @@ export default function MyProfilePage() {
             {/* Profile Header */}
             <div className="flex items-start gap-5 mb-5">
               <div className="relative group flex-shrink-0">
-                <div className={`w-20 h-20 rounded-full flex items-center justify-center text-white font-bold text-xl ring-4 ring-white shadow-md overflow-hidden ${avatarImageUrl ? '' : `bg-gradient-to-br ${avatarGradient}`}`}>
-                  {avatarImageUrl ? <img src={avatarImageUrl} alt="Your avatar" className="w-full h-full object-cover" /> : initials}
+                <div className={`w-20 h-20 rounded-full flex items-center justify-center text-white font-bold text-xl ring-4 ring-white shadow-md overflow-hidden ${displayAvatarUrl ? '' : `bg-gradient-to-br ${avatarGradient}`}`}>
+                  {displayAvatarUrl ? <img src={displayAvatarUrl} alt="Your avatar" className="w-full h-full object-cover" /> : initials}
                 </div>
                 <button onClick={handleAvatarClick} className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                   <EditIcon sx={{ fontSize: 18, color: 'white' }} />
@@ -423,12 +529,12 @@ export default function MyProfilePage() {
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2 mb-0.5">
-                      <h1 className="text-2xl font-bold tracking-tight">{profileName}</h1>
+                      <h1 className="text-2xl font-bold tracking-tight">{displayName}</h1>
                       <svg className="w-5 h-5 text-[#00a86b]" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
-                    <p className="text-gray-500 text-sm mb-3">{profileHandle}</p>
+                    <p className="text-gray-500 text-sm mb-3">{displayHandle}</p>
                     <div className="flex items-center gap-5 text-sm">
                       <div><span className="font-bold">127K</span><span className="text-gray-500 ml-1">followers</span></div>
                       <div><span className="font-bold">342</span><span className="text-gray-500 ml-1">following</span></div>
@@ -475,7 +581,7 @@ export default function MyProfilePage() {
             {/* Action Buttons */}
             <div className="flex items-center gap-2 mb-8">
               <button
-                onClick={() => { setEditName(profileName); setEditHandle(profileHandle); setShowEditProfile(true); }}
+                onClick={() => { setEditName(displayName); setEditHandle(displayHandle); setProfileSaveError(null); setShowEditProfile(true); }}
                 className="px-6 py-2 bg-black text-white font-medium text-sm rounded-full hover:bg-black/80 transition-colors flex items-center gap-2"
               >
                 <EditIcon sx={{ fontSize: 15 }} />
@@ -864,11 +970,11 @@ export default function MyProfilePage() {
                             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">{initials}</div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-1.5">
-                                <span className="font-semibold text-sm">{profileName}</span>
+                                <span className="font-semibold text-sm">{displayName}</span>
                                 {!post.draft && <svg className="w-3.5 h-3.5 text-[#00a86b]" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
                               </div>
                               <div className="flex items-center gap-1.5 text-xs text-gray-400">
-                                <span>{profileHandle}</span><span>·</span>
+                                <span>{displayHandle}</span><span>·</span>
                                 <span className={post.draft ? 'text-amber-500 font-medium' : ''}>{post.time}</span>
                               </div>
                             </div>
@@ -1410,8 +1516,11 @@ export default function MyProfilePage() {
                 <input value={editHandle} onChange={e => setEditHandle(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors" />
               </div>
             </div>
+            {profileSaveError && <p className="text-sm text-red-500 mt-3">{profileSaveError}</p>}
             <div className="flex items-center gap-2 mt-6">
-              <button onClick={handleSaveProfile} className="flex-1 py-2.5 bg-black text-white text-sm font-medium rounded-full hover:bg-black/80 transition-colors">Save Changes</button>
+              <button onClick={handleSaveProfile} disabled={savingProfile} className="flex-1 py-2.5 bg-black text-white text-sm font-medium rounded-full hover:bg-black/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                {savingProfile ? 'Saving…' : 'Save Changes'}
+              </button>
               <button onClick={() => setShowEditProfile(false)} className="flex-1 py-2.5 border border-gray-200 text-sm font-medium rounded-full hover:bg-gray-50 transition-colors">Cancel</button>
             </div>
           </div>
@@ -1431,7 +1540,7 @@ export default function MyProfilePage() {
             <input
               ref={videoFileInputRef}
               type="file"
-              accept="video/*"
+              accept="video/mp4,video/quicktime,video/webm"
               className="hidden"
               onChange={e => handleVideoFileSelected(e.target.files?.[0])}
             />
@@ -1444,30 +1553,23 @@ export default function MyProfilePage() {
             >
               <div className="text-3xl mb-2">🎬</div>
               <p className="text-sm font-medium text-gray-700 mb-1">
-                {uploadFileName ? `Selected: ${uploadFileName}` : 'Drop your video here or click to browse'}
+                {processingUpload ? 'Processing video…' : uploadFileName ? `Selected: ${uploadFileName}` : 'Drop your video here or click to browse'}
               </p>
-              <p className="text-xs text-gray-400">MP4, MOV up to 4GB</p>
+              <p className="text-xs text-gray-400">MP4, MOV, or WEBM up to 4GB</p>
             </div>
+            {uploadError && <p className="text-sm text-red-500 mb-4">{uploadError}</p>}
 
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1.5">Title <span className="text-red-400">*</span></label>
                 <input value={uploadTitle} onChange={e => setUploadTitle(e.target.value)} placeholder="Give your video a title..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors" />
               </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">Description</label>
-                <textarea value={uploadDesc} onChange={e => setUploadDesc(e.target.value)} placeholder="What's this video about?" rows={2} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors resize-none" />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">Category</label>
-                <select value={uploadCategory} onChange={e => setUploadCategory(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors bg-white">
-                  {TAGS.map(t => <option key={t} value={t}>{t}</option>)}
-                </select>
-              </div>
             </div>
 
             <div className="flex items-center gap-2 mt-6">
-              <button onClick={handleUploadVideo} disabled={!uploadTitle.trim()} className="flex-1 py-2.5 bg-black text-white text-sm font-medium rounded-full hover:bg-black/80 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">Upload</button>
+              <button onClick={handleUploadVideo} disabled={!uploadTitle.trim() || !uploadFile || processingUpload} className="flex-1 py-2.5 bg-black text-white text-sm font-medium rounded-full hover:bg-black/80 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                {processingUpload ? 'Uploading…' : 'Upload'}
+              </button>
               <button onClick={handleCloseUploadModal} className="flex-1 py-2.5 border border-gray-200 text-sm font-medium rounded-full hover:bg-gray-50 transition-colors">Cancel</button>
             </div>
           </div>
@@ -1486,8 +1588,8 @@ export default function MyProfilePage() {
             <div className="flex items-start gap-3 mb-4">
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">{initials}</div>
               <div className="flex-1">
-                <p className="text-sm font-semibold">{profileName}</p>
-                <p className="text-xs text-gray-400">{profileHandle}</p>
+                <p className="text-sm font-semibold">{displayName}</p>
+                <p className="text-xs text-gray-400">{displayHandle}</p>
               </div>
             </div>
 

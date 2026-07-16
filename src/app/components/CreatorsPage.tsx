@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { toast } from 'sonner';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import CloseIcon from '@mui/icons-material/Close';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import AppHeader from './AppHeader';
 import CreatorsSidebar from './CreatorsSidebar';
 import ReelEngagementActions from './reels/ReelEngagementActions';
@@ -27,18 +29,30 @@ import { searchCreators, matchesCreatorSearch } from '../utils/creatorSearch';
 import type { SavedContentInput } from '../contexts/SavedContentContext';
 import { getCreators } from '../../lib/services/profiles.service';
 import { getFollowerCounts } from '../../lib/services/follows.service';
+import { getReels } from '../../lib/services/reels.service';
 import { formatCount } from './reels/format';
-import type { Profile, FeaturedCategory } from '../../types/database';
+import type { Profile, FeaturedCategory, ReelWithCreator } from '../../types/database';
+import { BUCKETS, getPublicUrl } from '../../lib/storage';
 
 interface ContentItem {
   id: number;
   type: 'reel' | 'post' | 'model';
   thumbnail: string;
+  /** Bucket-relative path to a real uploaded video — present for DB-backed reels. */
+  storage_path?: string;
   title: string;
   creator: string;
   views?: string;
   duration?: string;
 }
+
+const FEATURED_REEL_FALLBACK_GRADIENTS = [
+  'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+  'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+  'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+  'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+];
 
 type SavedItemMeta = Omit<SavedContentInput, 'userId'>;
 
@@ -60,6 +74,7 @@ export default function CreatorsPage() {
   };
 
   const [playingReelIndex, setPlayingReelIndex] = useState<number | null>(null);
+  const [isReelPreviewMuted, setIsReelPreviewMuted] = useState(true);
   const wheelLockRef = useRef(false);
   // Mock like state, keyed by reel id — this preview modal's reel items have no db_id to
   // persist against (they're a page-local content list, not the shared Reel/Video models).
@@ -101,6 +116,20 @@ export default function CreatorsPage() {
         setFollowerCounts(counts ?? {});
         setCreatorsLoading(false);
       });
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  // Real reels for the "Featured Content" showcase. null = not yet resolved / error (use mock
+  // fallback); [] is a legitimate real empty result and is shown as-is, matching dbProfiles above.
+  const [dbReels, setDbReels] = useState<ReelWithCreator[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    getReels({ limit: 5 }).then(({ data, error }) => {
+      if (cancelled) return;
+      if (error) { setDbReels(null); return; }
+      setDbReels(data ?? []);
     });
     return () => { cancelled = true; };
   }, []);
@@ -177,13 +206,27 @@ export default function CreatorsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSearching, debouncedSearchQuery, selectedFilter, myFollowingCreators, allCreators, dbProfiles, followerCounts]);
 
-  const featuredContent: ContentItem[] = [
-    { id: 1, type: 'reel', thumbnail: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', title: 'Top 5 Stocks for 2026', creator: 'Alex Rodriguez', views: '24.5K', duration: '0:58' },
-    { id: 2, type: 'reel', thumbnail: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', title: 'Bitcoin Bull Case Explained', creator: 'Crypto Katie', views: '18.2K', duration: '1:12' },
-    { id: 3, type: 'reel', thumbnail: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', title: 'Beginner ETF Strategy', creator: 'David Park', views: '32.1K', duration: '0:45' },
-    { id: 4, type: 'reel', thumbnail: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', title: 'Python Trading Bot Tutorial', creator: 'Mike Ross', views: '15.8K', duration: '2:34' },
-    { id: 5, type: 'reel', thumbnail: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)', title: 'Market Analysis: Tech Sector', creator: 'Sarah Chen', views: '21.3K', duration: '1:28' },
-  ];
+  // Real reels when available (null = fetch failed, use mock; [] = genuinely no reels yet,
+  // shown as-is — same convention as dbProfiles above).
+  const featuredContent: ContentItem[] = useMemo(() => {
+    if (dbReels === null) {
+      return [
+        { id: 1, type: 'reel', thumbnail: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', title: 'Top 5 Stocks for 2026', creator: 'Alex Rodriguez', views: '24.5K', duration: '0:58' },
+        { id: 2, type: 'reel', thumbnail: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', title: 'Bitcoin Bull Case Explained', creator: 'Crypto Katie', views: '18.2K', duration: '1:12' },
+        { id: 3, type: 'reel', thumbnail: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', title: 'Beginner ETF Strategy', creator: 'David Park', views: '32.1K', duration: '0:45' },
+        { id: 4, type: 'reel', thumbnail: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', title: 'Python Trading Bot Tutorial', creator: 'Mike Ross', views: '15.8K', duration: '2:34' },
+        { id: 5, type: 'reel', thumbnail: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)', title: 'Market Analysis: Tech Sector', creator: 'Sarah Chen', views: '21.3K', duration: '1:28' },
+      ] as ContentItem[];
+    }
+    return dbReels.map((r, i): ContentItem => ({
+      id: i + 1,
+      type: 'reel',
+      thumbnail: r.thumbnail_url ?? FEATURED_REEL_FALLBACK_GRADIENTS[i % FEATURED_REEL_FALLBACK_GRADIENTS.length],
+      storage_path: r.storage_path ?? undefined,
+      title: r.caption.slice(0, 60),
+      creator: r.creator.full_name,
+    }));
+  }, [dbReels]);
 
   const displayedContent: ContentItem[] = useMemo(() => {
     if (isSearching) {
@@ -193,8 +236,7 @@ export default function CreatorsPage() {
     }
     if (selectedFilter !== 'My Following') return featuredContent;
     return featuredContent.filter(item => followedIds.has(nameToCreatorId(item.creator)));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSearching, debouncedSearchQuery, selectedFilter, followedIds]);
+  }, [isSearching, debouncedSearchQuery, selectedFilter, followedIds, featuredContent]);
 
   // Shared canonical video catalog (src/app/data/reels.ts) — same source the watch page and
   // creator profile pages use, so video ids and creator links stay consistent across the app.
@@ -554,6 +596,8 @@ export default function CreatorsPage() {
                     <p className="text-center text-gray-500 text-sm">Sign in to see your followed creators</p>
                   ) : selectedFilter === 'My Following' && displayedContent.length === 0 && !isSearching ? (
                     <p className="text-center text-gray-500 text-sm">Follow creators to see them here</p>
+                  ) : displayedContent.length === 0 ? (
+                    <p className="text-center text-gray-500 text-sm">No reels yet. Check back soon!</p>
                   ) : (
                     <div className="max-w-[1344px] mx-auto flex gap-4 overflow-x-auto pb-2 max-sm:-mx-4 max-sm:px-4" style={{ justifyContent: 'safe center' }}>
                       {displayedContent.map(renderContentCard)}
@@ -615,18 +659,42 @@ export default function CreatorsPage() {
             return (
               <>
               <div
-                className="relative w-[min(24rem,calc(100vw-2rem))] h-[85vh] rounded-2xl overflow-hidden"
-                style={{ background: reel.thumbnail }}
+                className="relative w-[min(24rem,calc(100vw-2rem))] h-[85vh] rounded-2xl overflow-hidden bg-black"
+                style={reel.storage_path ? undefined : { background: reel.thumbnail.startsWith('http') ? `url(${reel.thumbnail})` : reel.thumbnail, backgroundSize: 'cover', backgroundPosition: 'center' }}
                 onClick={(e) => e.stopPropagation()}
               >
                 <div key={reel.id} className="absolute inset-0">
+                  {reel.storage_path ? (
+                    <video
+                      className="absolute inset-0 w-full h-full object-cover"
+                      src={getPublicUrl(BUCKETS.reels, reel.storage_path)}
+                      poster={reel.thumbnail.startsWith('http') ? reel.thumbnail : undefined}
+                      muted={isReelPreviewMuted}
+                      autoPlay
+                      loop
+                      playsInline
+                    />
+                  ) : null}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
 
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                      <PlayArrowIcon sx={{ fontSize: 40, color: '#ffffff' }} />
+                  {!reel.storage_path && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                        <PlayArrowIcon sx={{ fontSize: 40, color: '#ffffff' }} />
+                      </div>
                     </div>
-                  </div>
+                  )}
+
+                  {reel.storage_path && (
+                    <button
+                      onClick={() => setIsReelPreviewMuted(m => !m)}
+                      aria-label={isReelPreviewMuted ? 'Unmute' : 'Mute'}
+                      title={isReelPreviewMuted ? 'Unmute' : 'Mute'}
+                      className="absolute top-3 left-3 z-20 w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-colors"
+                    >
+                      {isReelPreviewMuted ? <VolumeOffIcon sx={{ fontSize: 18 }} /> : <VolumeUpIcon sx={{ fontSize: 18 }} />}
+                    </button>
+                  )}
 
                   {reel.duration && (
                     <div className="absolute top-3 left-3 bg-black/50 text-white text-xs font-medium px-2 py-1 rounded">
@@ -655,7 +723,6 @@ export default function CreatorsPage() {
                       )}
                     </div>
                     {reel.views && <p className="text-white/70 text-xs mb-2">{reel.views} views</p>}
-                    <p className="text-white/60 text-xs">🎬 Reel playback coming soon</p>
                   </div>
                 </div>
 

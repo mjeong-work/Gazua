@@ -23,13 +23,17 @@ export async function getProfile(userId: string): Promise<ServiceResult<Profile>
 }
 
 // ── getCreatorByUsername ─────────────────────────────────────────
-/** Fetch a creator profile by their URL slug (username). Used on profile pages. */
+/**
+ * Fetch a profile by its URL slug (username). Used on profile pages —
+ * both a creator's public profile and a regular user's own profile
+ * (e.g. the /watchlist -> /profile/:username/investment redirect), so
+ * this intentionally does not filter on is_creator.
+ */
 export async function getCreatorByUsername(username: string): Promise<ServiceResult<Profile>> {
   const { data, error } = await supabase
     .from('profiles')
     .select(CREATOR_LIST_COLUMNS)
     .eq('username', username)
-    .eq('is_creator', true)
     .single()
 
   if (error) return { data: null, error: error.message }

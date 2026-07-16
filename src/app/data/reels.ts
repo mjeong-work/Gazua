@@ -10,6 +10,8 @@ export interface Reel {
   verified: boolean;
   caption: string;
   thumbnail: string;
+  /** Bucket-relative path to the uploaded video — present for DB-backed reels with real video. */
+  storage_path?: string;
   likes: number;
   comments: number;
   shares: number;

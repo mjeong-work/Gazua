@@ -1,6 +1,6 @@
 import { supabase } from '../supabase'
 import type { ServiceResult } from '../supabase'
-import type { Reel, ReelInsert, ReelWithCreator, VideoWithCreator } from '../../types/database'
+import type { Reel, ReelInsert, ReelWithCreator, Video, VideoInsert, VideoWithCreator } from '../../types/database'
 
 // ── Select fragments ─────────────────────────────────────────────
 const REEL_WITH_CREATOR = `
@@ -212,8 +212,23 @@ export async function getVideoById(
   return { data: data as unknown as VideoWithCreator, error: null }
 }
 
+// ── createVideo ──────────────────────────────────────────────────
+/** Create a new long-form video. Used by MyProfilePage's video upload modal. */
+export async function createVideo(
+  payload: Omit<VideoInsert, 'id' | 'created_at' | 'updated_at'>
+): Promise<ServiceResult<Video>> {
+  const { data, error } = await supabase
+    .from('videos')
+    .insert(payload)
+    .select()
+    .single()
+
+  if (error) return { data: null, error: error.message }
+  return { data, error: null }
+}
+
 // ── createReel ───────────────────────────────────────────────────
-/** Create a new reel. Used by CreateReelModal (future Supabase migration). */
+/** Create a new reel. Used by CreateReelModal. */
 export async function createReel(
   payload: Omit<ReelInsert, 'id' | 'created_at' | 'updated_at'>
 ): Promise<ServiceResult<Reel>> {

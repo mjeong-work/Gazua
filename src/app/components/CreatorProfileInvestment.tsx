@@ -360,12 +360,14 @@ export default function CreatorProfileInvestment() {
                       Subscribe
                     </button>
                   )}
-                  <button
-                    onClick={() => setShowChat(true)}
-                    className="px-5 sm:px-6 py-2.5 bg-gray-100 text-black font-medium text-sm rounded-full hover:bg-gray-200 transition-colors"
-                  >
-                    Message
-                  </button>
+                  {dbProfile && (
+                    <button
+                      onClick={() => setShowChat(true)}
+                      className="px-5 sm:px-6 py-2.5 bg-gray-100 text-black font-medium text-sm rounded-full hover:bg-gray-200 transition-colors"
+                    >
+                      Message
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -1014,12 +1016,12 @@ export default function CreatorProfileInvestment() {
         />
       )}
 
-      {showChat && (
+      {showChat && dbProfile && (
         <CreatorChatWidget
-          key={creatorId}
-          creatorId={creatorId}
+          key={dbProfile.id}
+          creatorId={dbProfile.id}
           creatorName={creator.name}
-          creatorAvatar={creator.avatar}
+          creatorAvatarUrl={dbProfile.avatar_url}
           onClose={() => setShowChat(false)}
         />
       )}

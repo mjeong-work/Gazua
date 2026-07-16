@@ -13,8 +13,10 @@ import { useOnboarding } from '../contexts/OnboardingContext';
 import AppHeader from './AppHeader';
 import { type Model, MOCK_MODELS } from '../data/models';
 import { useWatchlist } from '../contexts/WatchlistContext';
-import { getModels } from '../../lib/services/models.service';
-import type { ModelWithCreator } from '../../types/database';
+import { useAuth } from '../contexts/AuthContext';
+import { getModels, createModel } from '../../lib/services/models.service';
+import { BUCKETS, buildOwnerPath, uploadToBucket } from '../../lib/storage';
+import type { ModelWithCreator, ModelCategory, ModelDifficulty, ModelFileType } from '../../types/database';
 
 function normalizeDbModel(m: ModelWithCreator, index: number): Model {
   const initial = (m.creator?.full_name?.[0] ?? '?').toUpperCase();
@@ -55,6 +57,89 @@ export default function ModelHubPage() {
   });
 
   const isExpert = onboardingData.level === 'confident';
+  const { profile } = useAuth();
+
+  // Upload form state
+  const [uploadTitle, setUploadTitle] = useState('');
+  const [uploadDescription, setUploadDescription] = useState('');
+  const [uploadCategory, setUploadCategory] = useState<ModelCategory | ''>('');
+  const [uploadDifficulty, setUploadDifficulty] = useState<ModelDifficulty | ''>('');
+  const [uploadFileType, setUploadFileType] = useState<ModelFileType | ''>('');
+  const [uploadLearnings, setUploadLearnings] = useState('');
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadSubmitting, setUploadSubmitting] = useState(false);
+
+  const resetUploadForm = () => {
+    setUploadTitle('');
+    setUploadDescription('');
+    setUploadCategory('');
+    setUploadDifficulty('');
+    setUploadFileType('');
+    setUploadLearnings('');
+    setUploadFile(null);
+    setUploadError(null);
+  };
+
+  const handleCloseUploadModal = () => {
+    setShowUploadModal(false);
+    resetUploadForm();
+  };
+
+  const MODEL_MAX_BYTES = 25 * 1024 * 1024; // 25MB, matches the existing "max 25MB" copy
+
+  const handleModelFileSelected = (file: File | null | undefined) => {
+    if (!file) return;
+    if (file.size > MODEL_MAX_BYTES) {
+      setUploadError('File is too large — max 25MB.');
+      return;
+    }
+    setUploadError(null);
+    setUploadFile(file);
+  };
+
+  const handlePublishModel = async () => {
+    if (!profile?.id || !uploadTitle.trim() || !uploadCategory || !uploadDifficulty || !uploadFileType || !uploadFile) return;
+
+    setUploadSubmitting(true);
+    setUploadError(null);
+
+    const ext = uploadFile.name.split('.').pop() || 'bin';
+    const fileUpload = await uploadToBucket(BUCKETS.models, buildOwnerPath(profile.id, ext), uploadFile);
+    if (fileUpload.error || !fileUpload.data) {
+      setUploadError(fileUpload.error ?? 'Failed to upload file. Please try again.');
+      setUploadSubmitting(false);
+      return;
+    }
+
+    const learnings = uploadLearnings.split('\n').map(l => l.trim()).filter(Boolean);
+
+    const { data: newModel, error } = await createModel({
+      creator_id: profile.id,
+      title: uploadTitle.trim(),
+      description: uploadDescription.trim() || null,
+      category: uploadCategory,
+      difficulty: uploadDifficulty,
+      file_type: uploadFileType,
+      learnings,
+      storage_path: fileUpload.data.path,
+      access_level: 'Free Preview',
+    });
+
+    setUploadSubmitting(false);
+
+    if (error || !newModel) {
+      setUploadError(error ?? 'Failed to publish. Please try again.');
+      return;
+    }
+
+    setDbModels(prev => [normalizeDbModel({
+      ...newModel,
+      creator: { id: profile.id, username: profile.username, full_name: profile.full_name, avatar_url: profile.avatar_url },
+    }, 0), ...(prev ?? [])]);
+    handleCloseUploadModal();
+    triggerToast('Model published!');
+  };
 
   // Supabase-backed model data. null = not yet resolved (use mock fallback).
   const [dbModels, setDbModels] = useState<Model[] | null>(null);
@@ -99,18 +184,18 @@ export default function ModelHubPage() {
   }, [dbModels, searchQuery, filters]);
 
   const handleSave = (model: Model) => {
-    if (!isSaved('model', model.id)) {
+    if (!isSaved('model', model.db_id)) {
       addToWatchlist({
         ticker: model.title,
         name: model.title,
         assetType: 'Strategy',
         source_type: 'model',
-        source_content_id: model.db_id ?? String(model.id),
+        source_content_id: model.db_id,
         source: `Saved from model: ${model.title}`,
       });
       triggerToast('Saved to Watchlist', 'Build your thesis in the Watchlist tab');
     } else {
-      removeBySource('model', model.id);
+      removeBySource('model', model.db_id);
       triggerToast('Removed from Watchlist');
     }
   };
@@ -283,7 +368,7 @@ export default function ModelHubPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {filteredModels.map((model) => {
                 const isLocked = model.access === 'Expert Only' && !isExpert;
-                const isModelSaved = isSaved('model', model.id);
+                const isModelSaved = isSaved('model', model.db_id);
 
                 return (
                   <div
@@ -416,7 +501,7 @@ export default function ModelHubPage() {
       {showUploadModal && (
         <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-          onClick={() => setShowUploadModal(false)}
+          onClick={handleCloseUploadModal}
         >
           <div
             className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
@@ -429,7 +514,7 @@ export default function ModelHubPage() {
                 <p className="text-sm text-gray-600">Help the community learn with your finance models</p>
               </div>
               <button
-                onClick={() => setShowUploadModal(false)}
+                onClick={handleCloseUploadModal}
                 className="p-2 hover:bg-gray-100 rounded-full transition-colors"
               >
                 <CloseIcon sx={{ fontSize: 20 }} />
@@ -460,6 +545,8 @@ export default function ModelHubPage() {
                     <label className="block text-sm font-bold text-gray-700 mb-2">Model Title</label>
                     <input
                       type="text"
+                      value={uploadTitle}
+                      onChange={(e) => setUploadTitle(e.target.value)}
                       placeholder="e.g., Advanced Portfolio Optimizer"
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]"
                     />
@@ -468,8 +555,12 @@ export default function ModelHubPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-bold text-gray-700 mb-2">Category</label>
-                      <select className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]">
-                        <option>Select category</option>
+                      <select
+                        value={uploadCategory}
+                        onChange={(e) => setUploadCategory(e.target.value as ModelCategory)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]"
+                      >
+                        <option value="">Select category</option>
                         <option>Valuation</option>
                         <option>Portfolio</option>
                         <option>Quant Strategy</option>
@@ -480,8 +571,12 @@ export default function ModelHubPage() {
 
                     <div>
                       <label className="block text-sm font-bold text-gray-700 mb-2">Difficulty</label>
-                      <select className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]">
-                        <option>Select difficulty</option>
+                      <select
+                        value={uploadDifficulty}
+                        onChange={(e) => setUploadDifficulty(e.target.value as ModelDifficulty)}
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]"
+                      >
+                        <option value="">Select difficulty</option>
                         <option>Beginner</option>
                         <option>Intermediate</option>
                         <option>Advanced</option>
@@ -492,8 +587,12 @@ export default function ModelHubPage() {
 
                   <div>
                     <label className="block text-sm font-bold text-gray-700 mb-2">File Type</label>
-                    <select className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]">
-                      <option>Select file type</option>
+                    <select
+                      value={uploadFileType}
+                      onChange={(e) => setUploadFileType(e.target.value as ModelFileType)}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]"
+                    >
+                      <option value="">Select file type</option>
                       <option>Excel</option>
                       <option>Google Sheet</option>
                       <option>Python</option>
@@ -506,6 +605,8 @@ export default function ModelHubPage() {
                     <label className="block text-sm font-bold text-gray-700 mb-2">Description</label>
                     <textarea
                       rows={3}
+                      value={uploadDescription}
+                      onChange={(e) => setUploadDescription(e.target.value)}
                       placeholder="Describe what your model does and who it's for..."
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b] resize-none"
                     />
@@ -515,6 +616,8 @@ export default function ModelHubPage() {
                     <label className="block text-sm font-bold text-gray-700 mb-2">What users will learn (one per line)</label>
                     <textarea
                       rows={3}
+                      value={uploadLearnings}
+                      onChange={(e) => setUploadLearnings(e.target.value)}
                       placeholder="e.g., Build valuation models&#10;Calculate intrinsic value&#10;Compare to market price"
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b] resize-none"
                     />
@@ -522,15 +625,32 @@ export default function ModelHubPage() {
 
                   <div>
                     <label className="block text-sm font-bold text-gray-700 mb-2">Upload File</label>
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors cursor-pointer">
+                    <input
+                      type="file"
+                      id="model-file-input"
+                      accept=".xlsx,.xls,.csv,.py,.ipynb,.pdf"
+                      className="hidden"
+                      onChange={(e) => handleModelFileSelected(e.target.files?.[0])}
+                    />
+                    <label
+                      htmlFor="model-file-input"
+                      className="block border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors cursor-pointer"
+                    >
                       <UploadIcon sx={{ fontSize: 48, color: '#9ca3af' }} />
-                      <p className="text-sm text-gray-600 mt-2">Click to upload or drag and drop</p>
+                      <p className="text-sm text-gray-600 mt-2">
+                        {uploadFile ? `Selected: ${uploadFile.name}` : 'Click to upload or drag and drop'}
+                      </p>
                       <p className="text-xs text-gray-500 mt-1">Excel, CSV, Python, PDF (max 25MB)</p>
-                    </div>
+                    </label>
+                    {uploadError && <p className="text-sm text-red-500 mt-2">{uploadError}</p>}
                   </div>
 
-                  <button className="w-full py-4 bg-black text-white font-bold rounded-full hover:bg-black/80 transition-colors">
-                    Publish Model
+                  <button
+                    onClick={handlePublishModel}
+                    disabled={!uploadTitle.trim() || !uploadCategory || !uploadDifficulty || !uploadFileType || !uploadFile || uploadSubmitting}
+                    className="w-full py-4 bg-black text-white font-bold rounded-full hover:bg-black/80 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  >
+                    {uploadSubmitting ? 'Publishing…' : 'Publish Model'}
                   </button>
 
                   <p className="text-xs text-center text-gray-500">

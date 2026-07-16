@@ -18,6 +18,9 @@ import type { MarketIndex } from '../data/marketData';
 import { useWatchlist } from '../contexts/WatchlistContext';
 import { getCreator } from '../data/creators';
 import { useSwipePanel } from '../hooks/useSwipePanel';
+import { BUCKETS, getPublicUrl } from '../../lib/storage';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 
 type TimeRange = '1D' | '1W' | '1M' | '3M' | '1Y' | 'ALL';
 type SavedItemMeta = Omit<SavedContentInput, 'userId'>;
@@ -42,7 +45,10 @@ function normalizeDbReel(r: DbReel, index: number): Reel {
     avatar: (r.creator.full_name?.[0] ?? '?').toUpperCase(),
     verified: r.creator.is_verified,
     caption: r.caption,
+    // Raw thumbnail_url (or a CSS gradient fallback) — wrapped in url(...) only where used as a
+    // CSS `background` value; used as-is for <video poster>.
     thumbnail: r.thumbnail_url ?? FALLBACK_GRADIENTS[index % FALLBACK_GRADIENTS.length],
+    storage_path: r.storage_path ?? undefined,
     likes: r.like_count,
     comments: 0,
     shares: r.share_count,
@@ -78,6 +84,10 @@ export default function MainPageReels() {
   // under it.
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  // Real <video> playback for DB-backed reels — one global mute state (not per-card) matches
+  // standard short-form-feed UX; browsers require muted for autoplay so this starts true.
+  const [isMuted, setIsMuted] = useState(true);
+  const videoRefs = useRef<Map<number, HTMLVideoElement>>(new Map());
   const [activeTimeRange, setActiveTimeRange] = useState<TimeRange>('1M');
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -183,6 +193,18 @@ export default function MainPageReels() {
     setTimeout(() => setShowToast(false), 3000);
   };
 
+  // Play the active reel's video, pause every other one.
+  useEffect(() => {
+    videoRefs.current.forEach((el, idx) => {
+      if (idx === activeIndex) {
+        el.play().catch(() => {}); // autoplay can reject if not yet muted/ready — harmless
+      } else {
+        el.pause();
+        el.currentTime = 0;
+      }
+    });
+  }, [activeIndex]);
+
   const handleScroll = () => {
     const el = scrollRef.current;
     if (!el) return;
@@ -238,7 +260,7 @@ export default function MainPageReels() {
   };
 
   const handleSaveToWatchlist = (reel: Reel) => {
-    if (!isSaved('reel', reel.id)) {
+    if (!isSaved('reel', reel.db_id)) {
       const ticker = reel.tickers[0] ?? reel.caption.match(/#([A-Za-z]{1,5})\b/)?.[1]?.toUpperCase() ?? '';
       if (!ticker) {
         triggerToast('Could not identify a ticker in this reel');
@@ -249,12 +271,12 @@ export default function MainPageReels() {
         name: reel.caption.substring(0, 60),
         assetType: 'Strategy',
         source_type: 'reel',
-        source_content_id: reel.id,
+        source_content_id: reel.db_id,
         source: `Saved from reel by ${reel.creator}`,
       });
       triggerToast('Saved to Watchlist', 'Build your thesis in the Watchlist tab');
     } else {
-      removeBySource('reel', reel.id);
+      removeBySource('reel', reel.db_id);
       triggerToast('Removed from Watchlist');
     }
   };
@@ -486,7 +508,7 @@ export default function MainPageReels() {
               >
                 {(activeTab === 'following' ? (followingReels ?? []) : filteredReels).map((reel, index) => {
                   const isLiked = likedReels.has(getLikeKey(reel));
-                  const isSavedReel = isSaved('reel', reel.id);
+                  const isSavedReel = isSaved('reel', reel.db_id);
                   const hasProfile = !!getCreator(reel.creator_id);
                   const likeCount = reel.likes + (isLiked ? 1 : 0);
                   // UUID used for follow operations; falls back to undefined for mock reels
@@ -511,18 +533,60 @@ export default function MainPageReels() {
                       key={reel.id}
                       className="relative h-full w-full overflow-hidden snap-start flex items-center justify-center"
                     >
-                      {/* Thumbnail background */}
-                      <div className="absolute inset-0" style={{ background: reel.thumbnail }}>
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40" />
-                      </div>
+                      {reel.storage_path ? (
+                        <video
+                          ref={(el) => {
+                            if (el) {
+                              videoRefs.current.set(index, el);
+                              // Reels load asynchronously — by the time this element mounts,
+                              // the activeIndex-driven effect below may have already run and
+                              // won't fire again until activeIndex changes, so play here too.
+                              if (index === activeIndex) el.play().catch(() => {});
+                            } else {
+                              videoRefs.current.delete(index);
+                            }
+                          }}
+                          className="absolute inset-0 w-full h-full object-cover"
+                          src={getPublicUrl(BUCKETS.reels, reel.storage_path)}
+                          poster={reel.thumbnail.startsWith('http') ? reel.thumbnail : undefined}
+                          muted={isMuted}
+                          loop
+                          playsInline
+                        />
+                      ) : (
+                        <div
+                          className="absolute inset-0"
+                          style={{
+                            background: reel.thumbnail.startsWith('http') ? `url(${reel.thumbnail})` : reel.thumbnail,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                          }}
+                        />
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40" />
 
-                      {/* Play icon placeholder */}
-                      <div className="relative z-10 text-white text-center">
-                        <div className="w-32 h-32 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mb-4 mx-auto">
-                          <VideoLibraryIcon sx={{ fontSize: 64, color: '#ffffff' }} />
+                      {/* Play icon placeholder — only shown for reels with no real video yet */}
+                      {!reel.storage_path && (
+                        <div className="relative z-10 text-white text-center">
+                          <div className="w-32 h-32 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mb-4 mx-auto">
+                            <VideoLibraryIcon sx={{ fontSize: 64, color: '#ffffff' }} />
+                          </div>
+                          <p className="text-sm opacity-70">Investment Education Reel</p>
                         </div>
-                        <p className="text-sm opacity-70">Investment Education Reel</p>
-                      </div>
+                      )}
+
+                      {/* Mute toggle — tap anywhere-on-video convention, but a dedicated small
+                          button here keeps it from swallowing taps meant for the card underneath. */}
+                      {reel.storage_path && (
+                        <button
+                          onClick={() => setIsMuted(m => !m)}
+                          aria-label={isMuted ? 'Unmute' : 'Mute'}
+                          title={isMuted ? 'Unmute' : 'Mute'}
+                          className="absolute top-24 right-4 z-20 w-9 h-9 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-colors"
+                        >
+                          {isMuted ? <VolumeOffIcon sx={{ fontSize: 18 }} /> : <VolumeUpIcon sx={{ fontSize: 18 }} />}
+                        </button>
+                      )}
 
                       {/* Creator info overlay — bottom-20 clears the 64px mobile bottom nav */}
                       <div className="absolute bottom-20 left-3 right-16 z-20 lg:bottom-10 lg:left-8 lg:right-24">
@@ -621,7 +685,9 @@ export default function MainPageReels() {
         />
       )}
 
-      {/* Floating Create Button */}
+      {/* Floating Create Button — hidden while the comments panel is open, since it
+          otherwise sits directly on top of the comment composer's send button. */}
+      {!isCommentsOpen && (
       <button
         onClick={() => setShowCreateReel(true)}
         className="fixed bottom-24 right-4 lg:bottom-8 lg:right-8 w-14 h-14 bg-[#7CFFB2] text-black rounded-full shadow-lg hover:bg-[#6EEEA8] transition-all hover:scale-110 flex items-center justify-center z-40 group"
@@ -632,6 +698,7 @@ export default function MainPageReels() {
           Create Reel
         </span>
       </button>
+      )}
 
       {/* Toast */}
       {showToast && (

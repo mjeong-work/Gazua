@@ -17,7 +17,8 @@ export interface AddToWatchlistPayload {
   name?: string;
   assetType?: WatchlistItem['asset_type'];
   source_type: WatchlistSourceType;
-  source_content_id?: number;
+  /** Real Supabase UUID of the source post/reel/model — omit for mock (non-DB-backed) content. */
+  source_content_id?: string;
   source?: string;
 }
 
@@ -25,17 +26,13 @@ interface WatchlistContextType {
   watchlistItems: WatchlistItem[];
   addToWatchlist: (payload: AddToWatchlistPayload) => void;
   removeFromWatchlist: (id: string) => void;
-  removeBySource: (source_type: WatchlistSourceType, source_content_id: number) => void;
+  removeBySource: (source_type: WatchlistSourceType, source_content_id: string | undefined) => void;
   updateItem: (id: string, updates: Partial<WatchlistItem>) => void;
-  isSaved: (source_type: WatchlistSourceType, source_content_id: number) => boolean;
+  isSaved: (source_type: WatchlistSourceType, source_content_id: string | undefined) => boolean;
   isLoading: boolean;
 }
 
 const WatchlistContext = createContext<WatchlistContextType | undefined>(undefined);
-
-function numericIdToString(n: number | undefined): string | undefined {
-  return n !== undefined ? String(n) : undefined;
-}
 
 export function WatchlistProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -69,7 +66,7 @@ export function WatchlistProvider({ children }: { children: ReactNode }) {
   const addToWatchlist = (payload: AddToWatchlistPayload) => {
     const uid = userIdRef.current;
     const ticker = payload.ticker.toUpperCase();
-    const srcId = numericIdToString(payload.source_content_id);
+    const srcId = payload.source_content_id;
 
     const alreadySaved = watchlistItems.some(item =>
       srcId
@@ -127,16 +124,16 @@ export function WatchlistProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const removeBySource = (source_type: WatchlistSourceType, source_content_id: number) => {
+  const removeBySource = (source_type: WatchlistSourceType, source_content_id: string | undefined) => {
+    if (!source_content_id) return;
     const uid = userIdRef.current;
-    const srcId = String(source_content_id);
     setWatchlistItems(prev =>
       prev.filter(item =>
-        !(item.source_type === source_type && item.source_content_id === srcId)
+        !(item.source_type === source_type && item.source_content_id === source_content_id)
       )
     );
     if (uid) {
-      dbRemoveBySource(uid, source_type, srcId).catch(() => {});
+      dbRemoveBySource(uid, source_type, source_content_id).catch(() => {});
     }
   };
 
@@ -150,10 +147,10 @@ export function WatchlistProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const isSaved = (source_type: WatchlistSourceType, source_content_id: number): boolean => {
-    const srcId = String(source_content_id);
+  const isSaved = (source_type: WatchlistSourceType, source_content_id: string | undefined): boolean => {
+    if (!source_content_id) return false;
     return watchlistItems.some(
-      item => item.source_type === source_type && item.source_content_id === srcId
+      item => item.source_type === source_type && item.source_content_id === source_content_id
     );
   };
 

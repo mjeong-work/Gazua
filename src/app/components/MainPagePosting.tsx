@@ -357,19 +357,47 @@ export default function MainPagePosting() {
     setTimeout(() => setShowToast(false), 3000);
   };
 
+  // Same real share pattern already used by reels (ReelMoreMenu): native share sheet when
+  // available, clipboard-copy fallback otherwise. No dedicated post-permalink page exists yet,
+  // so this shares the current feed URL — same convention reels already use.
+  const handleShare = async (post: Post) => {
+    const shareUrl = window.location.href;
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({ title: post.asset, text: post.content.slice(0, 100), url: shareUrl });
+      } catch {
+        return; // user cancelled the native share sheet — not an error
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        triggerToast('Link copied');
+      } catch {
+        triggerToast('Could not copy link');
+        return;
+      }
+    }
+
+    if (post.db_id) {
+      const key = getLikeKey(post);
+      setShareCounts(prev => ({ ...prev, [key]: (prev[key] ?? post.shares) + 1 }));
+      incrementShareCount(post.db_id).catch(() => {});
+    }
+  };
+
   const handleSaveToWatchlist = (post: Post) => {
-    if (!isSaved('post', post.id)) {
+    if (!isSaved('post', post.db_id)) {
       addToWatchlist({
         ticker: post.asset,
         name: post.asset,
         assetType: categoryToAssetType(post.category),
         source_type: 'post',
-        source_content_id: post.id,
+        source_content_id: post.db_id,
         source: `Saved from post by ${post.creator}`,
       });
       triggerToast('Saved to Watchlist', 'Build your thesis in the Watchlist tab');
     } else {
-      removeBySource('post', post.id);
+      removeBySource('post', post.db_id);
       triggerToast('Removed from Watchlist');
     }
   };
@@ -777,7 +805,7 @@ export default function MainPagePosting() {
                       const displayLikes = post.likes
                         + (isLiked ? 1 : 0)
                         - (hydratedLikedIds.has(likeKey) ? 1 : 0);
-                      const isPostSaved = isSaved('post', post.id);
+                      const isPostSaved = isSaved('post', post.db_id);
                       const algoLabel = derivePostLabel(post.likes, post.shares, post.verified, post.category);
                       return (
                         <div key={post.id} className="bg-white border border-gray-200 rounded-xl p-5 hover:border-gray-300 transition-colors">
@@ -861,14 +889,7 @@ export default function MainPagePosting() {
                               </span>
                             </button>
                             <button
-                              onClick={() => {
-                                triggerToast('Share coming soon');
-                                if (post.db_id) {
-                                  const key = getLikeKey(post);
-                                  setShareCounts(prev => ({ ...prev, [key]: (prev[key] ?? post.shares) + 1 }));
-                                  incrementShareCount(post.db_id).catch(() => {});
-                                }
-                              }}
+                              onClick={() => handleShare(post)}
                               className="flex items-center gap-2 hover:text-green-500 transition-colors"
                             >
                               <ShareIcon sx={{ fontSize: 20 }} />

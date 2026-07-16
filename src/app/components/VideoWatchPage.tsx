@@ -6,13 +6,14 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import AppHeader from './AppHeader';
 import ReelEngagementBar from './reels/ReelEngagementBar';
 import ReelMetadata from './reels/ReelMetadata';
-import { seedFromId, formatCount } from './reels/format';
+import { seedFromId, formatCount, formatDurationSeconds } from './reels/format';
 import { CREATOR_VIDEOS, getVideosByCreator as getMockVideosByCreator } from '../data/reels';
 import { getCreator } from '../data/creators';
 import { getVideoById, getVideosByCreator as getDbVideosByCreator } from '../../lib/services/reels.service';
 import { getFollowerCount } from '../../lib/services/follows.service';
 import { useFollow, isUUID } from '../contexts/FollowContext';
 import type { SavedContentInput } from '../contexts/SavedContentContext';
+import { BUCKETS, getPublicUrl } from '../../lib/storage';
 
 type SavedItemMeta = Omit<SavedContentInput, 'userId'>;
 
@@ -21,12 +22,6 @@ const FALLBACK_GRADIENTS = [
   'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
   'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
 ];
-
-function formatDurationSeconds(secs: number): string {
-  const mm = String(Math.floor(secs / 60)).padStart(1, '0');
-  const ss = String(secs % 60).padStart(2, '0');
-  return `${mm}:${ss}`;
-}
 
 /** Stable numeric seed for seedFromId() — mock video ids are already numbers; real video ids
  * are UUID strings, so hash them down to an int instead (using .length would collide badly,
@@ -52,6 +47,8 @@ interface ResolvedVideo {
   numericSeed: number;
   title: string;
   thumbnail: string;
+  /** Bucket-relative storage path — present for DB-backed videos with a real uploaded file. */
+  storagePath?: string;
   duration: string;
   views: string;
   uploadedAt: string;
@@ -97,6 +94,7 @@ export default function VideoWatchPage() {
           numericSeed: hashToInt(dbVideo.id),
           title: dbVideo.title,
           thumbnail: dbVideo.thumbnail_url ?? FALLBACK_GRADIENTS[0],
+          storagePath: dbVideo.storage_path ?? undefined,
           duration: formatDurationSeconds(dbVideo.duration_seconds ?? 0),
           views: formatCount(dbVideo.view_count),
           uploadedAt: new Date(dbVideo.created_at).toLocaleDateString(),
@@ -223,18 +221,37 @@ export default function VideoWatchPage() {
 
           {/* ── Player ── */}
           <div className="relative aspect-video rounded-xl overflow-hidden mb-4 bg-black">
-            <div className="absolute inset-0" style={{ background: video.thumbnail }} />
-            <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-              <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                <PlayArrowIcon sx={{ fontSize: 40, color: '#ffffff' }} />
-              </div>
-            </div>
-            <div className="absolute bottom-3 left-3 bg-black/70 text-white text-xs font-medium px-2 py-1 rounded">
-              Video playback coming soon
-            </div>
-            <div className="absolute bottom-3 right-3 bg-black/70 text-white text-xs font-medium px-2 py-1 rounded">
-              {video.duration}
-            </div>
+            {video.storagePath ? (
+              <video
+                controls
+                playsInline
+                poster={video.thumbnail.startsWith('http') ? video.thumbnail : undefined}
+                className="w-full h-full object-contain bg-black"
+                src={getPublicUrl(BUCKETS.videos, video.storagePath)}
+              />
+            ) : (
+              <>
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background: video.thumbnail.startsWith('http') ? `url(${video.thumbnail})` : video.thumbnail,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
+                />
+                <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                  <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                    <PlayArrowIcon sx={{ fontSize: 40, color: '#ffffff' }} />
+                  </div>
+                </div>
+                <div className="absolute bottom-3 left-3 bg-black/70 text-white text-xs font-medium px-2 py-1 rounded">
+                  Preview only
+                </div>
+                <div className="absolute bottom-3 right-3 bg-black/70 text-white text-xs font-medium px-2 py-1 rounded">
+                  {video.duration}
+                </div>
+              </>
+            )}
           </div>
 
           {/* ── Title & stats ── */}

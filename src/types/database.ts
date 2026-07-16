@@ -529,6 +529,34 @@ export interface Database {
         }
       }
 
+      // ── messages ───────────────────────────────────────────────
+      messages: {
+        Row: {
+          id: string
+          sender_id: string
+          recipient_id: string
+          content: string
+          read_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          sender_id: string
+          recipient_id: string
+          content: string
+          read_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          sender_id?: string
+          recipient_id?: string
+          content?: string
+          read_at?: string | null
+          created_at?: string
+        }
+      }
+
       // ── subscriptions (Stripe platform) ───────────────────────
       subscriptions: {
         Row: {
@@ -951,6 +979,9 @@ export type Follow              = Tables<'follows'>['Row']
 
 export type Notification        = Tables<'notifications'>['Row']
 export type NotificationInsert  = Tables<'notifications'>['Insert']
+
+export type Message             = Tables<'messages'>['Row']
+export type MessageInsert       = Tables<'messages'>['Insert']
 
 export type Subscription        = Tables<'subscriptions'>['Row']
 export type CreatorMembership   = Tables<'creator_memberships'>['Row']
