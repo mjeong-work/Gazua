@@ -6,7 +6,7 @@ import { type Level, ONBOARDING_LEVELS } from '../../data/onboardingOptions';
 
 export default function PickLevel() {
   const navigate = useNavigate();
-  const { setLevel } = useOnboarding();
+  const { setLevel, completeOnboarding } = useOnboarding();
   const [selectedLevel, setSelectedLevel] = useState<Level | null>(null);
 
   const handleContinue = () => {
@@ -20,7 +20,7 @@ export default function PickLevel() {
     <div className="min-h-screen bg-white flex items-center justify-center px-6 relative">
       {/* Skip link */}
       <button
-        onClick={() => navigate('/main')}
+        onClick={() => { completeOnboarding(); navigate('/main'); }}
         className="absolute top-6 right-6 text-sm text-gray-400 hover:text-gray-600 transition-colors"
       >
         Skip →

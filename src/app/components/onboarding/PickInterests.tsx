@@ -6,7 +6,7 @@ import { INTEREST_OPTIONS } from '../../data/onboardingOptions';
 
 export default function PickInterests() {
   const navigate = useNavigate();
-  const { setInterests } = useOnboarding();
+  const { setInterests, completeOnboarding } = useOnboarding();
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
 
   const toggleInterest = (interest: string) => {
@@ -28,7 +28,7 @@ export default function PickInterests() {
     <div className="min-h-screen bg-white flex items-center justify-center px-6 relative">
       {/* Skip link */}
       <button
-        onClick={() => navigate('/main')}
+        onClick={() => { completeOnboarding(); navigate('/main'); }}
         className="absolute top-6 right-6 text-sm text-gray-400 hover:text-gray-600 transition-colors"
       >
         Skip →
