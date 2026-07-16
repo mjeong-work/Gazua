@@ -1,14 +1,17 @@
-import { useEffect, useMemo, useRef, useState, type TouchEvent, type WheelEvent } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type TouchEvent, type WheelEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { toast } from 'sonner';
+import { AnimatePresence } from 'motion/react';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import CloseIcon from '@mui/icons-material/Close';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import VolumeOffIcon from '@mui/icons-material/VolumeOff';
+import TuneIcon from '@mui/icons-material/Tune';
 import AppHeader from './AppHeader';
 import CreatorsSidebar from './CreatorsSidebar';
 import ReelEngagementActions from './reels/ReelEngagementActions';
 import { seedFromId } from './reels/format';
+import CreatorsFilterSheet, { type Difficulty } from './creators/CreatorsFilterSheet';
 import {
   getCreator,
   nameToCreatorId,
@@ -68,13 +71,44 @@ const FEATURED_REEL_FALLBACK_GRADIENTS = [
   'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
 ];
 
+// Maps a creator's featured_category (real DB profiles) onto the 3-tier difficulty scale
+// this page has always grouped creators into — same grouping the old single-select filter
+// used, now reusable for both the desktop pill row and the mobile filter sheet's multi-select.
+const CATEGORY_TO_DIFFICULTY: Partial<Record<FeaturedCategory, Difficulty>> = {
+  beginner_educator: 'Beginner',
+  featured: 'Intermediate',
+  trending: 'Intermediate',
+  stock_picker: 'Intermediate',
+  retirement_expert: 'Intermediate',
+  quant_builder: 'Advanced',
+  crypto_voice: 'Advanced',
+};
+
+const MOBILE_TABS = [
+  { key: 'creators', label: 'Creators' },
+  { key: 'reels', label: 'Reels' },
+  { key: 'videos', label: 'Videos' },
+] as const;
+type MobileTabKey = (typeof MOBILE_TABS)[number]['key'];
+
 type SavedItemMeta = Omit<SavedContentInput, 'userId'>;
 
 export default function CreatorsPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { followedIds, isFollowing: isFollowingFn, toggleFollow } = useFollow();
-  const [selectedFilter, setSelectedFilter] = useState<'All' | 'Beginner' | 'Intermediate' | 'Advanced' | 'My Following'>('All');
+
+  // Shared filter state — desktop's 5 pill buttons and mobile's filter sheet both write into
+  // this same pair (desktop always sets a single difficulty exclusively; mobile allows
+  // combining multiple), so both surfaces stay consistent with one source of truth.
+  const [difficultyFilters, setDifficultyFilters] = useState<Set<Difficulty>>(new Set());
+  const [myFollowingOnly, setMyFollowingOnly] = useState(false);
+
+  // Mobile-only: which of the 3 swipeable panels is active, and the difficulty filter sheet.
+  const [mobileTab, setMobileTab] = useState<MobileTabKey>('reels');
+  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
+  const swipeTrackRef = useRef<HTMLDivElement>(null);
+  const tabButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   // Search — driven by the top search bar (SearchModal), which syncs ?q= here while the user
   // is on this page. Debounced locally too so re-filtering doesn't run on every keystroke.
@@ -99,17 +133,34 @@ export default function CreatorsPage() {
   const [commentsPortalEl, setCommentsPortalEl] = useState<HTMLDivElement | null>(null);
   const [isCommentsOpen, setIsCommentsOpen] = useState(false);
 
+  // Desktop-only single-select filter row (All/Beginner/Intermediate/Advanced/My Following) —
+  // each button fully replaces difficultyFilters/myFollowingOnly, so desktop's behavior stays
+  // exactly as before even though the underlying state now supports mobile's multi-select.
+  const DESKTOP_FILTERS = ['All', 'Beginner', 'Intermediate', 'Advanced', 'My Following'] as const;
+  const isDesktopFilterActive = (filter: (typeof DESKTOP_FILTERS)[number]) => {
+    if (filter === 'All') return difficultyFilters.size === 0 && !myFollowingOnly;
+    if (filter === 'My Following') return myFollowingOnly;
+    return myFollowingOnly === false && difficultyFilters.size === 1 && difficultyFilters.has(filter);
+  };
+  const selectDesktopFilter = (filter: (typeof DESKTOP_FILTERS)[number]) => {
+    if (filter === 'All') { setDifficultyFilters(new Set()); setMyFollowingOnly(false); }
+    else if (filter === 'My Following') { setDifficultyFilters(new Set()); setMyFollowingOnly(true); }
+    else { setDifficultyFilters(new Set([filter])); setMyFollowingOnly(false); }
+  };
+
   // Skill-level groupings built from the shared creator dataset (src/app/data/creators.ts)
   // so this page routes to real profiles and matches the rest of the app.
   const sectionTitle = debouncedSearchQuery.trim()
     ? 'Search Results'
-    : {
-        All: 'Featured Creators',
-        Beginner: 'Beginner Educators',
-        Intermediate: 'Popular Creators',
-        Advanced: 'Advanced & Specialized',
-        'My Following': 'My Following',
-      }[selectedFilter];
+    : myFollowingOnly
+    ? 'My Following'
+    : difficultyFilters.size === 1 && difficultyFilters.has('Beginner')
+    ? 'Beginner Educators'
+    : difficultyFilters.size === 1 && difficultyFilters.has('Intermediate')
+    ? 'Popular Creators'
+    : difficultyFilters.size === 1 && difficultyFilters.has('Advanced')
+    ? 'Advanced & Specialized'
+    : 'Featured Creators';
 
   // Real Supabase creator directory. null = not yet resolved / error (use mock fallback);
   // [] is a legitimate real empty result and is NOT treated as a fallback signal.
@@ -180,11 +231,6 @@ export default function CreatorsPage() {
   const followTargetId = (creator: Creator): string =>
     typeof creator.id === 'string' && isUUID(creator.id) ? creator.id : nameToCreatorId(creator.name);
 
-  const creatorsByCategory = (categories: FeaturedCategory[]): Creator[] =>
-    (dbProfiles ?? [])
-      .filter(p => p.featured_category && categories.includes(p.featured_category))
-      .map(profileToCreatorCard);
-
   const allCreators: Creator[] = useMemo(() => {
     if (dbProfiles !== null) return dbProfiles.map(profileToCreatorCard);
     return [
@@ -199,39 +245,46 @@ export default function CreatorsPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dbProfiles, followerCounts]);
 
-  // Same follow data as the sidebar's "My Creators" section (FollowContext) — a creator
-  // counts as followed here if its real UUID (or, for mock creators, slugified name) is in
-  // the shared followedIds set.
-  const myFollowingCreators: Creator[] = useMemo(
-    () => allCreators.filter(c => followedIds.has(followTargetId(c))),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [allCreators, followedIds],
-  );
+  // slug/UUID -> difficulty tier, built from whichever creator source is active. Keyed the same
+  // way followTargetId() normalizes creators (real UUID for DB creators, name-slug for mock),
+  // so the same key can be reused to test reels/videos against their creator's tier below.
+  const creatorDifficultyLookup = useMemo(() => {
+    const map = new Map<string, Difficulty>();
+    if (dbProfiles !== null) {
+      dbProfiles.forEach(p => {
+        const diff = p.featured_category ? CATEGORY_TO_DIFFICULTY[p.featured_category] : undefined;
+        if (!diff) return;
+        map.set(p.id, diff);
+        map.set(p.username, diff);
+      });
+    } else {
+      BEGINNER_EDUCATORS.forEach(c => map.set(nameToCreatorId(c.name), 'Beginner'));
+      [...FEATURED_CREATORS, ...TRENDING_CREATORS, ...STOCK_PICKERS, ...RETIREMENT_EXPERTS]
+        .forEach(c => map.set(nameToCreatorId(c.name), 'Intermediate'));
+      [...QUANT_BUILDERS, ...CRYPTO_VOICES].forEach(c => map.set(nameToCreatorId(c.name), 'Advanced'));
+    }
+    return map;
+  }, [dbProfiles]);
+
+  const matchesDifficulty = (slug: string): boolean => {
+    if (difficultyFilters.size === 0) return true;
+    const diff = creatorDifficultyLookup.get(slug);
+    return diff !== undefined && difficultyFilters.has(diff);
+  };
 
   const isSearching = debouncedSearchQuery.trim().length > 0;
 
+  // Shared by desktop's Featured Creators section and mobile's Creators panel — both apply
+  // difficulty + My Following identically (desktop's buttons just never produce a multi-select
+  // combination, so this reproduces the old single-select behavior exactly for desktop).
   const displayedCreators: Creator[] = useMemo(() => {
-    // An active search takes priority over the tab filter (but doesn't change which tab is
-    // selected — clearing the search returns you to it).
     if (isSearching) return searchCreators(allCreators, debouncedSearchQuery);
-    switch (selectedFilter) {
-      case 'Beginner':
-        return dbProfiles !== null ? creatorsByCategory(['beginner_educator']) : BEGINNER_EDUCATORS;
-      case 'Intermediate':
-        return dbProfiles !== null
-          ? creatorsByCategory(['featured', 'trending', 'stock_picker', 'retirement_expert'])
-          : [...FEATURED_CREATORS, ...TRENDING_CREATORS, ...STOCK_PICKERS, ...RETIREMENT_EXPERTS];
-      case 'Advanced':
-        return dbProfiles !== null
-          ? creatorsByCategory(['quant_builder', 'crypto_voice'])
-          : [...QUANT_BUILDERS, ...CRYPTO_VOICES];
-      case 'My Following':
-        return myFollowingCreators;
-      default:
-        return allCreators;
-    }
+    let list = allCreators;
+    if (myFollowingOnly) list = list.filter(c => followedIds.has(followTargetId(c)));
+    if (difficultyFilters.size > 0) list = list.filter(c => matchesDifficulty(followTargetId(c)));
+    return list;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSearching, debouncedSearchQuery, selectedFilter, myFollowingCreators, allCreators, dbProfiles, followerCounts]);
+  }, [isSearching, debouncedSearchQuery, allCreators, myFollowingOnly, followedIds, difficultyFilters, creatorDifficultyLookup]);
 
   // Real reels when available (null = fetch failed, use mock; [] = genuinely no reels yet,
   // shown as-is — same convention as dbProfiles above).
@@ -255,15 +308,32 @@ export default function CreatorsPage() {
     }));
   }, [dbReels]);
 
+  // Desktop's Featured Content rail — unchanged from before (only ever respected My Following,
+  // never difficulty). Kept exactly as-is so desktop's behavior doesn't shift.
   const displayedContent: ContentItem[] = useMemo(() => {
     if (isSearching) {
       return featuredContent.filter(item =>
         matchesCreatorSearch({ title: item.title, creatorName: item.creator }, debouncedSearchQuery),
       );
     }
-    if (selectedFilter !== 'My Following') return featuredContent;
+    if (!myFollowingOnly) return featuredContent;
     return featuredContent.filter(item => followedIds.has(nameToCreatorId(item.creator)));
-  }, [isSearching, debouncedSearchQuery, selectedFilter, followedIds, featuredContent]);
+  }, [isSearching, debouncedSearchQuery, myFollowingOnly, followedIds, featuredContent]);
+
+  // Mobile's Reels panel — same source, but (unlike the desktop rail above) also respects the
+  // difficulty filter, per the mobile filter sheet applying to whichever tab is active.
+  const mobileReelsItems: ContentItem[] = useMemo(() => {
+    if (isSearching) {
+      return featuredContent.filter(item =>
+        matchesCreatorSearch({ title: item.title, creatorName: item.creator }, debouncedSearchQuery),
+      );
+    }
+    let list = featuredContent;
+    if (myFollowingOnly) list = list.filter(item => followedIds.has(nameToCreatorId(item.creator)));
+    if (difficultyFilters.size > 0) list = list.filter(item => matchesDifficulty(nameToCreatorId(item.creator)));
+    return list;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSearching, debouncedSearchQuery, featuredContent, myFollowingOnly, followedIds, difficultyFilters, creatorDifficultyLookup]);
 
   // Real DB videos when available (null = fetch failed, use mock; [] = genuinely none yet,
   // shown as-is — same convention as dbReels/featuredContent above). Falls back to the shared
@@ -303,12 +373,27 @@ export default function CreatorsPage() {
     });
   }, [dbVideos]);
 
+  // Desktop's Videos rail — unchanged from before (never filtered by My Following or
+  // difficulty, always just the first 4). Kept exactly as-is so desktop's behavior doesn't shift.
   const videos: VideoItem[] = useMemo(() => {
     if (!isSearching) return allVideoItems.slice(0, 4);
     return allVideoItems
       .filter(video => matchesCreatorSearch({ title: video.title, creatorName: video.creator }, debouncedSearchQuery))
       .slice(0, 4);
   }, [isSearching, debouncedSearchQuery, allVideoItems]);
+
+  // Mobile's Videos panel — same source, uncapped (it's a full browsing tab, not a preview
+  // rail) and, like the Reels panel above, also respects the difficulty filter.
+  const mobileVideoItems: VideoItem[] = useMemo(() => {
+    if (isSearching) {
+      return allVideoItems.filter(video => matchesCreatorSearch({ title: video.title, creatorName: video.creator }, debouncedSearchQuery));
+    }
+    let list = allVideoItems;
+    if (myFollowingOnly) list = list.filter(video => followedIds.has(video.creatorRouteSlug));
+    if (difficultyFilters.size > 0) list = list.filter(video => matchesDifficulty(video.creatorRouteSlug));
+    return list;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSearching, debouncedSearchQuery, allVideoItems, myFollowingOnly, followedIds, difficultyFilters, creatorDifficultyLookup]);
 
   const hasAnySearchResults = displayedCreators.length > 0 || displayedContent.length > 0 || videos.length > 0;
 
@@ -394,7 +479,81 @@ export default function CreatorsPage() {
     setTimeout(() => { wheelLockRef.current = false; }, 500);
   };
 
-  const renderCreatorCard = (creator: Creator) => {
+  // ── Mobile tab-and-swipe wiring ─────────────────────────────────────
+  // Panels are laid out side by side in a native horizontal scroll-snap container so the
+  // browser handles axis disambiguation for us — a mostly-vertical touch gesture scrolls a
+  // panel's own overflow-y-auto content exactly like any normal scroll, and only a clearly
+  // horizontal gesture pages between tabs. No custom touch-drag math, no double-scroll region.
+  const prefersReducedMotion = () =>
+    typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+  const scrollToTabIndex = (index: number, smooth: boolean) => {
+    const track = swipeTrackRef.current;
+    if (!track) return;
+    track.scrollTo({ left: index * track.clientWidth, behavior: smooth ? 'smooth' : 'auto' });
+  };
+
+  const handleTabClick = (key: MobileTabKey) => {
+    setMobileTab(key);
+    scrollToTabIndex(MOBILE_TABS.findIndex(t => t.key === key), !prefersReducedMotion());
+  };
+
+  const handleTabListKeyDown = (e: ReactKeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    e.preventDefault();
+    const idx = MOBILE_TABS.findIndex(t => t.key === mobileTab);
+    const nextIdx = e.key === 'ArrowRight' ? (idx + 1) % MOBILE_TABS.length : (idx - 1 + MOBILE_TABS.length) % MOBILE_TABS.length;
+    handleTabClick(MOBILE_TABS[nextIdx].key);
+    tabButtonRefs.current[nextIdx]?.focus();
+  };
+
+  // Keeps the toggle in sync when the change came from a swipe rather than a tap.
+  const handleSwipeScroll = () => {
+    const track = swipeTrackRef.current;
+    if (!track || track.clientWidth === 0) return;
+    const idx = Math.min(MOBILE_TABS.length - 1, Math.max(0, Math.round(track.scrollLeft / track.clientWidth)));
+    const key = MOBILE_TABS[idx].key;
+    setMobileTab(prev => (prev === key ? prev : key));
+  };
+
+  // Snap to the default tab (Reels) before first paint so there's no visible flash of the
+  // Creators panel on load.
+  useLayoutEffect(() => {
+    scrollToTabIndex(MOBILE_TABS.findIndex(t => t.key === mobileTab), false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Re-snap (no animation) after a viewport/orientation change so panels stay aligned with
+  // the active tab instead of landing mid-panel.
+  useEffect(() => {
+    const onResize = () => scrollToTabIndex(MOBILE_TABS.findIndex(t => t.key === mobileTab), false);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mobileTab]);
+
+  const toggleDifficulty = (level: Difficulty) => {
+    setDifficultyFilters(prev => {
+      const next = new Set(prev);
+      next.has(level) ? next.delete(level) : next.add(level);
+      return next;
+    });
+  };
+
+  const clearMobileFilters = () => {
+    setDifficultyFilters(new Set());
+    setMyFollowingOnly(false);
+  };
+
+  const mobileEmptyMessage = (kind: 'creators' | 'reels' | 'videos'): string => {
+    if (isSearching) return `No ${kind} found for "${debouncedSearchQuery}"`;
+    if (myFollowingOnly && !user) return 'Sign in to see your followed creators';
+    if (myFollowingOnly) return `Follow creators to see their ${kind} here`;
+    if (difficultyFilters.size > 0) return `No ${kind} match the selected filters`;
+    return `No ${kind} yet. Check back soon!`;
+  };
+
+  const renderCreatorCard = (creator: Creator, opts: { fullWidth?: boolean } = {}) => {
     const creatorSlug = nameToCreatorId(creator.name);
     const followId = followTargetId(creator);
     const isFollowing = isFollowingFn(followId);
@@ -403,7 +562,7 @@ export default function CreatorsPage() {
     const hasProfile = dbProfiles !== null ? true : !!getCreator(creatorSlug);
 
     return (
-      <div key={creator.id} className="flex-shrink-0 w-[min(78vw,300px)] sm:w-80 border border-gray-200 rounded-xl p-6 hover:border-gray-300 transition-colors bg-white">
+      <div key={creator.id} className={`${opts.fullWidth ? 'w-full' : 'flex-shrink-0 w-[min(78vw,300px)] sm:w-80'} border border-gray-200 rounded-xl p-6 hover:border-gray-300 transition-colors bg-white`}>
         <div className="flex items-start gap-4 mb-4">
           <div
             onClick={hasProfile ? () => navigate(`/profile/${creatorSlug}/investment`) : undefined}
@@ -471,12 +630,12 @@ export default function CreatorsPage() {
     else navigate('/main');
   };
 
-  const renderContentCard = (item: ContentItem) => {
+  const renderContentCard = (item: ContentItem, opts: { fullWidth?: boolean } = {}) => {
     const contentCreatorSlug = nameToCreatorId(item.creator);
     const contentHasProfile = !!getCreator(contentCreatorSlug);
 
     return (
-      <div key={item.id} onClick={() => handleContentClick(item)} className="flex-shrink-0 w-[min(48vw,220px)] sm:w-64 group cursor-pointer">
+      <div key={item.id} onClick={() => handleContentClick(item)} className={`${opts.fullWidth ? 'w-full' : 'flex-shrink-0 w-[min(48vw,220px)] sm:w-64'} group cursor-pointer`}>
         <div className="relative aspect-[9/16] rounded-xl overflow-hidden mb-3">
           <div
             className="absolute inset-0"
@@ -515,9 +674,9 @@ export default function CreatorsPage() {
     );
   };
 
-  const renderVideoCard = (video: VideoItem) => {
+  const renderVideoCard = (video: VideoItem, opts: { fullWidth?: boolean } = {}) => {
     return (
-      <div key={video.id} onClick={() => navigate(`/watch/${video.id}`)} className="flex-shrink-0 w-[min(78vw,300px)] sm:w-80 group cursor-pointer">
+      <div key={video.id} onClick={() => navigate(`/watch/${video.id}`)} className={`${opts.fullWidth ? 'w-full' : 'flex-shrink-0 w-[min(78vw,300px)] sm:w-80'} group cursor-pointer`}>
         <div className="relative aspect-video rounded-xl overflow-hidden mb-3">
           <div
             className="absolute inset-0"
@@ -566,6 +725,8 @@ export default function CreatorsPage() {
     );
   };
 
+  const activeMobileFilterCount = difficultyFilters.size + (myFollowingOnly ? 1 : 0);
+
   return (
     <div className="h-screen flex flex-col bg-white">
       <AppHeader />
@@ -574,55 +735,74 @@ export default function CreatorsPage() {
         <CreatorsSidebar />
 
         {/* Main Content */}
-        <div className={`flex-1 min-w-0 bg-white ${playingReelIndex !== null ? 'overflow-hidden' : 'overflow-y-auto'}`}>
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-12 max-sm:pt-6 max-sm:pb-28">
-          {/* Hero */}
-          <div className="text-center mb-8 max-sm:mb-4">
-            <h1 className="text-5xl font-bold mb-4 max-sm:hidden">Discover Finance Creators</h1>
-            <p className="text-xl text-gray-600 mb-8 max-sm:hidden">
-              Learn from expert investors, traders, and educators sharing real strategies and market insights.
-            </p>
+        <div className={`flex-1 min-w-0 bg-white overflow-hidden ${playingReelIndex === null ? 'lg:overflow-y-auto' : ''}`}>
 
-            {/* Filter Tabs */}
-            <div className="flex items-center justify-center gap-3 max-sm:justify-start max-sm:overflow-x-auto max-sm:no-scrollbar max-sm:-mx-4 max-sm:px-4">
-              {(['All', 'Beginner', 'Intermediate', 'Advanced', 'My Following'] as const).map((filter) => (
-                <button
-                  key={filter}
-                  onClick={() => setSelectedFilter(filter)}
-                  className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all shrink-0 ${
-                    selectedFilter === filter
-                      ? 'bg-black text-white'
-                      : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  {filter}
-                </button>
-              ))}
+          {/* ── Mobile (< lg): tab-and-swipe browsing ── */}
+          <div className="lg:hidden h-full flex flex-col">
+            <div className="flex items-center border-b border-gray-200 flex-shrink-0">
+              <div
+                role="tablist"
+                aria-label="Content type"
+                className="flex flex-1"
+                onKeyDown={handleTabListKeyDown}
+              >
+                {MOBILE_TABS.map(({ key, label }, i) => (
+                  <button
+                    key={key}
+                    ref={(el) => { tabButtonRefs.current[i] = el; }}
+                    role="tab"
+                    id={`creators-tab-${key}`}
+                    aria-selected={mobileTab === key}
+                    aria-controls={`creators-panel-${key}`}
+                    tabIndex={mobileTab === key ? 0 : -1}
+                    onClick={() => handleTabClick(key)}
+                    className={`flex-1 py-3.5 text-sm text-center border-b-2 transition-colors ${
+                      mobileTab === key ? 'border-black text-black font-semibold' : 'border-transparent text-gray-500 font-medium'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => setIsFilterSheetOpen(true)}
+                aria-haspopup="dialog"
+                aria-expanded={isFilterSheetOpen}
+                aria-label={`Filter by level${activeMobileFilterCount > 0 ? ` (${activeMobileFilterCount} active)` : ''}`}
+                className="relative shrink-0 px-4 py-3.5 text-gray-600 hover:text-black transition-colors"
+              >
+                <TuneIcon sx={{ fontSize: 20 }} />
+                {activeMobileFilterCount > 0 && (
+                  <span className="absolute top-2.5 right-3 w-2 h-2 rounded-full bg-[#00a86b]" />
+                )}
+              </button>
             </div>
 
             {isSearching && (
-              <p className="text-sm text-gray-500 mt-4">
-                Showing results for <span className="font-medium text-black">"{debouncedSearchQuery}"</span>
+              <p className="text-sm text-gray-500 px-4 py-3 flex-shrink-0 border-b border-gray-100">
+                Results for <span className="font-medium text-black">"{debouncedSearchQuery}"</span>
                 {' · '}
                 <button onClick={clearSearch} className="text-[#00a86b] hover:underline">Clear</button>
               </p>
             )}
-          </div>
 
-          {isSearching && !hasAnySearchResults ? (
-            <p className="text-center text-gray-500 text-sm py-12">
-              No results found for "{debouncedSearchQuery}"
-            </p>
-          ) : (
-            <>
-              {/* Featured Creators */}
-              {(!isSearching || displayedCreators.length > 0) && (
-                <section className="mb-12">
-                  <h2 className="text-2xl font-bold mb-6 text-center">{sectionTitle}</h2>
+            <div
+              ref={swipeTrackRef}
+              onScroll={handleSwipeScroll}
+              className="flex-1 min-h-0 flex overflow-x-auto snap-x snap-mandatory no-scrollbar overscroll-x-contain"
+            >
+              {/* Creators panel */}
+              <div
+                id="creators-panel-creators"
+                role="tabpanel"
+                aria-labelledby="creators-tab-creators"
+                className="w-full h-full flex-shrink-0 snap-start overflow-y-auto overflow-x-hidden"
+              >
+                <div className="px-4 py-4 pb-28">
                   {creatorsLoading ? (
-                    <div className="max-w-[1328px] mx-auto flex gap-4 overflow-x-auto pb-2 max-sm:-mx-4 max-sm:px-4" style={{ justifyContent: 'safe center' }}>
+                    <div className="flex flex-col gap-4">
                       {[1, 2, 3].map(n => (
-                        <div key={n} className="flex-shrink-0 w-[min(78vw,300px)] sm:w-80 border border-gray-200 rounded-xl p-6 animate-pulse">
+                        <div key={n} className="w-full border border-gray-200 rounded-xl p-6 animate-pulse">
                           <div className="flex items-start gap-4 mb-4">
                             <div className="w-16 h-16 rounded-full bg-gray-200 flex-shrink-0" />
                             <div className="flex-1 space-y-2 pt-1">
@@ -634,52 +814,160 @@ export default function CreatorsPage() {
                         </div>
                       ))}
                     </div>
-                  ) : selectedFilter === 'My Following' && !user && !isSearching ? (
-                    <p className="text-center text-gray-500 text-sm">Sign in to see your followed creators</p>
-                  ) : selectedFilter === 'My Following' && displayedCreators.length === 0 && !isSearching ? (
-                    <p className="text-center text-gray-500 text-sm">Follow creators to see them here</p>
+                  ) : displayedCreators.length === 0 ? (
+                    <p className="text-center text-gray-500 text-sm py-12">{mobileEmptyMessage('creators')}</p>
                   ) : (
-                    <div className="max-w-[1328px] mx-auto flex gap-4 overflow-x-auto pb-2 max-sm:-mx-4 max-sm:px-4" style={{ justifyContent: 'safe center' }}>
-                      {displayedCreators.map(renderCreatorCard)}
+                    <div className="flex flex-col gap-4">
+                      {displayedCreators.map((c) => renderCreatorCard(c, { fullWidth: true }))}
                     </div>
                   )}
-                </section>
-              )}
+                </div>
+              </div>
 
-              {/* Featured Content */}
-              {(!isSearching || displayedContent.length > 0) && (
-                <section className="mb-12">
-                  <h2 className="text-2xl font-bold mb-6 text-center">Featured Content</h2>
-                  {selectedFilter === 'My Following' && !user && !isSearching ? (
-                    <p className="text-center text-gray-500 text-sm">Sign in to see your followed creators</p>
-                  ) : selectedFilter === 'My Following' && displayedContent.length === 0 && !isSearching ? (
-                    <p className="text-center text-gray-500 text-sm">Follow creators to see them here</p>
-                  ) : displayedContent.length === 0 ? (
-                    <p className="text-center text-gray-500 text-sm">No reels yet. Check back soon!</p>
+              {/* Reels panel */}
+              <div
+                id="creators-panel-reels"
+                role="tabpanel"
+                aria-labelledby="creators-tab-reels"
+                className="w-full h-full flex-shrink-0 snap-start overflow-y-auto overflow-x-hidden"
+              >
+                <div className="px-4 py-4 pb-28">
+                  {mobileReelsItems.length === 0 ? (
+                    <p className="text-center text-gray-500 text-sm py-12">{mobileEmptyMessage('reels')}</p>
                   ) : (
-                    <div className="max-w-[1344px] mx-auto flex gap-4 overflow-x-auto pb-2 max-sm:-mx-4 max-sm:px-4" style={{ justifyContent: 'safe center' }}>
-                      {displayedContent.map(renderContentCard)}
+                    <div className="grid grid-cols-2 gap-3">
+                      {mobileReelsItems.map((item) => renderContentCard(item, { fullWidth: true }))}
                     </div>
                   )}
-                </section>
-              )}
+                </div>
+              </div>
 
-              {/* Videos */}
-              {(!isSearching || videos.length > 0) && (
-                <section className="mb-12">
-                  <h2 className="text-2xl font-bold mb-6 text-center">Videos</h2>
-                  {videos.length === 0 ? (
-                    <p className="text-center text-gray-500 text-sm">No videos yet. Check back soon!</p>
+              {/* Videos panel */}
+              <div
+                id="creators-panel-videos"
+                role="tabpanel"
+                aria-labelledby="creators-tab-videos"
+                className="w-full h-full flex-shrink-0 snap-start overflow-y-auto overflow-x-hidden"
+              >
+                <div className="px-4 py-4 pb-28">
+                  {mobileVideoItems.length === 0 ? (
+                    <p className="text-center text-gray-500 text-sm py-12">{mobileEmptyMessage('videos')}</p>
                   ) : (
-                    <div className="max-w-[1328px] mx-auto flex gap-4 overflow-x-auto pb-2 max-sm:-mx-4 max-sm:px-4" style={{ justifyContent: 'safe center' }}>
-                      {videos.map(renderVideoCard)}
+                    <div className="flex flex-col gap-5">
+                      {mobileVideoItems.map((v) => renderVideoCard(v, { fullWidth: true }))}
                     </div>
                   )}
-                </section>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Desktop / tablet (>= lg): unchanged stacked layout ── */}
+          <div className="hidden lg:block max-w-[1600px] mx-auto px-4 sm:px-6 py-12">
+            {/* Hero */}
+            <div className="text-center mb-8">
+              <h1 className="text-5xl font-bold mb-4">Discover Finance Creators</h1>
+              <p className="text-xl text-gray-600 mb-8">
+                Learn from expert investors, traders, and educators sharing real strategies and market insights.
+              </p>
+
+              {/* Filter Tabs */}
+              <div className="flex items-center justify-center gap-3">
+                {DESKTOP_FILTERS.map((filter) => (
+                  <button
+                    key={filter}
+                    onClick={() => selectDesktopFilter(filter)}
+                    className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all shrink-0 ${
+                      isDesktopFilterActive(filter)
+                        ? 'bg-black text-white'
+                        : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    {filter}
+                  </button>
+                ))}
+              </div>
+
+              {isSearching && (
+                <p className="text-sm text-gray-500 mt-4">
+                  Showing results for <span className="font-medium text-black">"{debouncedSearchQuery}"</span>
+                  {' · '}
+                  <button onClick={clearSearch} className="text-[#00a86b] hover:underline">Clear</button>
+                </p>
               )}
-            </>
-          )}
-        </div>
+            </div>
+
+            {isSearching && !hasAnySearchResults ? (
+              <p className="text-center text-gray-500 text-sm py-12">
+                No results found for "{debouncedSearchQuery}"
+              </p>
+            ) : (
+              <>
+                {/* Featured Creators */}
+                {(!isSearching || displayedCreators.length > 0) && (
+                  <section className="mb-12">
+                    <h2 className="text-2xl font-bold mb-6 text-center">{sectionTitle}</h2>
+                    {creatorsLoading ? (
+                      <div className="max-w-[1328px] mx-auto flex gap-4 overflow-x-auto pb-2" style={{ justifyContent: 'safe center' }}>
+                        {[1, 2, 3].map(n => (
+                          <div key={n} className="flex-shrink-0 w-[min(78vw,300px)] sm:w-80 border border-gray-200 rounded-xl p-6 animate-pulse">
+                            <div className="flex items-start gap-4 mb-4">
+                              <div className="w-16 h-16 rounded-full bg-gray-200 flex-shrink-0" />
+                              <div className="flex-1 space-y-2 pt-1">
+                                <div className="h-4 bg-gray-200 rounded w-2/3" />
+                                <div className="h-3 bg-gray-200 rounded w-full" />
+                              </div>
+                            </div>
+                            <div className="h-9 bg-gray-200 rounded-full" />
+                          </div>
+                        ))}
+                      </div>
+                    ) : myFollowingOnly && !user && !isSearching ? (
+                      <p className="text-center text-gray-500 text-sm">Sign in to see your followed creators</p>
+                    ) : myFollowingOnly && displayedCreators.length === 0 && !isSearching ? (
+                      <p className="text-center text-gray-500 text-sm">Follow creators to see them here</p>
+                    ) : (
+                      <div className="max-w-[1328px] mx-auto flex gap-4 overflow-x-auto pb-2" style={{ justifyContent: 'safe center' }}>
+                        {displayedCreators.map((c) => renderCreatorCard(c))}
+                      </div>
+                    )}
+                  </section>
+                )}
+
+                {/* Featured Content */}
+                {(!isSearching || displayedContent.length > 0) && (
+                  <section className="mb-12">
+                    <h2 className="text-2xl font-bold mb-6 text-center">Featured Content</h2>
+                    {myFollowingOnly && !user && !isSearching ? (
+                      <p className="text-center text-gray-500 text-sm">Sign in to see your followed creators</p>
+                    ) : myFollowingOnly && displayedContent.length === 0 && !isSearching ? (
+                      <p className="text-center text-gray-500 text-sm">Follow creators to see them here</p>
+                    ) : displayedContent.length === 0 ? (
+                      <p className="text-center text-gray-500 text-sm">No reels yet. Check back soon!</p>
+                    ) : (
+                      <div className="max-w-[1344px] mx-auto flex gap-4 overflow-x-auto pb-2" style={{ justifyContent: 'safe center' }}>
+                        {displayedContent.map((item) => renderContentCard(item))}
+                      </div>
+                    )}
+                  </section>
+                )}
+
+                {/* Videos */}
+                {(!isSearching || videos.length > 0) && (
+                  <section className="mb-12">
+                    <h2 className="text-2xl font-bold mb-6 text-center">Videos</h2>
+                    {videos.length === 0 ? (
+                      <p className="text-center text-gray-500 text-sm">No videos yet. Check back soon!</p>
+                    ) : (
+                      <div className="max-w-[1328px] mx-auto flex gap-4 overflow-x-auto pb-2" style={{ justifyContent: 'safe center' }}>
+                        {videos.map((v) => renderVideoCard(v))}
+                      </div>
+                    )}
+                  </section>
+                )}
+              </>
+            )}
+          </div>
         </div>
       </div>
 
@@ -850,6 +1138,20 @@ export default function CreatorsPage() {
           })()}
         </div>
       )}
+
+      {/* ── Mobile difficulty filter sheet ── */}
+      <AnimatePresence>
+        {isFilterSheetOpen && (
+          <CreatorsFilterSheet
+            difficultyFilters={difficultyFilters}
+            onToggleDifficulty={toggleDifficulty}
+            myFollowingOnly={myFollowingOnly}
+            onToggleMyFollowing={() => setMyFollowingOnly(v => !v)}
+            onClear={clearMobileFilters}
+            onClose={() => setIsFilterSheetOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
