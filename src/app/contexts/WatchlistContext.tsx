@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
+import { toast } from 'sonner';
 import { useAuth } from './AuthContext';
 import {
   getWatchlistItems,
@@ -108,7 +109,13 @@ export function WatchlistProvider({ children }: { children: ReactNode }) {
         source_content_id: srcId,
         source_label: payload.source,
       }).then(({ data: saved, error }) => {
-        if (error || !saved) return;
+        if (error || !saved) {
+          // Roll back the optimistic item — it was never actually persisted, so leaving it
+          // in state would show as "saved" until the next refetch silently drops it.
+          setWatchlistItems(prev => prev.filter(item => item.id !== optimisticItem.id));
+          toast.error(error ?? 'Failed to save to watchlist. Please try again.');
+          return;
+        }
         setWatchlistItems(prev =>
           prev.map(item => item.id === optimisticItem.id ? saved : item)
         );

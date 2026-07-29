@@ -1,13 +1,68 @@
-import { useState, useEffect, type KeyboardEvent as ReactKeyboardEvent } from 'react';
+import { useState, useEffect, useMemo, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
+import { getCreators, searchCreators as searchCreatorsDb } from '../../lib/services/profiles.service';
+import type { Profile } from '../../types/database';
+import {
+  nameToCreatorId,
+  FEATURED_CREATORS,
+  TRENDING_CREATORS,
+  BEGINNER_EDUCATORS,
+  QUANT_BUILDERS,
+  STOCK_PICKERS,
+  CRYPTO_VOICES,
+  RETIREMENT_EXPERTS,
+} from '../data/creators';
+import { searchCreators as rankMockCreators } from '../utils/creatorSearch';
+import { useDebouncedValue } from '../hooks/useDebouncedValue';
 
 interface SearchModalProps {
   onClose: () => void;
 }
 
 const CREATORS_SEARCH_PREFIX = '/creators';
+
+interface CreatorResult {
+  type: 'creator';
+  name: string;
+  handle: string;
+  avatar: string;
+  verified: boolean;
+  route: string;
+}
+
+interface AssetResult {
+  type: 'stock' | 'crypto';
+  name: string;
+  description: string;
+  route: string;
+}
+
+type SearchResult = CreatorResult | AssetResult;
+
+// Static — every ticker the app actually supports live data/charts for (see marketData.ts /
+// market.service.ts), so unlike creators this list isn't an incomplete subset of a larger table.
+const ASSET_RESULTS: AssetResult[] = [
+  { type: 'stock', name: 'NVDA', description: 'Nvidia Corporation', route: '/main?ticker=NVDA' },
+  { type: 'stock', name: 'TSLA', description: 'Tesla Inc.', route: '/main?ticker=TSLA' },
+  { type: 'stock', name: 'SPY', description: 'S&P 500 ETF', route: '/main?ticker=SPY' },
+  { type: 'stock', name: 'QQQ', description: 'Nasdaq 100 ETF', route: '/main?ticker=QQQ' },
+  { type: 'crypto', name: 'BTC', description: 'Bitcoin', route: '/main?ticker=BTC' },
+  { type: 'crypto', name: 'ETH', description: 'Ethereum', route: '/main?ticker=ETH' },
+];
+
+// Full mock creator catalog (same source CreatorsPage uses) — fallback only for when Supabase
+// is unreachable/unconfigured, so search still covers every creator instead of a hardcoded 7.
+const ALL_MOCK_CREATORS = [
+  ...FEATURED_CREATORS,
+  ...TRENDING_CREATORS,
+  ...BEGINNER_EDUCATORS,
+  ...QUANT_BUILDERS,
+  ...STOCK_PICKERS,
+  ...CRYPTO_VOICES,
+  ...RETIREMENT_EXPERTS,
+];
 
 export default function SearchModal({ onClose }: SearchModalProps) {
   const navigate = useNavigate();
@@ -34,28 +89,57 @@ export default function SearchModal({ onClose }: SearchModalProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, isOnCreatorsPage]);
 
-  const mockResults = [
-    { type: 'creator', name: 'Alex Rodriguez', handle: '@alexrodriguez', avatar: '👨‍💼', verified: true, route: '/profile/alex-rodriguez/investment' },
-    { type: 'creator', name: 'Sarah Chen', handle: '@sarahchen', avatar: '👩‍💼', verified: true, route: '/profile/sarah-chen/investment' },
-    { type: 'creator', name: 'Mike Ross', handle: '@mikeross', avatar: '👨‍💻', verified: true, route: '/profile/mike-ross/investment' },
-    { type: 'creator', name: 'Emma Wilson', handle: '@emmawilson', avatar: '👩‍🔬', verified: false, route: '/profile/emma-wilson/investment' },
-    { type: 'creator', name: 'David Park', handle: '@davidpark', avatar: '👨‍🎓', verified: true, route: '/profile/david-park/investment' },
-    { type: 'creator', name: 'Lisa Zhang', handle: '@lisazhang', avatar: '👩‍💼', verified: true, route: '/profile/lisa-zhang/investment' },
-    { type: 'creator', name: 'James Lee', handle: '@jameslee', avatar: '👨‍💼', verified: true, route: '/profile/james-lee/investment' },
-    { type: 'stock', name: 'NVDA', description: 'Nvidia Corporation', route: '/main?ticker=NVDA' },
-    { type: 'stock', name: 'TSLA', description: 'Tesla Inc.', route: '/main?ticker=TSLA' },
-    { type: 'stock', name: 'SPY', description: 'S&P 500 ETF', route: '/main?ticker=SPY' },
-    { type: 'stock', name: 'QQQ', description: 'Nasdaq 100 ETF', route: '/main?ticker=QQQ' },
-    { type: 'crypto', name: 'BTC', description: 'Bitcoin', route: '/main?ticker=BTC' },
-    { type: 'crypto', name: 'ETH', description: 'Ethereum', route: '/main?ticker=ETH' },
-  ];
+  // Real creator search against Supabase (profiles table), debounced so it doesn't fire on
+  // every keystroke. null = not yet resolved / Supabase unreachable -> use the full local mock
+  // creator catalog below instead of the old hardcoded 7-name subset.
+  const debouncedQuery = useDebouncedValue(query, 250);
+  const [dbCreators, setDbCreators] = useState<Profile[] | null>(null);
+  const [isSearchingCreators, setIsSearchingCreators] = useState(true);
 
-  const filteredResults = query.trim()
-    ? mockResults.filter(result =>
+  useEffect(() => {
+    let cancelled = false;
+    setIsSearchingCreators(true);
+    const trimmed = debouncedQuery.trim();
+    const request = trimmed ? searchCreatorsDb(trimmed, 8) : getCreators({ limit: 8 });
+    request.then(({ data, error }) => {
+      if (cancelled) return;
+      setDbCreators(error || !data ? null : data);
+      setIsSearchingCreators(false);
+    });
+    return () => { cancelled = true; };
+  }, [debouncedQuery]);
+
+  const creatorResults: CreatorResult[] = useMemo(() => {
+    if (dbCreators !== null) {
+      return dbCreators.map((p): CreatorResult => ({
+        type: 'creator',
+        name: p.full_name,
+        handle: `@${p.handle ?? p.username}`,
+        avatar: p.avatar_url || '👤',
+        verified: p.is_verified,
+        route: `/profile/${p.username}/investment`,
+      }));
+    }
+    const trimmed = query.trim();
+    const ranked = trimmed ? rankMockCreators(ALL_MOCK_CREATORS, trimmed) : ALL_MOCK_CREATORS;
+    return ranked.slice(0, 8).map((c): CreatorResult => ({
+      type: 'creator',
+      name: c.name,
+      handle: `@${nameToCreatorId(c.name).replace(/-/g, '')}`,
+      avatar: c.avatar,
+      verified: c.verified,
+      route: `/profile/${nameToCreatorId(c.name)}/investment`,
+    }));
+  }, [dbCreators, query]);
+
+  const assetResults: AssetResult[] = query.trim()
+    ? ASSET_RESULTS.filter(result =>
         result.name.toLowerCase().includes(query.toLowerCase()) ||
-        (result.description && result.description.toLowerCase().includes(query.toLowerCase()))
+        result.description.toLowerCase().includes(query.toLowerCase())
       )
-    : mockResults;
+    : ASSET_RESULTS;
+
+  const filteredResults: SearchResult[] = [...creatorResults, ...assetResults];
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -77,7 +161,7 @@ export default function SearchModal({ onClose }: SearchModalProps) {
     onClose();
   };
 
-  const handleResultClick = (result: typeof mockResults[0]) => {
+  const handleResultClick = (result: SearchResult) => {
     if (isOnCreatorsPage) {
       applyCreatorsPageFilter(result.name);
       return;
@@ -173,6 +257,10 @@ export default function SearchModal({ onClose }: SearchModalProps) {
                   )}
                 </button>
               ))}
+            </div>
+          ) : isSearchingCreators ? (
+            <div className="p-12 text-center text-gray-500">
+              <p>Searching...</p>
             </div>
           ) : (
             <div className="p-12 text-center text-gray-500">
