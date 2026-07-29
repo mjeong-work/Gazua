@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
+import { formatDistanceToNow } from 'date-fns';
 import Footer from './Footer';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
@@ -10,7 +11,10 @@ import InsertChartIcon from '@mui/icons-material/InsertChart';
 import AddIcon from '@mui/icons-material/Add';
 import AppHeader from './AppHeader';
 import { getWatchlistPrices, type TickerPrice } from '../../lib/market.service';
-import { type WatchlistItem } from '../data/watchlist';
+// WatchlistItem now sourced from the real DB schema (types/database.ts), not the
+// mock shape in data/watchlist.ts — the two used to diverge (camelCase display
+// fields like price/change1D/relatedPosts don't exist on the actual table).
+import type { WatchlistItem } from '../../types/database';
 import { useWatchlist } from '../contexts/WatchlistContext';
 
 export default function WatchlistPage() {
@@ -32,7 +36,7 @@ export default function WatchlistPage() {
   // Add Asset form state
   const [newTicker, setNewTicker] = useState('');
   const [newName, setNewName] = useState('');
-  const [newAssetType, setNewAssetType] = useState<WatchlistItem['assetType']>('Stock');
+  const [newAssetType, setNewAssetType] = useState<WatchlistItem['asset_type']>('Stock');
 
   const triggerToast = (message: string) => {
     setToastMessage(message);
@@ -40,7 +44,7 @@ export default function WatchlistPage() {
     setTimeout(() => setShowToast(false), 3000);
   };
 
-  const handleRemove = (id: number) => {
+  const handleRemove = (id: string) => {
     removeFromWatchlist(id);
     setSelectedItem(null);
     triggerToast('Removed from Watchlist');
@@ -151,28 +155,27 @@ export default function WatchlistPage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="text-xl font-bold">{item.ticker}</h3>
-                          <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs font-medium">{item.assetType}</span>
+                          <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs font-medium">{item.asset_type}</span>
                         </div>
-                        <p className="text-sm text-gray-600 mb-2">{item.name}</p>
+                        <p className="text-sm text-gray-600 mb-2">{item.name ?? item.ticker}</p>
                       </div>
                       <div className="text-right">
                         {(() => {
+                          // watchlist_items has no price/change columns — price is live-only
+                          // (Polygon). No 1W change source exists anywhere yet (DB or live API),
+                          // so it's omitted rather than shown as fabricated data.
                           const lp = livePrices.get(item.ticker);
-                          const price = lp?.price ?? item.price;
-                          const change1D = lp?.change1D ?? item.change1D;
                           return (
                             <>
-                              <p className="text-xl font-bold">{price}</p>
-                              <div className="flex items-center gap-2 text-xs mt-1">
-                                <span className={`flex items-center gap-0.5 ${change1D >= 0 ? 'text-[#00a86b]' : 'text-red-500'}`}>
-                                  {change1D >= 0 ? <TrendingUpIcon sx={{ fontSize: 12 }} /> : <TrendingDownIcon sx={{ fontSize: 12 }} />}
-                                  {Math.abs(change1D)}% 1D
-                                </span>
-                                <span className="text-gray-400">|</span>
-                                <span className={item.change1W >= 0 ? 'text-[#00a86b]' : 'text-red-500'}>
-                                  {Math.abs(item.change1W)}% 1W
-                                </span>
-                              </div>
+                              <p className="text-xl font-bold">{lp?.price ?? '—'}</p>
+                              {lp && (
+                                <div className="flex items-center gap-2 text-xs mt-1">
+                                  <span className={`flex items-center gap-0.5 ${lp.change1D >= 0 ? 'text-[#00a86b]' : 'text-red-500'}`}>
+                                    {lp.change1D >= 0 ? <TrendingUpIcon sx={{ fontSize: 12 }} /> : <TrendingDownIcon sx={{ fontSize: 12 }} />}
+                                    {Math.abs(lp.change1D)}% 1D
+                                  </span>
+                                </div>
+                              )}
                             </>
                           );
                         })()}
@@ -181,21 +184,20 @@ export default function WatchlistPage() {
 
                     <div className="flex items-center gap-2 mb-4 flex-wrap">
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}>{item.status}</span>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getInterestColor(item.interestLevel)}`}>{item.interestLevel} Interest</span>
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getInterestColor(item.interest_level)}`}>{item.interest_level} Interest</span>
                     </div>
 
                     <div className="mb-4">
-                      <p className="text-sm text-gray-600 mb-1">{item.source}</p>
-                      <p className="text-xs text-gray-500">Updated {item.lastUpdated}</p>
+                      <p className="text-sm text-gray-600 mb-1">{item.source_label ?? 'Added manually'}</p>
+                      <p className="text-xs text-gray-500">Updated {formatDistanceToNow(new Date(item.updated_at), { addSuffix: true })}</p>
                     </div>
 
                     <p className="text-sm text-gray-700 line-clamp-2 mb-4">{item.thesis || 'No thesis yet — click to add one.'}</p>
 
-                    <div className="flex items-center gap-4 text-xs text-gray-600 mb-4">
-                      {item.relatedPosts > 0 && <span>{item.relatedPosts} posts</span>}
-                      {item.relatedReels > 0 && <span>{item.relatedReels} reels</span>}
-                      {item.relatedModels > 0 && <span>{item.relatedModels} models</span>}
-                    </div>
+                    {/* relatedPosts/relatedReels/relatedModels: out of scope for this
+                        mock→live refactor — watchlist_items has no aggregate columns for
+                        these, so the counts have no data source. Not deleted, just not
+                        wired up yet; see QA handoff note. */}
 
                     <button
                       onClick={(e) => { e.stopPropagation(); setSelectedItem(item); }}
@@ -230,10 +232,10 @@ export default function WatchlistPage() {
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <h2 className="text-3xl font-bold">{selectedItem.ticker}</h2>
-                  <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">{selectedItem.assetType}</span>
+                  <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">{selectedItem.asset_type}</span>
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(selectedItem.status)}`}>{selectedItem.status}</span>
                 </div>
-                <p className="text-gray-600">{selectedItem.name}</p>
+                <p className="text-gray-600">{selectedItem.name ?? selectedItem.ticker}</p>
               </div>
               <button onClick={() => setSelectedItem(null)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                 <CloseIcon sx={{ fontSize: 20 }} />
@@ -241,23 +243,23 @@ export default function WatchlistPage() {
             </div>
 
             <div className="p-8 space-y-6">
-              {/* Price Info */}
-              <div className="flex items-center flex-wrap gap-4 sm:gap-8 pb-6 border-b border-gray-200">
-                <div><p className="text-sm text-gray-600 mb-1">Current Price</p><p className="text-3xl font-bold">{selectedItem.price}</p></div>
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">1D Change</p>
-                  <p className={`text-xl font-bold ${selectedItem.change1D >= 0 ? 'text-[#00a86b]' : 'text-red-500'}`}>
-                    {selectedItem.change1D >= 0 ? '+' : ''}{selectedItem.change1D}%
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">1W Change</p>
-                  <p className={`text-xl font-bold ${selectedItem.change1W >= 0 ? 'text-[#00a86b]' : 'text-red-500'}`}>
-                    {selectedItem.change1W >= 0 ? '+' : ''}{selectedItem.change1W}%
-                  </p>
-                </div>
-                <div><p className="text-sm text-gray-600 mb-1">Time Horizon</p><p className="text-lg font-medium">{selectedItem.timeHorizon}</p></div>
-              </div>
+              {/* Price Info — live-only (Polygon); no price/change columns on watchlist_items.
+                  No 1W change source exists yet, so it's omitted rather than fabricated. */}
+              {(() => {
+                const lp = livePrices.get(selectedItem.ticker);
+                return (
+                  <div className="flex items-center flex-wrap gap-4 sm:gap-8 pb-6 border-b border-gray-200">
+                    <div><p className="text-sm text-gray-600 mb-1">Current Price</p><p className="text-3xl font-bold">{lp?.price ?? '—'}</p></div>
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">1D Change</p>
+                      <p className={`text-xl font-bold ${lp ? (lp.change1D >= 0 ? 'text-[#00a86b]' : 'text-red-500') : 'text-gray-400'}`}>
+                        {lp ? `${lp.change1D >= 0 ? '+' : ''}${lp.change1D}%` : '—'}
+                      </p>
+                    </div>
+                    <div><p className="text-sm text-gray-600 mb-1">Time Horizon</p><p className="text-lg font-medium">{selectedItem.time_horizon}</p></div>
+                  </div>
+                );
+              })()}
 
               {/* My Thesis */}
               <div>
@@ -268,11 +270,11 @@ export default function WatchlistPage() {
               </div>
 
               {/* Why Watching */}
-              {selectedItem.whyWatching && (
+              {selectedItem.why_watching && (
                 <div>
                   <h3 className="font-bold mb-3">Why I'm Watching This</h3>
                   <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <p className="text-gray-700 leading-relaxed">{selectedItem.whyWatching}</p>
+                    <p className="text-gray-700 leading-relaxed">{selectedItem.why_watching}</p>
                   </div>
                 </div>
               )}
@@ -293,11 +295,11 @@ export default function WatchlistPage() {
               )}
 
               {/* Upside Drivers */}
-              {selectedItem.upsideDrivers.length > 0 && (
+              {selectedItem.upside_drivers.length > 0 && (
                 <div>
                   <h3 className="font-bold mb-3">Upside Drivers</h3>
                   <ul className="space-y-2">
-                    {selectedItem.upsideDrivers.map((d, i) => (
+                    {selectedItem.upside_drivers.map((d, i) => (
                       <li key={i} className="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
                         <span className="text-green-600 mt-0.5">↗</span>
                         <span className="text-gray-700">{d}</span>
@@ -322,34 +324,37 @@ export default function WatchlistPage() {
                 </div>
               )}
 
-              {/* Related Content */}
+              {/* Related Content — out of scope for this mock→live refactor.
+                  watchlist_items has no relatedPosts/relatedReels/relatedModels
+                  columns, so these can no longer show real counts. Kept as a UI
+                  shell (not deleted) for a future backend-aggregation pass. */}
               <div>
                 <h3 className="font-bold mb-3">Related Content</h3>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="p-4 bg-gray-50 rounded-lg text-center">
                     <ArticleIcon sx={{ fontSize: 32, color: '#9ca3af', marginBottom: 1 }} />
-                    <p className="text-2xl font-bold mb-1">{selectedItem.relatedPosts}</p>
+                    <p className="text-sm text-gray-400 mb-1">Coming soon</p>
                     <p className="text-sm text-gray-600">Posts</p>
                   </div>
                   <div className="p-4 bg-gray-50 rounded-lg text-center">
                     <VideoLibraryIcon sx={{ fontSize: 32, color: '#9ca3af', marginBottom: 1 }} />
-                    <p className="text-2xl font-bold mb-1">{selectedItem.relatedReels}</p>
+                    <p className="text-sm text-gray-400 mb-1">Coming soon</p>
                     <p className="text-sm text-gray-600">Reels</p>
                   </div>
                   <div className="p-4 bg-gray-50 rounded-lg text-center">
                     <InsertChartIcon sx={{ fontSize: 32, color: '#9ca3af', marginBottom: 1 }} />
-                    <p className="text-2xl font-bold mb-1">{selectedItem.relatedModels}</p>
+                    <p className="text-sm text-gray-400 mb-1">Coming soon</p>
                     <p className="text-sm text-gray-600">Models</p>
                   </div>
                 </div>
               </div>
 
               {/* Decision Notes */}
-              {selectedItem.decisionNotes && (
+              {selectedItem.decision_notes && (
                 <div>
                   <h3 className="font-bold mb-3">Decision Notes</h3>
                   <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
-                    <p className="text-gray-700 leading-relaxed">{selectedItem.decisionNotes}</p>
+                    <p className="text-gray-700 leading-relaxed">{selectedItem.decision_notes}</p>
                   </div>
                 </div>
               )}
@@ -438,7 +443,7 @@ export default function WatchlistPage() {
                 <label className="block text-sm font-bold text-gray-700 mb-2">Asset Type</label>
                 <select
                   value={newAssetType}
-                  onChange={e => setNewAssetType(e.target.value as WatchlistItem['assetType'])}
+                  onChange={e => setNewAssetType(e.target.value as WatchlistItem['asset_type'])}
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]"
                 >
                   <option value="Stock">Stock</option>
