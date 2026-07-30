@@ -21,6 +21,13 @@ import { useFollow } from '../contexts/FollowContext';
 import { useAuth } from '../contexts/AuthContext';
 import WatchingTab from './WatchingTab';
 import { SUBSCRIBE_ENABLED, ACTUAL_PORTFOLIO_ENABLED } from '../featureFlags';
+import type { Simulation } from '../data/simulations';
+import { MOCK_SIMULATIONS, filterChartData } from '../data/simulations';
+import SimulationSetupCard from './SimulationSetupCard';
+import PerformanceSummaryCards from './PerformanceSummaryCards';
+import PerformanceTrendChart from './PerformanceTrendChart';
+import PastSimulationsList from './PastSimulationsList';
+import SimulationInsights from './SimulationInsights';
 
 // Same 4-color default palette the hardcoded allocation used, extended for portfolios with
 // more than 4 real slices.
@@ -101,12 +108,12 @@ export default function CreatorProfileInvestment() {
   const [toastMessage, setToastMessage] = useState('');
   const [showMoreMenu, setShowMoreMenu] = useState(false);
 
-  // ── Investment tab (Figma placeholder — TODO: rebuild with real data) ──
+  // ── Investment tab ─────────────────────────────────────────────────
   const [simulatorMode, setSimulatorMode] = useState(true);
   const [simulationExpanded, setSimulationExpanded] = useState(false);
-  const [showSimulationList, setShowSimulationList] = useState(false);
   const [holdingsExpanded, setHoldingsExpanded] = useState(false);
   const [timeRange, setTimeRange] = useState<'1W' | '1M' | '3M' | '1Y' | 'ALL'>('1M');
+  const [selectedSimulation, setSelectedSimulation] = useState<Simulation>(MOCK_SIMULATIONS[0]);
 
   const portfolioData = useMemo(() => {
     const points = { '1W': 7, '1M': 30, '3M': 90, '1Y': 252, 'ALL': 400 }[timeRange];
@@ -117,6 +124,16 @@ export default function CreatorProfileInvestment() {
       return { time: `t${i}`, value: Math.max(val, base * 0.85) };
     });
   }, [timeRange]);
+
+  const simulationChartData = useMemo(
+    () => filterChartData(selectedSimulation.chartData, timeRange),
+    [selectedSimulation, timeRange],
+  );
+
+  const handleSelectSimulation = (simulation: Simulation) => {
+    setSelectedSimulation(simulation);
+    setSimulationExpanded(false);
+  };
 
   // Reads the real profiles.portfolio_allocation Json column (shape: {name, value}[], colors
   // assigned by the frontend) when a creator has one set; falls back to the same default
@@ -401,7 +418,7 @@ export default function CreatorProfileInvestment() {
               </div>
             </div>
 
-            {/* ── Investment Tab (Figma placeholder — TODO: rebuild with real data) ── */}
+            {/* ── Investment Tab ── */}
             {activeTab === 'investment' && (
             <div className="space-y-4">
               {/* Simulator Toggle */}
@@ -429,260 +446,27 @@ export default function CreatorProfileInvestment() {
               {simulatorMode ? (
                 // Simulator View
                 <div className="space-y-4">
-                  {/* Simulation Settings */}
-                  <div
-                    onClick={() => setSimulationExpanded(!simulationExpanded)}
-                    className="p-4 bg-white rounded-lg border border-gray-200 cursor-pointer hover:border-gray-300 transition-colors"
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <h2 className="text-base font-semibold">Simulation Setup</h2>
-                      <svg
-                        className={`w-4 h-4 text-gray-500 transition-transform ${simulationExpanded ? 'rotate-180' : ''}`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </div>
+                  <SimulationSetupCard
+                    simulation={selectedSimulation}
+                    expanded={simulationExpanded}
+                    onToggle={() => setSimulationExpanded(v => !v)}
+                  />
 
-                    {!simulationExpanded ? (
-                      // Collapsed Summary View
-                      <div className="space-y-1">
-                        <p className="text-xs text-gray-600">
-                          <span className="font-medium">Period:</span> Jan 1 - Jun 1, 2026 (5 months)
-                        </p>
-                        <p className="text-xs text-gray-600">
-                          <span className="font-medium">Holdings:</span> 2 stocks (NVDA, TSLA) + Cash
-                        </p>
-                        <p className="text-xs text-gray-600">
-                          <span className="font-medium">Capital:</span> $50,000
-                        </p>
-                      </div>
-                    ) : (
-                      // Expanded Detail View
-                      <div className="space-y-3">
-                        <div className="grid grid-cols-2 gap-3">
-                          <div>
-                            <label className="block text-xs font-medium text-gray-600 mb-1.5">Start Date</label>
-                            <div className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded text-xs">
-                              Jan 1, 2026
-                            </div>
-                          </div>
-                          <div>
-                            <label className="block text-xs font-medium text-gray-600 mb-1.5">Initial Capital</label>
-                            <div className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded text-xs">
-                              $50,000
-                            </div>
-                          </div>
-                        </div>
+                  <PerformanceSummaryCards simulation={selectedSimulation} />
 
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1.5">Hypothetical Holdings</label>
-                          <div className="space-y-1.5">
-                            <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded text-xs flex items-center justify-between">
-                              <span>NVDA - $30,000 @ $800/share</span>
-                              <span className="text-gray-500">37.5 shares</span>
-                            </div>
-                            <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded text-xs flex items-center justify-between">
-                              <span>TSLA - $15,000 @ $250/share</span>
-                              <span className="text-gray-500">60 shares</span>
-                            </div>
-                            <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded text-xs flex items-center justify-between">
-                              <span>Cash</span>
-                              <span className="text-gray-500">$5,000</span>
-                            </div>
-                          </div>
-                        </div>
+                  <PerformanceTrendChart
+                    chartData={simulationChartData}
+                    timeRange={timeRange}
+                    onTimeRangeChange={setTimeRange}
+                  />
 
-                        <div>
-                          <label className="block text-xs font-medium text-gray-600 mb-1.5">Simulation Rationale</label>
-                          <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded">
-                            <ul className="space-y-1 text-xs text-gray-600">
-                              <li>• Testing AI chip sector growth thesis through NVDA exposure</li>
-                              <li>• EV market diversification with TSLA position</li>
-                              <li>• Conservative 10% cash buffer for volatility management</li>
-                              <li>• 5-month timeframe to capture Q1-Q2 earnings cycles</li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  <PastSimulationsList
+                    simulations={MOCK_SIMULATIONS}
+                    selectedId={selectedSimulation.id}
+                    onSelect={handleSelectSimulation}
+                  />
 
-                  {/* Performance Comparison */}
-                  <div>
-                    <h2 className="text-base font-semibold mb-3">Hypothesis vs Actual Performance</h2>
-                    <div className="grid grid-cols-3 gap-3 mb-4">
-                      {/* Hypothesis */}
-                      <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
-                        <p className="text-xs text-gray-600 mb-1">Your Hypothesis</p>
-                        <p className="text-xl font-bold text-purple-700 mb-0.5">+15.0%</p>
-                        <p className="text-xs text-gray-500">$57,500</p>
-                      </div>
-
-                      {/* Actual */}
-                      <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                        <p className="text-xs text-gray-600 mb-1">Actual Performance</p>
-                        <p className="text-xl font-bold text-brand mb-0.5">+8.5%</p>
-                        <p className="text-xs text-gray-500">$54,250</p>
-                      </div>
-
-                      {/* Difference */}
-                      <div className="p-3 bg-red-50 rounded-lg border border-red-200">
-                        <p className="text-xs text-gray-600 mb-1">Difference</p>
-                        <p className="text-xl font-bold text-red-700 mb-0.5">-6.5%</p>
-                        <p className="text-xs text-gray-500">-$3,250</p>
-                      </div>
-                    </div>
-
-                    {/* Chart Comparison */}
-                    <div className="bg-gray-50 rounded-lg p-4 w-full">
-                      <div className="h-48 min-h-[192px] w-full min-w-[300px]">
-                        <ResponsiveContainer width="100%" height={192} minWidth={300} minHeight={192} key="simulator-chart-container">
-                          <LineChart id="simulator-chart" key="simulator-line-chart">
-                            <XAxis dataKey="time" hide key="simulator-xaxis" />
-                            <YAxis hide domain={['dataMin', 'dataMax']} key="simulator-yaxis" />
-                            <Tooltip contentStyle={CHART_TOOLTIP_STYLE} formatter={chartCurrencyFormatter('Value')} labelFormatter={hideChartLabel} />
-                            <Line
-                              data={portfolioData}
-                              type="monotone"
-                              dataKey="value"
-                              stroke="var(--brand)"
-                              strokeWidth={2}
-                              dot={false}
-                              isAnimationActive={false}
-                              key="simulator-actual-line"
-                              name="Actual"
-                            />
-                            <Line
-                              data={portfolioData.map((d, i) => ({ ...d, value: d.value * 1.06 }))}
-                              type="monotone"
-                              dataKey="value"
-                              stroke="#9333ea"
-                              strokeWidth={2}
-                              strokeDasharray="5 5"
-                              dot={false}
-                              isAnimationActive={false}
-                              key="simulator-hypothesis-line"
-                              name="Hypothesis"
-                            />
-                          </LineChart>
-                        </ResponsiveContainer>
-                      </div>
-                      <div className="flex items-center justify-center gap-4 mt-3">
-                        <div className="flex items-center gap-1.5">
-                          <div className="w-3 h-0.5 bg-brand"></div>
-                          <span className="text-xs font-medium">Actual</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <div className="w-3 h-0.5 bg-purple-700" style={{ borderTop: '2px dashed #9333ea', height: 0 }}></div>
-                          <span className="text-xs font-medium">Hypothesis</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* More Simulations Button */}
-                  <button
-                    onClick={() => setShowSimulationList(!showSimulationList)}
-                    className="w-full p-3 bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-gray-600"
-                  >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                    {showSimulationList ? 'Hide Past Simulations' : 'View More Simulations'}
-                  </button>
-
-                  {/* Simulation List */}
-                  {showSimulationList && (
-                    <div className="p-4 bg-white rounded-lg border border-gray-200 space-y-2.5">
-                      <h3 className="font-semibold text-sm mb-3">Past Simulations</h3>
-
-                      {/* Simulation 1 */}
-                      <div className="p-3 bg-gray-50 rounded border border-gray-200 hover:border-gray-300 transition-colors cursor-pointer">
-                        <div className="flex items-center justify-between mb-1.5">
-                          <h4 className="font-medium text-sm">Tech Growth Portfolio</h4>
-                          <span className="text-xs text-gray-500">Dec 1, 2025 - Mar 1, 2026</span>
-                        </div>
-                        <div className="flex items-center gap-3 text-xs text-gray-600 mb-1.5">
-                          <span>3 Holdings</span>
-                          <span>•</span>
-                          <span>$75,000 Capital</span>
-                        </div>
-                        <div className="flex items-center gap-3 text-xs">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-gray-500">Hypothesis:</span>
-                            <span className="font-medium text-purple-700">+22.0%</span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-gray-500">Actual:</span>
-                            <span className="font-medium text-brand">+18.5%</span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-gray-500">Diff:</span>
-                            <span className="font-medium text-red-700">-3.5%</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Simulation 2 */}
-                      <div className="p-3 bg-gray-50 rounded border border-gray-200 hover:border-gray-300 transition-colors cursor-pointer">
-                        <div className="flex items-center justify-between mb-1.5">
-                          <h4 className="font-medium text-sm">Conservative Value Play</h4>
-                          <span className="text-xs text-gray-500">Sep 1, 2025 - Dec 1, 2025</span>
-                        </div>
-                        <div className="flex items-center gap-3 text-xs text-gray-600 mb-1.5">
-                          <span>4 Holdings</span>
-                          <span>•</span>
-                          <span>$100,000 Capital</span>
-                        </div>
-                        <div className="flex items-center gap-3 text-xs">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-gray-500">Hypothesis:</span>
-                            <span className="font-medium text-purple-700">+8.0%</span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-gray-500">Actual:</span>
-                            <span className="font-medium text-brand">+11.2%</span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-gray-500">Diff:</span>
-                            <span className="font-medium text-brand">+3.2%</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Simulation 3 */}
-                      <div className="p-3 bg-gray-50 rounded border border-gray-200 hover:border-gray-300 transition-colors cursor-pointer">
-                        <div className="flex items-center justify-between mb-1.5">
-                          <h4 className="font-medium text-sm">Crypto Diversification Test</h4>
-                          <span className="text-xs text-gray-500">Jun 1, 2025 - Sep 1, 2025</span>
-                        </div>
-                        <div className="flex items-center gap-3 text-xs text-gray-600 mb-1.5">
-                          <span>5 Holdings</span>
-                          <span>•</span>
-                          <span>$25,000 Capital</span>
-                        </div>
-                        <div className="flex items-center gap-3 text-xs">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-gray-500">Hypothesis:</span>
-                            <span className="font-medium text-purple-700">+35.0%</span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-gray-500">Actual:</span>
-                            <span className="font-medium text-red-700">-5.2%</span>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-gray-500">Diff:</span>
-                            <span className="font-medium text-red-700">-40.2%</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Insights */}
+                  <SimulationInsights insights={selectedSimulation.insights} />
                 </div>
               ) : (
                 // Real Portfolio View
