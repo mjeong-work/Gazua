@@ -119,7 +119,7 @@ export default function PerformanceTrendChart({ chartData, timeRange, onTimeRang
             <Line
               type="monotone"
               dataKey="actualValue"
-              stroke="#00a86b"
+              stroke="var(--brand)"
               strokeWidth={2}
               dot={false}
               isAnimationActive={false}
@@ -141,7 +141,7 @@ export default function PerformanceTrendChart({ chartData, timeRange, onTimeRang
         </div>
         <div className="flex items-center gap-2">
           <svg width="24" height="8">
-            <line x1="0" y1="4" x2="24" y2="4" stroke="#00a86b" strokeWidth="2" />
+            <line x1="0" y1="4" x2="24" y2="4" stroke="var(--brand)" strokeWidth="2" />
           </svg>
           Actual
         </div>

@@ -189,7 +189,7 @@ export default function CreateReelModal({ onClose, onSuccess }: CreateReelModalP
               onDragLeave={() => setIsDragging(false)}
               onDrop={(e) => { e.preventDefault(); setIsDragging(false); handleFileSelected(e.dataTransfer.files?.[0]); }}
               className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors cursor-pointer ${
-                isDragging ? 'border-[#00a86b] bg-green-50' : 'border-gray-300 hover:border-gray-400'
+                isDragging ? 'border-brand bg-green-50' : 'border-gray-300 hover:border-gray-400'
               }`}
             >
               {thumbnailPreviewUrl ? (
@@ -222,7 +222,7 @@ export default function CreateReelModal({ onClose, onSuccess }: CreateReelModalP
               placeholder="e.g., NVDA, Bitcoin, Market Update"
               value={ticker}
               onChange={(e) => setTicker(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]"
+              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
             />
           </div>
 
@@ -236,7 +236,7 @@ export default function CreateReelModal({ onClose, onSuccess }: CreateReelModalP
               placeholder="Describe what your reel is about..."
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b] resize-none"
+              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand resize-none"
             />
             <p className="text-xs text-gray-500 mt-1">
               {caption.length} / 2200 characters

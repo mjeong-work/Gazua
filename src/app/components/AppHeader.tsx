@@ -61,7 +61,7 @@ export default function AppHeader() {
     paths.some(p => pathname === p || pathname.startsWith(p + '/'));
 
   const cls = (paths: string[]) =>
-    `hover:opacity-70 transition-opacity ${active(paths) ? 'text-[#00a86b]' : ''}`;
+    `hover:opacity-70 transition-opacity ${active(paths) ? 'text-brand' : ''}`;
 
   return (
     <>
@@ -107,7 +107,7 @@ export default function AppHeader() {
               ? <NotificationsIcon sx={{ fontSize: 22 }} />
               : <NotificationsNoneIcon sx={{ fontSize: 22 }} />}
             {unreadCount > 0 && (
-              <span className="absolute top-1 right-1 w-2 h-2 bg-[#00a86b] rounded-full" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-brand rounded-full" />
             )}
           </button>
         </div>
@@ -170,7 +170,7 @@ export default function AppHeader() {
             <button onClick={() => navigate('/messages')} className={`relative ${cls(['/messages'])}`}>
               Messages
               {unreadMessageCount > 0 && (
-                <span className="absolute -top-1 -right-2.5 w-2 h-2 bg-[#00a86b] rounded-full" />
+                <span className="absolute -top-1 -right-2.5 w-2 h-2 bg-brand rounded-full" />
               )}
             </button>
             <button onClick={() => navigate('/account')} className={cls(['/account'])}>
@@ -183,14 +183,14 @@ export default function AppHeader() {
             )}
             <button
               onClick={() => navigate('/notifications')}
-              className={`relative p-2 -m-2 rounded-full hover:bg-gray-100 transition-colors ${active(['/notifications']) ? 'text-[#00a86b]' : ''}`}
+              className={`relative p-2 -m-2 rounded-full hover:bg-gray-100 transition-colors ${active(['/notifications']) ? 'text-brand' : ''}`}
               aria-label="Notifications"
             >
               {active(['/notifications'])
                 ? <NotificationsIcon sx={{ fontSize: 20 }} />
                 : <NotificationsNoneIcon sx={{ fontSize: 20 }} />}
               {unreadCount > 0 && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-[#00a86b] rounded-full" />
+                <span className="absolute top-1 right-1 w-2 h-2 bg-brand rounded-full" />
               )}
             </button>
           </nav>
@@ -204,7 +204,7 @@ export default function AppHeader() {
         <div className="flex items-center justify-around h-16">
           <button
             onClick={() => navigate('/main')}
-            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/main', '/home']) ? 'text-[#00a86b]' : 'text-gray-500'}`}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/main', '/home']) ? 'text-brand' : 'text-gray-500'}`}
           >
             {active(['/main', '/home'])
               ? <HomeIcon sx={{ fontSize: 24 }} />
@@ -213,7 +213,7 @@ export default function AppHeader() {
           </button>
           <button
             onClick={() => navigate('/creators')}
-            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/creators', '/profile']) ? 'text-[#00a86b]' : 'text-gray-500'}`}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/creators', '/profile']) ? 'text-brand' : 'text-gray-500'}`}
           >
             {active(['/creators', '/profile'])
               ? <PeopleIcon sx={{ fontSize: 24 }} />
@@ -222,7 +222,7 @@ export default function AppHeader() {
           </button>
           <button
             onClick={() => navigate('/my-profile')}
-            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/my-profile']) ? 'text-[#00a86b]' : 'text-gray-500'}`}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/my-profile']) ? 'text-brand' : 'text-gray-500'}`}
           >
             {active(['/my-profile'])
               ? <PersonIcon sx={{ fontSize: 24 }} />
@@ -231,19 +231,19 @@ export default function AppHeader() {
           </button>
           <button
             onClick={() => navigate('/messages')}
-            className={`relative flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/messages']) ? 'text-[#00a86b]' : 'text-gray-500'}`}
+            className={`relative flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/messages']) ? 'text-brand' : 'text-gray-500'}`}
           >
             {active(['/messages'])
               ? <ChatBubbleIcon sx={{ fontSize: 24 }} />
               : <ChatBubbleOutlineIcon sx={{ fontSize: 24 }} />}
             {unreadMessageCount > 0 && (
-              <span className="absolute top-0 right-4 w-2 h-2 bg-[#00a86b] rounded-full" />
+              <span className="absolute top-0 right-4 w-2 h-2 bg-brand rounded-full" />
             )}
             <span className="text-[10px] font-medium">Messages</span>
           </button>
           <button
             onClick={() => navigate('/account')}
-            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/account']) ? 'text-[#00a86b]' : 'text-gray-500'}`}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/account']) ? 'text-brand' : 'text-gray-500'}`}
           >
             {active(['/account'])
               ? <SettingsIcon sx={{ fontSize: 24 }} />

@@ -207,12 +207,12 @@ function InlineComments({
               onChange={e => setText(e.target.value.slice(0, 500))}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }}
               disabled={submitting}
-              className="flex-1 px-3 py-1.5 border border-gray-200 rounded-full text-xs focus:outline-none focus:border-[#00a86b] transition-colors disabled:opacity-50 bg-gray-50"
+              className="flex-1 px-3 py-1.5 border border-gray-200 rounded-full text-xs focus:outline-none focus:border-brand transition-colors disabled:opacity-50 bg-gray-50"
             />
             <button
               onClick={handleSubmit}
               disabled={!text.trim() || submitting}
-              className="w-7 h-7 flex items-center justify-center rounded-full bg-[#00a86b] text-white hover:bg-[#00965f] transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+              className="w-7 h-7 flex items-center justify-center rounded-full bg-brand text-white hover:bg-brand-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
               aria-label="Post comment"
             >
               <SendIcon sx={{ fontSize: 14 }} />
@@ -531,7 +531,7 @@ export default function MainPagePosting() {
                 <h2 className="text-3xl font-bold">
                   {tickerInfo?.price ?? '—'}
                 </h2>
-                <span className={`text-sm font-medium ${tickerInfo ? (tickerInfo.positive ? 'text-[#00a86b]' : 'text-red-500') : 'text-gray-400'}`}>
+                <span className={`text-sm font-medium ${tickerInfo ? (tickerInfo.positive ? 'text-brand' : 'text-red-500') : 'text-gray-400'}`}>
                   {tickerInfo ? `${tickerInfo.changeAmt} (${tickerInfo.change})` : ''}
                 </span>
               </div>
@@ -551,7 +551,7 @@ export default function MainPagePosting() {
                     <Line
                       type="monotone"
                       dataKey="value"
-                      stroke={tickerInfo && !tickerInfo.positive ? '#ef4444' : '#00a86b'}
+                      stroke={tickerInfo && !tickerInfo.positive ? '#ef4444' : 'var(--brand)'}
                       strokeWidth={2}
                       dot={false}
                       isAnimationActive={false}
@@ -592,7 +592,7 @@ export default function MainPagePosting() {
                     <div key={index.id} className="p-4 bg-gray-50 rounded-lg">
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">{index.name}</span>
-                        <span className={`text-xs font-medium ${index.positive ? 'text-[#00a86b]' : 'text-red-500'}`}>{index.change}</span>
+                        <span className={`text-xs font-medium ${index.positive ? 'text-brand' : 'text-red-500'}`}>{index.change}</span>
                       </div>
                       <p className="text-xl font-bold mt-1">{index.value}</p>
                     </div>
@@ -722,7 +722,7 @@ export default function MainPagePosting() {
                           <div className="flex flex-wrap gap-2 mb-2">
                             <span className="text-xs text-gray-600">Your interests:</span>
                             {onboardingData.interests.map(interest => (
-                              <span key={interest} className="px-2 py-1 bg-[#7CFFB2]/20 text-[#00a86b] text-xs font-medium rounded-full border border-[#7CFFB2]/30">
+                              <span key={interest} className="px-2 py-1 bg-[#7CFFB2]/20 text-brand text-xs font-medium rounded-full border border-[#7CFFB2]/30">
                                 {interest}
                               </span>
                             ))}
@@ -823,7 +823,7 @@ export default function MainPagePosting() {
                                 </button>
                                 {post.verified && (
                                   <span title="Portfolio allocation verified by Gazua" className="inline-flex">
-                                    <svg className="w-4 h-4 text-[#00a86b]" viewBox="0 0 24 24" fill="currentColor">
+                                    <svg className="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="currentColor">
                                       <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                   </span>
@@ -838,7 +838,7 @@ export default function MainPagePosting() {
                                   ${post.asset}
                                 </button>
                                 {isOnboarded && onboardingData.interests.includes(post.category) && (
-                                  <span className="inline-block px-2 py-0.5 bg-[#7CFFB2]/20 text-[#00a86b] text-xs font-medium rounded border border-[#7CFFB2]/30">✨ For you</span>
+                                  <span className="inline-block px-2 py-0.5 bg-[#7CFFB2]/20 text-brand text-xs font-medium rounded border border-[#7CFFB2]/30">✨ For you</span>
                                 )}
                                 {algoLabel && <AlgorithmicLabel label={algoLabel} />}
                               </div>
@@ -851,7 +851,7 @@ export default function MainPagePosting() {
                           {getCreator(post.creator_id) && (
                             <button
                               onClick={() => navigate(`/profile/${post.creator_id}/investment`)}
-                              className="text-xs text-[#00a86b] hover:underline mb-3 block"
+                              className="text-xs text-brand hover:underline mb-3 block"
                             >
                               See {post.creator}'s portfolio →
                             </button>
@@ -897,13 +897,13 @@ export default function MainPagePosting() {
                             </button>
                             <button
                               onClick={() => handleSaveToWatchlist(post)}
-                              className={`ml-auto transition-colors flex items-center gap-1.5 ${isPostSaved ? 'text-[#00a86b]' : 'hover:text-[#00a86b]'}`}
+                              className={`ml-auto transition-colors flex items-center gap-1.5 ${isPostSaved ? 'text-brand' : 'hover:text-brand'}`}
                               title={isPostSaved ? 'Remove from Watchlist' : 'Save to Watchlist'}
                             >
                               {isPostSaved ? (
                                 <>
-                                  <BookmarkIcon sx={{ fontSize: 20, color: '#00a86b' }} />
-                                  <span className="text-xs text-[#00a86b]">Saved</span>
+                                  <BookmarkIcon sx={{ fontSize: 20, color: 'var(--brand)' }} />
+                                  <span className="text-xs text-brand">Saved</span>
                                 </>
                               ) : (
                                 <>
@@ -954,7 +954,7 @@ export default function MainPagePosting() {
 
       {/* Toast */}
       {showToast && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 lg:bottom-8 bg-[#00a86b] text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3 z-50 animate-slide-up pointer-events-none">
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 lg:bottom-8 bg-brand text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3 z-50 animate-slide-up pointer-events-none">
           <div>
             <p className="font-bold">{toastMessage}</p>
             {toastSubtitle && <p className="text-sm opacity-90">{toastSubtitle}</p>}

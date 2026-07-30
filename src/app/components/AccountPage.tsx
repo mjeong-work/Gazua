@@ -193,7 +193,7 @@ export default function AccountPage() {
           <ul className="space-y-2 mb-5">
             {tierConfig.features.map(f => (
               <li key={f} className="flex items-center gap-2.5 text-sm text-gray-600">
-                <span className="text-[#00a86b] font-bold leading-none">✓</span>
+                <span className="text-brand font-bold leading-none">✓</span>
                 {f}
               </li>
             ))}
@@ -202,7 +202,7 @@ export default function AccountPage() {
           {tier === 'free' ? (
             <button
               onClick={() => navigate('/pricing')}
-              className="w-full py-2.5 bg-[#00a86b] text-white rounded-xl text-sm font-semibold hover:bg-[#009660] transition-colors"
+              className="w-full py-2.5 bg-brand text-white rounded-xl text-sm font-semibold hover:bg-brand-hover transition-colors"
             >
               Upgrade Plan
             </button>
@@ -210,7 +210,7 @@ export default function AccountPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => navigate('/pricing')}
-                className="flex-1 py-2.5 border border-[#00a86b] text-[#00a86b] rounded-xl text-sm font-medium hover:bg-[#00a86b]/5 transition-colors"
+                className="flex-1 py-2.5 border border-brand text-brand rounded-xl text-sm font-medium hover:bg-brand/5 transition-colors"
               >
                 Manage Subscription
               </button>

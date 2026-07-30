@@ -27,7 +27,7 @@ export default function SaveButton({ isSaved, onToggle, variant = 'rail' }: Save
     <ReelActionButton
       icon={
         isSaved
-          ? <BookmarkIcon sx={{ fontSize: rail ? 22 : 20, color: rail ? '#000000' : '#00a86b' }} />
+          ? <BookmarkIcon sx={{ fontSize: rail ? 22 : 20, color: rail ? '#000000' : 'var(--brand)' }} />
           : <BookmarkBorderIcon sx={{ fontSize: rail ? 22 : 20, color: rail ? '#fff' : '#374151' }} />
       }
       label={isSaved ? 'Remove from saved' : 'Save'}
@@ -40,7 +40,7 @@ export default function SaveButton({ isSaved, onToggle, variant = 'rail' }: Save
       {rail ? (
         isSaved && <span className="text-[10px] font-medium text-white">Saved</span>
       ) : (
-        <span className={`text-sm font-medium ${isSaved ? 'text-[#00a86b]' : 'text-gray-700'}`}>
+        <span className={`text-sm font-medium ${isSaved ? 'text-brand' : 'text-gray-700'}`}>
           {isSaved ? 'Saved' : 'Save'}
         </span>
       )}

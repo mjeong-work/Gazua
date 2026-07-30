@@ -89,7 +89,7 @@ export default function ReportButton({
             </div>
 
             {done ? (
-              <p className="text-sm text-[#00a86b] text-center py-4">
+              <p className="text-sm text-brand text-center py-4">
                 Report submitted. Thank you for keeping Gazua safe.
               </p>
             ) : (

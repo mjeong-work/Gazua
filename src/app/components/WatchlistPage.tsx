@@ -122,7 +122,7 @@ export default function WatchlistPage() {
                   <div className="text-4xl mb-3">{path.icon}</div>
                   <h3 className="font-bold mb-2">{path.title}</h3>
                   <p className="text-sm text-gray-600 mb-4 leading-relaxed">{path.description}</p>
-                  <button onClick={() => navigate(path.route)} className="text-sm font-medium text-[#00a86b] hover:underline">
+                  <button onClick={() => navigate(path.route)} className="text-sm font-medium text-brand hover:underline">
                     {path.action} →
                   </button>
                 </div>
@@ -170,7 +170,7 @@ export default function WatchlistPage() {
                               <p className="text-xl font-bold">{lp?.price ?? '—'}</p>
                               {lp && (
                                 <div className="flex items-center gap-2 text-xs mt-1">
-                                  <span className={`flex items-center gap-0.5 ${lp.change1D >= 0 ? 'text-[#00a86b]' : 'text-red-500'}`}>
+                                  <span className={`flex items-center gap-0.5 ${lp.change1D >= 0 ? 'text-brand' : 'text-red-500'}`}>
                                     {lp.change1D >= 0 ? <TrendingUpIcon sx={{ fontSize: 12 }} /> : <TrendingDownIcon sx={{ fontSize: 12 }} />}
                                     {Math.abs(lp.change1D)}% 1D
                                   </span>
@@ -252,7 +252,7 @@ export default function WatchlistPage() {
                     <div><p className="text-sm text-gray-600 mb-1">Current Price</p><p className="text-3xl font-bold">{lp?.price ?? '—'}</p></div>
                     <div>
                       <p className="text-sm text-gray-600 mb-1">1D Change</p>
-                      <p className={`text-xl font-bold ${lp ? (lp.change1D >= 0 ? 'text-[#00a86b]' : 'text-red-500') : 'text-gray-400'}`}>
+                      <p className={`text-xl font-bold ${lp ? (lp.change1D >= 0 ? 'text-brand' : 'text-red-500') : 'text-gray-400'}`}>
                         {lp ? `${lp.change1D >= 0 ? '+' : ''}${lp.change1D}%` : '—'}
                       </p>
                     </div>
@@ -286,7 +286,7 @@ export default function WatchlistPage() {
                   <ul className="space-y-2">
                     {selectedItem.assumptions.map((a, i) => (
                       <li key={i} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                        <span className="text-[#00a86b] mt-0.5">✓</span>
+                        <span className="text-brand mt-0.5">✓</span>
                         <span className="text-gray-700">{a}</span>
                       </li>
                     ))}
@@ -394,7 +394,7 @@ export default function WatchlistPage() {
               onChange={e => setEditThesisText(e.target.value)}
               rows={8}
               placeholder="Write your investment thesis here..."
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b] resize-none mb-4"
+              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand resize-none mb-4"
             />
             <div className="flex gap-3">
               <button onClick={handleSaveThesis} className="flex-1 py-3 bg-black text-white rounded-full font-medium hover:bg-black/80 transition-colors">
@@ -426,7 +426,7 @@ export default function WatchlistPage() {
                   placeholder="e.g., AAPL, BTC, SPY"
                   value={newTicker}
                   onChange={e => setNewTicker(e.target.value.toUpperCase())}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                 />
               </div>
               <div>
@@ -436,7 +436,7 @@ export default function WatchlistPage() {
                   placeholder="e.g., Apple Inc."
                   value={newName}
                   onChange={e => setNewName(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                 />
               </div>
               <div>
@@ -444,7 +444,7 @@ export default function WatchlistPage() {
                 <select
                   value={newAssetType}
                   onChange={e => setNewAssetType(e.target.value as WatchlistItem['asset_type'])}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                 >
                   <option value="Stock">Stock</option>
                   <option value="ETF">ETF</option>
@@ -467,7 +467,7 @@ export default function WatchlistPage() {
 
       {/* Toast */}
       {showToast && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-[#00a86b] text-white px-6 py-4 rounded-xl shadow-lg z-50 animate-slide-up pointer-events-none">
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-brand text-white px-6 py-4 rounded-xl shadow-lg z-50 animate-slide-up pointer-events-none">
           <p className="font-bold">{toastMessage}</p>
         </div>
       )}

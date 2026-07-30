@@ -24,7 +24,7 @@ import { SUBSCRIBE_ENABLED, ACTUAL_PORTFOLIO_ENABLED } from '../featureFlags';
 
 // Same 4-color default palette the hardcoded allocation used, extended for portfolios with
 // more than 4 real slices.
-const ALLOCATION_COLORS = ['#00a86b', '#7CFFB2', '#f43f5e', '#e5e7eb', '#60a5fa', '#a78bfa'];
+const ALLOCATION_COLORS = ['var(--brand)', '#7CFFB2', '#f43f5e', '#e5e7eb', '#60a5fa', '#a78bfa'];
 
 interface DisplayPost {
   id: string;
@@ -135,7 +135,7 @@ export default function CreatorProfileInvestment() {
       });
     }
     return [
-      { name: 'Stocks', value: 45, color: '#00a86b' },
+      { name: 'Stocks', value: 45, color: 'var(--brand)' },
       { name: 'ETFs', value: 30, color: '#7CFFB2' },
       { name: 'Crypto', value: 15, color: '#f43f5e' },
       { name: 'Cash', value: 10, color: '#e5e7eb' },
@@ -280,7 +280,7 @@ export default function CreatorProfileInvestment() {
                       <h1 className="text-2xl sm:text-3xl font-bold">{creator.name}</h1>
                       {creator.verified && (
                         <span title="Portfolio allocation verified by Gazua" className="inline-flex">
-                          <svg className="w-6 h-6 text-[#00a86b]" viewBox="0 0 24 24" fill="currentColor">
+                          <svg className="w-6 h-6 text-brand" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                         </span>
@@ -322,7 +322,7 @@ export default function CreatorProfileInvestment() {
                       title="Toggle notifications"
                     >
                       {notificationsOn
-                        ? <NotificationsActiveIcon sx={{ fontSize: 20, color: '#00a86b' }} />
+                        ? <NotificationsActiveIcon sx={{ fontSize: 20, color: 'var(--brand)' }} />
                         : <NotificationsIcon sx={{ fontSize: 20 }} />
                       }
                     </button>
@@ -414,7 +414,7 @@ export default function CreatorProfileInvestment() {
                   <button
                     onClick={() => setSimulatorMode(!simulatorMode)}
                     className={`relative w-11 h-6 rounded-full transition-colors ${
-                      simulatorMode ? 'bg-[#00a86b]' : 'bg-gray-300'
+                      simulatorMode ? 'bg-brand' : 'bg-gray-300'
                     }`}
                   >
                     <div
@@ -524,7 +524,7 @@ export default function CreatorProfileInvestment() {
                       {/* Actual */}
                       <div className="p-3 bg-green-50 rounded-lg border border-green-200">
                         <p className="text-xs text-gray-600 mb-1">Actual Performance</p>
-                        <p className="text-xl font-bold text-[#00a86b] mb-0.5">+8.5%</p>
+                        <p className="text-xl font-bold text-brand mb-0.5">+8.5%</p>
                         <p className="text-xs text-gray-500">$54,250</p>
                       </div>
 
@@ -548,7 +548,7 @@ export default function CreatorProfileInvestment() {
                               data={portfolioData}
                               type="monotone"
                               dataKey="value"
-                              stroke="#00a86b"
+                              stroke="var(--brand)"
                               strokeWidth={2}
                               dot={false}
                               isAnimationActive={false}
@@ -572,7 +572,7 @@ export default function CreatorProfileInvestment() {
                       </div>
                       <div className="flex items-center justify-center gap-4 mt-3">
                         <div className="flex items-center gap-1.5">
-                          <div className="w-3 h-0.5 bg-[#00a86b]"></div>
+                          <div className="w-3 h-0.5 bg-brand"></div>
                           <span className="text-xs font-medium">Actual</span>
                         </div>
                         <div className="flex items-center gap-1.5">
@@ -617,7 +617,7 @@ export default function CreatorProfileInvestment() {
                           </div>
                           <div className="flex items-center gap-1.5">
                             <span className="text-gray-500">Actual:</span>
-                            <span className="font-medium text-[#00a86b]">+18.5%</span>
+                            <span className="font-medium text-brand">+18.5%</span>
                           </div>
                           <div className="flex items-center gap-1.5">
                             <span className="text-gray-500">Diff:</span>
@@ -644,11 +644,11 @@ export default function CreatorProfileInvestment() {
                           </div>
                           <div className="flex items-center gap-1.5">
                             <span className="text-gray-500">Actual:</span>
-                            <span className="font-medium text-[#00a86b]">+11.2%</span>
+                            <span className="font-medium text-brand">+11.2%</span>
                           </div>
                           <div className="flex items-center gap-1.5">
                             <span className="text-gray-500">Diff:</span>
-                            <span className="font-medium text-[#00a86b]">+3.2%</span>
+                            <span className="font-medium text-brand">+3.2%</span>
                           </div>
                         </div>
                       </div>
@@ -690,7 +690,7 @@ export default function CreatorProfileInvestment() {
 
               {/* Actual Portfolio Badge */}
               <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#00a86b]/10 text-[#00a86b] text-xs font-semibold rounded-full border border-[#00a86b]/20">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand/10 text-brand text-xs font-semibold rounded-full border border-brand/20">
                   <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
@@ -706,7 +706,7 @@ export default function CreatorProfileInvestment() {
                     <h2 className="text-base font-semibold">Performance Chart</h2>
                   </div>
                   <div className="text-right">
-                    <p className="text-base font-medium text-[#00a86b]">+2.66%</p>
+                    <p className="text-base font-medium text-brand">+2.66%</p>
                   </div>
                 </div>
 
@@ -720,7 +720,7 @@ export default function CreatorProfileInvestment() {
                         <Line
                           type="monotone"
                           dataKey="value"
-                          stroke="#00a86b"
+                          stroke="var(--brand)"
                           strokeWidth={2}
                           dot={false}
                           isAnimationActive={false}
@@ -807,7 +807,7 @@ export default function CreatorProfileInvestment() {
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-medium">$41,820.00</p>
-                        <p className="text-xs text-[#00a86b]">+2.66%</p>
+                        <p className="text-xs text-brand">+2.66%</p>
                       </div>
                     </div>
 
@@ -824,7 +824,7 @@ export default function CreatorProfileInvestment() {
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-medium">$18,340.50</p>
-                        <p className="text-xs text-[#00a86b]">+0.88%</p>
+                        <p className="text-xs text-brand">+0.88%</p>
                       </div>
                     </div>
 
@@ -875,7 +875,7 @@ export default function CreatorProfileInvestment() {
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-medium">$4,230.00</p>
-                        <p className="text-xs text-[#00a86b]">+0.52%</p>
+                        <p className="text-xs text-brand">+0.52%</p>
                       </div>
                     </div>
 
@@ -928,7 +928,7 @@ export default function CreatorProfileInvestment() {
                           <div className="flex items-center gap-1.5">
                             <span className="font-semibold text-sm">{creator.name}</span>
                             {creator.verified && (
-                              <svg className="w-4 h-4 text-[#00a86b]" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                              <svg className="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             )}
                           </div>
                           <div className="flex items-center gap-2 text-xs text-gray-500">
@@ -939,7 +939,7 @@ export default function CreatorProfileInvestment() {
                       </div>
                       <p className="text-sm text-gray-800 leading-relaxed mb-3">{post.content}</p>
                       <div className="flex items-center gap-6 text-xs text-gray-500">
-                        <button className="flex items-center gap-1.5 hover:text-[#00a86b] transition-colors">
+                        <button className="flex items-center gap-1.5 hover:text-brand transition-colors">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
                           {post.likes.toLocaleString()}
                         </button>
@@ -1027,7 +1027,7 @@ export default function CreatorProfileInvestment() {
       )}
 
       {showToast && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-[#00a86b] text-white px-6 py-4 rounded-xl shadow-lg z-50 animate-slide-up pointer-events-none">
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-brand text-white px-6 py-4 rounded-xl shadow-lg z-50 animate-slide-up pointer-events-none">
           <p className="font-bold">{toastMessage}</p>
         </div>
       )}

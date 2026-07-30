@@ -271,7 +271,7 @@ export default function ModelHubPage() {
                   placeholder="Search models by title or description..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 pr-4 py-3 w-full border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]"
+                  className="pl-12 pr-4 py-3 w-full border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                 />
               </div>
             </div>
@@ -282,7 +282,7 @@ export default function ModelHubPage() {
                 <select
                   value={filters.difficulty}
                   onChange={(e) => setFilters(prev => ({ ...prev, difficulty: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                 >
                   <option>All</option>
                   <option>Beginner</option>
@@ -297,7 +297,7 @@ export default function ModelHubPage() {
                 <select
                   value={filters.fileType}
                   onChange={(e) => setFilters(prev => ({ ...prev, fileType: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                 >
                   <option>All</option>
                   <option>Excel</option>
@@ -313,7 +313,7 @@ export default function ModelHubPage() {
                 <select
                   value={filters.category}
                   onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                 >
                   <option>All</option>
                   <option>Valuation</option>
@@ -329,7 +329,7 @@ export default function ModelHubPage() {
                 <select
                   value={filters.access}
                   onChange={(e) => setFilters(prev => ({ ...prev, access: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                 >
                   <option>All</option>
                   <option>Free Preview</option>
@@ -390,7 +390,7 @@ export default function ModelHubPage() {
                         title={isModelSaved ? "Saved to Watchlist" : "Save to Watchlist"}
                       >
                         {isModelSaved ? (
-                          <BookmarkIcon sx={{ fontSize: 20, color: '#00a86b' }} />
+                          <BookmarkIcon sx={{ fontSize: 20, color: 'var(--brand)' }} />
                         ) : (
                           <BookmarkBorderIcon sx={{ fontSize: 20 }} />
                         )}
@@ -426,7 +426,7 @@ export default function ModelHubPage() {
                       <ul className="space-y-1">
                         {model.learnings.slice(0, 3).map((learning, idx) => (
                           <li key={idx} className="text-xs text-gray-600 flex items-start gap-2">
-                            <span className="text-[#00a86b] mt-0.5">•</span>
+                            <span className="text-brand mt-0.5">•</span>
                             <span>{learning}</span>
                           </li>
                         ))}
@@ -548,7 +548,7 @@ export default function ModelHubPage() {
                       value={uploadTitle}
                       onChange={(e) => setUploadTitle(e.target.value)}
                       placeholder="e.g., Advanced Portfolio Optimizer"
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                     />
                   </div>
 
@@ -558,7 +558,7 @@ export default function ModelHubPage() {
                       <select
                         value={uploadCategory}
                         onChange={(e) => setUploadCategory(e.target.value as ModelCategory)}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                       >
                         <option value="">Select category</option>
                         <option>Valuation</option>
@@ -574,7 +574,7 @@ export default function ModelHubPage() {
                       <select
                         value={uploadDifficulty}
                         onChange={(e) => setUploadDifficulty(e.target.value as ModelDifficulty)}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]"
+                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                       >
                         <option value="">Select difficulty</option>
                         <option>Beginner</option>
@@ -590,7 +590,7 @@ export default function ModelHubPage() {
                     <select
                       value={uploadFileType}
                       onChange={(e) => setUploadFileType(e.target.value as ModelFileType)}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                     >
                       <option value="">Select file type</option>
                       <option>Excel</option>
@@ -608,7 +608,7 @@ export default function ModelHubPage() {
                       value={uploadDescription}
                       onChange={(e) => setUploadDescription(e.target.value)}
                       placeholder="Describe what your model does and who it's for..."
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b] resize-none"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand resize-none"
                     />
                   </div>
 
@@ -619,7 +619,7 @@ export default function ModelHubPage() {
                       value={uploadLearnings}
                       onChange={(e) => setUploadLearnings(e.target.value)}
                       placeholder="e.g., Build valuation models&#10;Calculate intrinsic value&#10;Compare to market price"
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b] resize-none"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand resize-none"
                     />
                   </div>
 
@@ -715,7 +715,7 @@ export default function ModelHubPage() {
                 <ul className="space-y-2">
                   {selectedModel.learnings.map((learning, idx) => (
                     <li key={idx} className="flex items-start gap-3">
-                      <CheckCircleIcon sx={{ fontSize: 20, color: '#00a86b', marginTop: '2px' }} />
+                      <CheckCircleIcon sx={{ fontSize: 20, color: 'var(--brand)', marginTop: '2px' }} />
                       <span className="text-gray-700">{learning}</span>
                     </li>
                   ))}
@@ -771,7 +771,7 @@ export default function ModelHubPage() {
 
       {/* Toast */}
       {showToast && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-[#00a86b] text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3 z-50 animate-slide-up pointer-events-none">
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-brand text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3 z-50 animate-slide-up pointer-events-none">
           <div>
             <p className="font-bold">{toastMessage}</p>
             {toastSubtitle && <p className="text-sm opacity-90">{toastSubtitle}</p>}

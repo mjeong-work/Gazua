@@ -212,7 +212,7 @@ export default function PricingPage() {
                 </div>
 
                 {isActivePlan ? (
-                  <div className="w-full py-3 rounded-full font-medium mb-8 text-center border-2 border-[#00a86b] text-[#00a86b] text-sm">
+                  <div className="w-full py-3 rounded-full font-medium mb-8 text-center border-2 border-brand text-brand text-sm">
                     Current Plan
                   </div>
                 ) : (
@@ -232,7 +232,7 @@ export default function PricingPage() {
                 <ul className="space-y-3">
                   {tier.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-3 text-sm">
-                      <Check className={`w-5 h-5 flex-shrink-0 mt-0.5 ${tier.highlighted ? 'text-[#00a86b]' : 'text-gray-400'}`} />
+                      <Check className={`w-5 h-5 flex-shrink-0 mt-0.5 ${tier.highlighted ? 'text-brand' : 'text-gray-400'}`} />
                       <span>{feature}</span>
                     </li>
                   ))}

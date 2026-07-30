@@ -232,7 +232,7 @@ export default function SearchModal({ onClose }: SearchModalProps) {
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-sm">{result.name}</span>
                           {result.verified && (
-                            <svg className="w-4 h-4 text-[#00a86b]" viewBox="0 0 24 24" fill="currentColor">
+                            <svg className="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="currentColor">
                               <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                           )}

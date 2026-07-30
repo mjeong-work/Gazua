@@ -29,7 +29,7 @@ export default function LegalPage() {
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
               We couldn't find the legal document you're looking for.
             </p>
-            <Link to="/legal/terms" className="text-[#00a86b] hover:underline text-sm">
+            <Link to="/legal/terms" className="text-brand hover:underline text-sm">
               View Terms of Service
             </Link>
           </div>

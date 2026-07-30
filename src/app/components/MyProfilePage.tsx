@@ -85,7 +85,7 @@ const INIT_SIMULATIONS: Simulation[] = [
 ];
 
 const ALLOCATION_DATA = [
-  { name: 'Stocks', value: 45, color: '#00a86b' },
+  { name: 'Stocks', value: 45, color: 'var(--brand)' },
   { name: 'ETFs', value: 30, color: '#7CFFB2' },
   { name: 'Crypto', value: 15, color: '#f43f5e' },
   { name: 'Cash', value: 10, color: '#e5e7eb' },
@@ -530,7 +530,7 @@ export default function MyProfilePage() {
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
                       <h1 className="text-2xl font-bold tracking-tight break-words">{displayName}</h1>
-                      <svg className="w-5 h-5 text-[#00a86b] flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                      <svg className="w-5 h-5 text-brand flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
@@ -544,7 +544,7 @@ export default function MyProfilePage() {
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <button
                       onClick={handleShare}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${shareCopied ? 'bg-[#00a86b]/10 text-[#00a86b]' : 'hover:bg-gray-100 text-gray-500'}`}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${shareCopied ? 'bg-brand/10 text-brand' : 'hover:bg-gray-100 text-gray-500'}`}
                       title="Share profile"
                     >
                       {shareCopied ? <CheckIcon sx={{ fontSize: 15 }} /> : <ShareIcon sx={{ fontSize: 15 }} />}
@@ -566,7 +566,7 @@ export default function MyProfilePage() {
             {/* Private Stats Bar */}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-5 p-3 bg-gray-50 rounded-xl border border-gray-200">
               <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#00a86b] flex-shrink-0" />
+                <div className="w-1.5 h-1.5 rounded-full bg-brand flex-shrink-0" />
                 <span className="text-xs text-gray-500 whitespace-nowrap">Visible to you only</span>
               </div>
               <div className="h-3 w-px bg-gray-300 hidden sm:block" />
@@ -623,7 +623,7 @@ export default function MyProfilePage() {
                   {ACTUAL_PORTFOLIO_ENABLED && (
                     <button
                       onClick={() => setSimulatorMode(!simulatorMode)}
-                      className={`relative w-11 h-6 rounded-full transition-colors ${simulatorMode ? 'bg-[#00a86b]' : 'bg-gray-300'}`}
+                      className={`relative w-11 h-6 rounded-full transition-colors ${simulatorMode ? 'bg-brand' : 'bg-gray-300'}`}
                     >
                       <div className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${simulatorMode ? 'translate-x-5' : 'translate-x-0'}`} />
                     </button>
@@ -731,12 +731,12 @@ export default function MyProfilePage() {
                             </div>
                             <div className="p-3 bg-green-50 rounded-lg border border-green-200">
                               <p className="text-xs text-gray-600 mb-1">Actual Performance</p>
-                              <p className="text-xl font-bold text-[#00a86b] mb-0.5">{selectedSimulation.actualPercent! >= 0 ? '+' : ''}{selectedSimulation.actualPercent!.toFixed(1)}%</p>
+                              <p className="text-xl font-bold text-brand mb-0.5">{selectedSimulation.actualPercent! >= 0 ? '+' : ''}{selectedSimulation.actualPercent!.toFixed(1)}%</p>
                               <p className="text-xs text-gray-500">${simActualValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
                             </div>
                             <div className={`p-3 rounded-lg border ${simDiffPercent >= 0 ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
                               <p className="text-xs text-gray-600 mb-1">Difference</p>
-                              <p className={`text-xl font-bold mb-0.5 ${simDiffPercent >= 0 ? 'text-[#00a86b]' : 'text-red-700'}`}>{simDiffPercent >= 0 ? '+' : ''}{simDiffPercent.toFixed(1)}%</p>
+                              <p className={`text-xl font-bold mb-0.5 ${simDiffPercent >= 0 ? 'text-brand' : 'text-red-700'}`}>{simDiffPercent >= 0 ? '+' : ''}{simDiffPercent.toFixed(1)}%</p>
                               <p className="text-xs text-gray-500">{simDiffValue >= 0 ? '+' : '-'}${Math.abs(simDiffValue).toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
                             </div>
                           </div>
@@ -747,13 +747,13 @@ export default function MyProfilePage() {
                                   <XAxis dataKey="time" hide key="sim-xaxis" />
                                   <YAxis hide domain={['dataMin', 'dataMax']} key="sim-yaxis" />
                                   <Tooltip contentStyle={CHART_TOOLTIP_STYLE} formatter={chartCurrencyFormatter('Value')} labelFormatter={hideChartLabel} />
-                                  <Line data={portfolioData} type="monotone" dataKey="value" stroke="#00a86b" strokeWidth={2} dot={false} isAnimationActive={false} key="sim-actual" name="Actual" />
+                                  <Line data={portfolioData} type="monotone" dataKey="value" stroke="var(--brand)" strokeWidth={2} dot={false} isAnimationActive={false} key="sim-actual" name="Actual" />
                                   <Line data={portfolioData.map(d => ({ ...d, value: d.value * 1.06 }))} type="monotone" dataKey="value" stroke="#9333ea" strokeWidth={2} strokeDasharray="5 5" dot={false} isAnimationActive={false} key="sim-hypothesis" name="Hypothesis" />
                                 </LineChart>
                               </ResponsiveContainer>
                             </div>
                             <div className="flex items-center justify-center gap-4 mt-3">
-                              <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-[#00a86b]" /><span className="text-xs font-medium">Actual</span></div>
+                              <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-brand" /><span className="text-xs font-medium">Actual</span></div>
                               <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-purple-600" style={{ borderTop: '2px dashed #9333ea', height: 0 }} /><span className="text-xs font-medium">Hypothesis</span></div>
                             </div>
                           </div>
@@ -785,8 +785,8 @@ export default function MyProfilePage() {
                             </div>
                             <div className="flex items-center gap-3 text-xs">
                               <div className="flex items-center gap-1.5"><span className="text-gray-500">Hypothesis:</span><span className="font-medium text-purple-700">{sim.hypo}</span></div>
-                              <div className="flex items-center gap-1.5"><span className="text-gray-500">Actual:</span><span className={`font-medium ${sim.diffPos ? 'text-[#00a86b]' : 'text-red-700'}`}>{sim.actual}</span></div>
-                              <div className="flex items-center gap-1.5"><span className="text-gray-500">Diff:</span><span className={`font-medium ${sim.diffPos ? 'text-[#00a86b]' : 'text-red-700'}`}>{sim.diff}</span></div>
+                              <div className="flex items-center gap-1.5"><span className="text-gray-500">Actual:</span><span className={`font-medium ${sim.diffPos ? 'text-brand' : 'text-red-700'}`}>{sim.actual}</span></div>
+                              <div className="flex items-center gap-1.5"><span className="text-gray-500">Diff:</span><span className={`font-medium ${sim.diffPos ? 'text-brand' : 'text-red-700'}`}>{sim.diff}</span></div>
                             </div>
                           </div>
                         ))}
@@ -797,7 +797,7 @@ export default function MyProfilePage() {
                   /* ── Real Portfolio View ── */
                   <div className="space-y-5">
                     <div className="flex items-center gap-2">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#00a86b]/10 text-[#00a86b] text-xs font-semibold rounded-full border border-[#00a86b]/20">
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand/10 text-brand text-xs font-semibold rounded-full border border-brand/20">
                         <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         Actual Portfolio
                       </span>
@@ -807,7 +807,7 @@ export default function MyProfilePage() {
                     <div>
                       <div className="flex items-center justify-between mb-3">
                         <h2 className="text-base font-semibold">Performance Chart</h2>
-                        <p className="text-base font-medium text-[#00a86b]">+2.66%</p>
+                        <p className="text-base font-medium text-brand">+2.66%</p>
                       </div>
                       <div className="bg-gray-50 rounded-xl p-4">
                         <div className="h-48 w-full">
@@ -816,7 +816,7 @@ export default function MyProfilePage() {
                               <XAxis dataKey="time" hide key="my-profile-xaxis" />
                               <YAxis hide domain={['dataMin', 'dataMax']} key="my-profile-yaxis" />
                               <Tooltip contentStyle={CHART_TOOLTIP_STYLE} formatter={chartCurrencyFormatter('Value')} labelFormatter={hideChartLabel} />
-                              <Line type="monotone" dataKey="value" stroke="#00a86b" strokeWidth={2} dot={false} isAnimationActive={false} key="my-profile-line" />
+                              <Line type="monotone" dataKey="value" stroke="var(--brand)" strokeWidth={2} dot={false} isAnimationActive={false} key="my-profile-line" />
                             </LineChart>
                           </ResponsiveContainer>
                         </div>
@@ -908,7 +908,7 @@ export default function MyProfilePage() {
                             onKeyDown={e => { if (e.key === 'Enter') handleSaveVideoTitle(video.id); if (e.key === 'Escape') setEditingVideoId(null); }}
                             className="flex-1 text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:border-black"
                           />
-                          <button onClick={() => handleSaveVideoTitle(video.id)} className="p-1 text-[#00a86b] hover:bg-green-50 rounded transition-colors"><CheckIcon sx={{ fontSize: 16 }} /></button>
+                          <button onClick={() => handleSaveVideoTitle(video.id)} className="p-1 text-brand hover:bg-green-50 rounded transition-colors"><CheckIcon sx={{ fontSize: 16 }} /></button>
                           <button onClick={() => setEditingVideoId(null)} className="p-1 text-gray-400 hover:bg-gray-100 rounded transition-colors"><CloseIcon sx={{ fontSize: 16 }} /></button>
                         </div>
                       ) : (
@@ -925,7 +925,7 @@ export default function MyProfilePage() {
                               <BarChart data={ANALYTICS_DATA} barSize={12} key={`analytics-bar-${video.id}`}>
                                 <XAxis dataKey="day" hide key={`analytics-xaxis-${video.id}`} />
                                 <YAxis hide key={`analytics-yaxis-${video.id}`} />
-                                <Bar dataKey="views" fill="#00a86b" radius={[3, 3, 0, 0]} key={`bar-${video.id}`} />
+                                <Bar dataKey="views" fill="var(--brand)" radius={[3, 3, 0, 0]} key={`bar-${video.id}`} />
                                 <Tooltip contentStyle={{ fontSize: 11, padding: '4px 8px', borderRadius: 6 }} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
                               </BarChart>
                             </ResponsiveContainer>
@@ -971,7 +971,7 @@ export default function MyProfilePage() {
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-1.5">
                                 <span className="font-semibold text-sm">{displayName}</span>
-                                {!post.draft && <svg className="w-3.5 h-3.5 text-[#00a86b]" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
+                                {!post.draft && <svg className="w-3.5 h-3.5 text-brand" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
                               </div>
                               <div className="flex items-center gap-1.5 text-xs text-gray-400">
                                 <span>{displayHandle}</span><span>·</span>
@@ -1243,7 +1243,7 @@ export default function MyProfilePage() {
                       <div key={card.label} className="p-4 bg-white border border-gray-200 rounded-xl">
                         <p className="text-xs text-gray-500 mb-1">{card.label}</p>
                         <p className="text-xl font-bold mb-0.5">{card.value}</p>
-                        <span className={`text-xs font-medium ${card.pos ? 'text-[#00a86b]' : 'text-red-500'}`}>{card.delta} vs last month</span>
+                        <span className={`text-xs font-medium ${card.pos ? 'text-brand' : 'text-red-500'}`}>{card.delta} vs last month</span>
                       </div>
                     ))}
                   </div>
@@ -1260,7 +1260,7 @@ export default function MyProfilePage() {
                           <XAxis dataKey="day" hide key="analytics-views-xaxis" />
                           <YAxis hide key="analytics-views-yaxis" />
                           <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, padding: '6px 10px' }} formatter={(v: number) => [v.toLocaleString(), 'Views']} labelFormatter={() => ''} />
-                          <Line type="monotone" dataKey="views" stroke="#00a86b" strokeWidth={2} dot={false} isAnimationActive={false} key="analytics-views-line" />
+                          <Line type="monotone" dataKey="views" stroke="var(--brand)" strokeWidth={2} dot={false} isAnimationActive={false} key="analytics-views-line" />
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
@@ -1284,7 +1284,7 @@ export default function MyProfilePage() {
                                 <span>CTR {v.ctr}</span>
                               </div>
                             </div>
-                            <span className={`text-xs font-semibold flex-shrink-0 ${v.trend.startsWith('+') ? 'text-[#00a86b]' : 'text-red-500'}`}>{v.trend}</span>
+                            <span className={`text-xs font-semibold flex-shrink-0 ${v.trend.startsWith('+') ? 'text-brand' : 'text-red-500'}`}>{v.trend}</span>
                           </div>
                         ))}
                       </div>
@@ -1319,7 +1319,7 @@ export default function MyProfilePage() {
                     <div className="flex items-center justify-between mb-4">
                       <h2 className="text-base font-semibold">Post Engagement — Last 14 days</h2>
                       <div className="flex items-center gap-4 text-xs">
-                        <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-[#00a86b]" /><span>Likes</span></div>
+                        <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-brand" /><span>Likes</span></div>
                         <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-blue-400" /><span>Comments</span></div>
                         <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-purple-400" /><span>Reposts</span></div>
                       </div>
@@ -1330,7 +1330,7 @@ export default function MyProfilePage() {
                           <XAxis dataKey="day" tick={{ fontSize: 10 }} key="analytics-engagement-xaxis" />
                           <YAxis hide key="analytics-engagement-yaxis" />
                           <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, padding: '6px 10px' }} />
-                          <Line type="monotone" dataKey="likes" stroke="#00a86b" strokeWidth={2} dot={false} isAnimationActive={false} key="analytics-likes-line" />
+                          <Line type="monotone" dataKey="likes" stroke="var(--brand)" strokeWidth={2} dot={false} isAnimationActive={false} key="analytics-likes-line" />
                           <Line type="monotone" dataKey="comments" stroke="#60a5fa" strokeWidth={2} dot={false} isAnimationActive={false} key="analytics-comments-line" />
                           <Line type="monotone" dataKey="reposts" stroke="#a78bfa" strokeWidth={2} dot={false} isAnimationActive={false} key="analytics-reposts-line" />
                         </LineChart>
@@ -1350,7 +1350,7 @@ export default function MyProfilePage() {
                               <span className="font-semibold">{s.pct}%</span>
                             </div>
                             <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                              <div className="h-full bg-[#00a86b] rounded-full transition-all" style={{ width: `${s.pct}%` }} />
+                              <div className="h-full bg-brand rounded-full transition-all" style={{ width: `${s.pct}%` }} />
                             </div>
                           </div>
                         ))}
@@ -1549,7 +1549,7 @@ export default function MyProfilePage() {
               onDragOver={e => { e.preventDefault(); setIsDraggingVideo(true); }}
               onDragLeave={() => setIsDraggingVideo(false)}
               onDrop={e => { e.preventDefault(); setIsDraggingVideo(false); handleVideoFileSelected(e.dataTransfer.files?.[0]); }}
-              className={`border-2 border-dashed rounded-xl p-8 text-center mb-4 transition-colors cursor-pointer ${isDraggingVideo ? 'border-[#00a86b] bg-green-50' : 'border-gray-200 hover:border-gray-300'}`}
+              className={`border-2 border-dashed rounded-xl p-8 text-center mb-4 transition-colors cursor-pointer ${isDraggingVideo ? 'border-brand bg-green-50' : 'border-gray-200 hover:border-gray-300'}`}
             >
               <div className="text-3xl mb-2">🎬</div>
               <p className="text-sm font-medium text-gray-700 mb-1">

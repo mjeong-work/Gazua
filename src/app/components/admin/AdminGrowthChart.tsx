@@ -9,7 +9,7 @@ interface AdminGrowthChartProps {
 }
 
 // Structural template borrowed from PerformanceTrendChart.tsx / MyProfilePage.tsx's analytics
-// tab: ResponsiveContainer + LineChart, #00a86b primary series, light CartesianGrid, compact
+// tab: ResponsiveContainer + LineChart, brand token (--brand) primary series, light CartesianGrid, compact
 // tooltip via chartTooltip.ts. Not a literal import of PerformanceTrendChart (that component is
 // tightly coupled to currency-formatted simulation data) — just the same established styling.
 export default function AdminGrowthChart({ data, bucket, onBucketChange }: AdminGrowthChartProps) {
@@ -42,12 +42,12 @@ export default function AdminGrowthChart({ data, bucket, onBucketChange }: Admin
               <XAxis dataKey="bucket" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
               <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip contentStyle={CHART_TOOLTIP_STYLE} labelFormatter={showChartLabel} />
-              <Line type="monotone" dataKey="newUsers" name="New users" stroke="#00a86b" strokeWidth={2} dot={false} isAnimationActive={false} />
+              <Line type="monotone" dataKey="newUsers" name="New users" stroke="var(--brand)" strokeWidth={2} dot={false} isAnimationActive={false} />
               <Line type="monotone" dataKey="newCreators" name="New creators" stroke="#7c3aed" strokeWidth={2} strokeDasharray="5 5" dot={false} isAnimationActive={false} />
             </LineChart>
           </ResponsiveContainer>
           <div className="flex items-center justify-center gap-4 mt-3">
-            <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-[#00a86b]" /><span className="text-xs font-medium text-gray-600">New users</span></div>
+            <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-brand" /><span className="text-xs font-medium text-gray-600">New users</span></div>
             <div className="flex items-center gap-1.5"><div style={{ borderTop: '2px dashed #7c3aed', height: 0 }} className="w-3" /><span className="text-xs font-medium text-gray-600">New creators</span></div>
           </div>
         </div>

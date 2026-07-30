@@ -77,7 +77,7 @@ export default function MessagesPage() {
                       </div>
                       <p className={`text-xs truncate ${isUnread ? 'text-black font-medium' : 'text-gray-500'}`}>{conv.lastMessage.content}</p>
                     </div>
-                    {isUnread && <span className="w-2 h-2 rounded-full bg-[#00a86b] flex-shrink-0" />}
+                    {isUnread && <span className="w-2 h-2 rounded-full bg-brand flex-shrink-0" />}
                   </button>
                 );
               })}

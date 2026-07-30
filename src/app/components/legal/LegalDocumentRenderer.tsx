@@ -16,7 +16,7 @@ interface LegalDocumentRendererProps {
 }
 
 // Maps markdown elements to the exact typography classes TermsPage/PrivacyPage used
-// (max-w-3xl reading column, text-sm/gray-700 body copy, #00a86b links), so rendered
+// (max-w-3xl reading column, text-sm/gray-700 body copy, brand-token links), so rendered
 // markdown is visually indistinguishable from the old hardcoded-JSX pages, now with
 // dark-mode variants and scroll-margin for anchor-linked headings under the sticky header.
 export default function LegalDocumentRenderer({ markdown }: LegalDocumentRendererProps) {
@@ -50,7 +50,7 @@ export default function LegalDocumentRenderer({ markdown }: LegalDocumentRendere
           a: ({ href, children }) => {
             if (!href) return <>{children}</>;
             const isInternal = href.startsWith('/');
-            const className = 'text-[#00a86b] hover:underline';
+            const className = 'text-brand hover:underline';
             if (isInternal) {
               return <Link to={href} className={className}>{children}</Link>;
             }

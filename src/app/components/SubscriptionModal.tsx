@@ -83,7 +83,7 @@ export default function SubscriptionModal({ onClose, creatorName }: Subscription
                 onClick={() => setSelectedTier(tier.id)}
                 className={`relative border-2 rounded-xl p-6 cursor-pointer transition-all ${
                   selectedTier === tier.id
-                    ? 'border-[#00a86b] bg-[#00a86b]/5'
+                    ? 'border-brand bg-brand/5'
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
@@ -99,7 +99,7 @@ export default function SubscriptionModal({ onClose, creatorName }: Subscription
                     <div
                       className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
                         selectedTier === tier.id
-                          ? 'border-[#00a86b] bg-[#00a86b]'
+                          ? 'border-brand bg-brand'
                           : 'border-gray-300'
                       }`}
                     >
@@ -123,7 +123,7 @@ export default function SubscriptionModal({ onClose, creatorName }: Subscription
                     <ul className="space-y-2">
                       {tier.features.map((feature) => (
                         <li key={feature} className="flex items-start gap-2 text-sm">
-                          <Check className="w-4 h-4 text-[#00a86b] mt-0.5 flex-shrink-0" />
+                          <Check className="w-4 h-4 text-brand mt-0.5 flex-shrink-0" />
                           <span>{feature}</span>
                         </li>
                       ))}

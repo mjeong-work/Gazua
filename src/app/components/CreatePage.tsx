@@ -81,14 +81,14 @@ export default function CreatePage() {
               <button
                 key={type.id}
                 onClick={() => handleCreate(type.id)}
-                className="text-left border-2 border-gray-200 rounded-2xl p-5 sm:p-8 hover:border-[#00a86b] hover:shadow-lg transition-all bg-white group"
+                className="text-left border-2 border-gray-200 rounded-2xl p-5 sm:p-8 hover:border-brand hover:shadow-lg transition-all bg-white group"
               >
                 <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${type.color} flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform`}>
                   {type.icon}
                 </div>
                 <h3 className="text-2xl font-bold mb-3">{type.title}</h3>
                 <p className="text-gray-600 mb-6 leading-relaxed">{type.description}</p>
-                <div className="flex items-center gap-2 text-[#00a86b] font-medium">
+                <div className="flex items-center gap-2 text-brand font-medium">
                   <span>{type.action}</span>
                   <span>→</span>
                 </div>
@@ -101,23 +101,23 @@ export default function CreatePage() {
             <h3 className="font-bold mb-3">Tips for Great Content</h3>
             <ul className="space-y-2 text-sm text-gray-700">
               <li className="flex items-start gap-2">
-                <span className="text-[#00a86b] mt-0.5">•</span>
+                <span className="text-brand mt-0.5">•</span>
                 <span><strong>Be specific:</strong> Share concrete examples, data, or actionable insights</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-[#00a86b] mt-0.5">•</span>
+                <span className="text-brand mt-0.5">•</span>
                 <span><strong>Show your work:</strong> Explain your thinking and methodology</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-[#00a86b] mt-0.5">•</span>
+                <span className="text-brand mt-0.5">•</span>
                 <span><strong>Tag appropriately:</strong> Use relevant tags so others can discover your content</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-[#00a86b] mt-0.5">•</span>
+                <span className="text-brand mt-0.5">•</span>
                 <span><strong>Engage with feedback:</strong> Respond to comments and questions from the community</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-[#00a86b] mt-0.5">•</span>
+                <span className="text-brand mt-0.5">•</span>
                 <span><strong>Disclaimer:</strong> Always remind readers to do their own research</span>
               </li>
             </ul>

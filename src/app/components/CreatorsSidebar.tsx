@@ -94,7 +94,7 @@ export default function CreatorsSidebar() {
                       <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm flex-shrink-0">
                         {creator.avatar}
                       </div>
-                      <span className={`flex-1 min-w-0 text-sm truncate ${isSelected ? 'font-semibold text-[#00a86b]' : 'font-medium text-gray-800'} ${isExpanded ? '' : 'lg:hidden'}`}>
+                      <span className={`flex-1 min-w-0 text-sm truncate ${isSelected ? 'font-semibold text-brand' : 'font-medium text-gray-800'} ${isExpanded ? '' : 'lg:hidden'}`}>
                         {creator.name}
                       </span>
                       <span className={`flex-shrink-0 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium ${isExpanded ? '' : 'lg:hidden'}`}>
@@ -139,7 +139,7 @@ export default function CreatorsSidebar() {
                         {item.name ? <span className="text-gray-500 font-normal"> · {item.name}</span> : null}
                       </span>
                       {isUp !== null && (
-                        <span className={`flex-shrink-0 flex items-center gap-0.5 text-xs font-medium ${isUp ? 'text-[#00a86b]' : 'text-red-500'} ${isExpanded ? '' : 'lg:hidden'}`}>
+                        <span className={`flex-shrink-0 flex items-center gap-0.5 text-xs font-medium ${isUp ? 'text-brand' : 'text-red-500'} ${isExpanded ? '' : 'lg:hidden'}`}>
                           {isUp ? <TrendingUpIcon sx={{ fontSize: 14 }} /> : <TrendingDownIcon sx={{ fontSize: 14 }} />}
                           {isUp ? '+' : ''}{change!.toFixed(1)}%
                         </span>

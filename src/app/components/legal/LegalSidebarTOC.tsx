@@ -46,7 +46,7 @@ export default function LegalSidebarTOC({ headings, className = '' }: LegalSideb
               href={`#${heading.id}`}
               className={`block -ml-px border-l pl-3 text-sm transition-colors ${
                 activeId === heading.id
-                  ? 'border-[#00a86b] text-[#00a86b] font-medium'
+                  ? 'border-brand text-brand font-medium'
                   : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white'
               }`}
             >

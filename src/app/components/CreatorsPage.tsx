@@ -579,7 +579,7 @@ export default function CreatorsPage() {
                 {creator.name}
               </h3>
               {creator.verified && (
-                <svg className="w-5 h-5 text-[#00a86b] flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                <svg className="w-5 h-5 text-brand flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               )}
@@ -661,7 +661,7 @@ export default function CreatorsPage() {
           )}
         </div>
 
-        <h3 className="font-medium text-sm mb-1 group-hover:text-[#00a86b] transition-colors line-clamp-2">
+        <h3 className="font-medium text-sm mb-1 group-hover:text-brand transition-colors line-clamp-2">
           {item.title}
         </h3>
         <p
@@ -700,7 +700,7 @@ export default function CreatorsPage() {
           </div>
 
           <div className="flex-1 min-w-0">
-            <h3 className="font-medium text-sm mb-1 line-clamp-2 group-hover:text-[#00a86b] transition-colors">
+            <h3 className="font-medium text-sm mb-1 line-clamp-2 group-hover:text-brand transition-colors">
               {video.title}
             </h3>
             <div className="flex items-center gap-1 mb-0.5">
@@ -773,7 +773,7 @@ export default function CreatorsPage() {
               >
                 <TuneIcon sx={{ fontSize: 20 }} />
                 {activeMobileFilterCount > 0 && (
-                  <span className="absolute top-2.5 right-3 w-2 h-2 rounded-full bg-[#00a86b]" />
+                  <span className="absolute top-2.5 right-3 w-2 h-2 rounded-full bg-brand" />
                 )}
               </button>
             </div>
@@ -782,7 +782,7 @@ export default function CreatorsPage() {
               <p className="text-sm text-gray-500 px-4 py-3 flex-shrink-0 border-b border-gray-100">
                 Results for <span className="font-medium text-black">"{debouncedSearchQuery}"</span>
                 {' · '}
-                <button onClick={clearSearch} className="text-[#00a86b] hover:underline">Clear</button>
+                <button onClick={clearSearch} className="text-brand hover:underline">Clear</button>
               </p>
             )}
 
@@ -892,7 +892,7 @@ export default function CreatorsPage() {
                 <p className="text-sm text-gray-500 mt-4">
                   Showing results for <span className="font-medium text-black">"{debouncedSearchQuery}"</span>
                   {' · '}
-                  <button onClick={clearSearch} className="text-[#00a86b] hover:underline">Clear</button>
+                  <button onClick={clearSearch} className="text-brand hover:underline">Clear</button>
                 </p>
               )}
             </div>

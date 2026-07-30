@@ -74,7 +74,7 @@ export default function AdminSidebar({ isMobileOpen, onMobileClose }: AdminSideb
                 title={!isExpanded ? item.label : undefined}
                 className={`w-full flex items-center gap-2.5 py-2.5 rounded-full text-left transition-colors ${
                   isExpanded ? 'px-3' : 'px-3 lg:px-0 lg:justify-center'
-                } ${active ? 'bg-[#00a86b]/10 text-[#00a86b]' : 'text-gray-600 hover:bg-gray-100'}`}
+                } ${active ? 'bg-brand/10 text-brand' : 'text-gray-600 hover:bg-gray-100'}`}
               >
                 <Icon sx={{ fontSize: 20 }} />
                 <span className={`text-sm font-medium ${isExpanded ? '' : 'lg:hidden'}`}>{item.label}</span>

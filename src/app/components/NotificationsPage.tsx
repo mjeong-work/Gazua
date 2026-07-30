@@ -22,7 +22,7 @@ function formatRelativeTime(iso: string): string {
 
 function typeIcon(type: NotificationType) {
   switch (type) {
-    case 'creator_post': return <ArticleIcon sx={{ fontSize: 20, color: '#00a86b' }} />;
+    case 'creator_post': return <ArticleIcon sx={{ fontSize: 20, color: 'var(--brand)' }} />;
     case 'price_alert': return <TrendingUpIcon sx={{ fontSize: 20, color: '#d97706' }} />;
     case 'model_update': return <CampaignIcon sx={{ fontSize: 20, color: '#2563eb' }} />;
     default: return <NotificationsIcon sx={{ fontSize: 20, color: '#6b7280' }} />;
@@ -74,7 +74,7 @@ export default function NotificationsPage() {
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllRead}
-                className="text-sm font-medium text-[#00a86b] hover:underline"
+                className="text-sm font-medium text-brand hover:underline"
               >
                 Mark all as read
               </button>
@@ -114,7 +114,7 @@ export default function NotificationsPage() {
                   key={n.id}
                   onClick={() => !n.read && handleMarkRead(n.id)}
                   className={`w-full flex gap-3 p-4 rounded-xl border text-left transition-colors ${
-                    n.read ? 'border-gray-100 bg-white' : 'border-[#00a86b]/30 bg-[#00a86b]/5'
+                    n.read ? 'border-gray-100 bg-white' : 'border-brand/30 bg-brand/5'
                   } hover:border-gray-300`}
                 >
                   <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
@@ -123,7 +123,7 @@ export default function NotificationsPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="font-semibold text-sm">{n.title}</p>
-                      {!n.read && <span className="w-2 h-2 rounded-full bg-[#00a86b] flex-shrink-0" />}
+                      {!n.read && <span className="w-2 h-2 rounded-full bg-brand flex-shrink-0" />}
                     </div>
                     {n.message && <p className="text-sm text-gray-600 mt-0.5">{n.message}</p>}
                     <p className="text-xs text-gray-400 mt-1">{formatRelativeTime(n.created_at)}</p>

@@ -106,7 +106,7 @@ export default function SignUp() {
       <div className="min-h-screen bg-white flex items-center justify-center px-6">
         <div className="max-w-md w-full text-center">
           <div className="flex justify-center mb-6">
-            <CheckCircle className="w-16 h-16 text-[#00a86b]" strokeWidth={1.5} />
+            <CheckCircle className="w-16 h-16 text-brand" strokeWidth={1.5} />
           </div>
           <h2 className="text-2xl font-bold mb-3">Check your email</h2>
           <p className="text-gray-600 mb-2">

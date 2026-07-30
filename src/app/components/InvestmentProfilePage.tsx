@@ -16,7 +16,7 @@ type AnalysisState =
   | { status: 'success'; insights: InvestmentInsights; generatedAt: Date }
   | { status: 'error'; message: string };
 
-const SEGMENT_COLORS = ['#00a86b', '#0ea5e9', '#f59e0b', '#8b5cf6', '#ef4444'];
+const SEGMENT_COLORS = ['var(--brand)', '#0ea5e9', '#f59e0b', '#8b5cf6', '#ef4444'];
 
 function StyleBar({ breakdown }: { breakdown: InvestmentInsights['styleBreakdown'] }) {
   return (
@@ -114,7 +114,7 @@ function PersonalityCard({ personality }: { personality: InvestmentInsights['per
         {personality.traits.map(trait => (
           <span
             key={trait}
-            className="px-3 py-1.5 bg-[#7CFFB2]/15 text-[#00a86b] text-sm font-medium rounded-full border border-[#7CFFB2]/30"
+            className="px-3 py-1.5 bg-[#7CFFB2]/15 text-brand text-sm font-medium rounded-full border border-[#7CFFB2]/30"
           >
             {trait}
           </span>
@@ -151,7 +151,7 @@ function RecommendationCard({ rec }: { rec: InvestmentInsights['recommendations'
       </div>
       <p className="font-semibold text-sm mb-1 line-clamp-2">{rec.title}</p>
       <p className="text-xs text-gray-500 mb-2">{rec.creator}</p>
-      <p className="text-xs text-[#00a86b] leading-relaxed">{rec.reason}</p>
+      <p className="text-xs text-brand leading-relaxed">{rec.reason}</p>
     </div>
   );
 }

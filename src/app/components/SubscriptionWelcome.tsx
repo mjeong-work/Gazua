@@ -63,7 +63,7 @@ export default function SubscriptionWelcome() {
         }`}
       >
         {/* Plan badge */}
-        <div className="inline-flex items-center bg-[#7CFFB2]/20 border border-[#7CFFB2]/50 px-4 py-1.5 rounded-full text-xs font-medium text-[#00a86b] mb-4">
+        <div className="inline-flex items-center bg-[#7CFFB2]/20 border border-[#7CFFB2]/50 px-4 py-1.5 rounded-full text-xs font-medium text-brand mb-4">
           {config.name} Plan activated
         </div>
 

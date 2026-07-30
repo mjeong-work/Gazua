@@ -231,13 +231,13 @@ export default function CommentPanel({
                   onChange={e => setText(e.target.value.slice(0, 500))}
                   onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }}
                   disabled={submitting}
-                  className="flex-1 px-3 py-1.5 border border-gray-200 rounded-full text-sm focus:outline-none focus:border-[#00a86b] transition-colors disabled:opacity-50 bg-gray-50"
+                  className="flex-1 px-3 py-1.5 border border-gray-200 rounded-full text-sm focus:outline-none focus:border-brand transition-colors disabled:opacity-50 bg-gray-50"
                 />
                 <button
                   onClick={handleSubmit}
                   disabled={!text.trim() || submitting}
                   aria-label="Post comment"
-                  className="w-8 h-8 flex items-center justify-center rounded-full bg-[#00a86b] text-white hover:bg-[#00965f] transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
+                  className="w-8 h-8 flex items-center justify-center rounded-full bg-brand text-white hover:bg-brand-hover transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex-shrink-0"
                 >
                   <SendIcon sx={{ fontSize: 16 }} />
                 </button>

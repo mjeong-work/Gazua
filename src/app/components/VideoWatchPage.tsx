@@ -275,7 +275,7 @@ export default function VideoWatchPage() {
                 <div className="flex items-center gap-1.5">
                   <span className="font-semibold text-sm">{video.creatorName}</span>
                   {video.creatorVerified && (
-                    <svg className="w-4 h-4 text-[#00a86b]" viewBox="0 0 24 24" fill="currentColor">
+                    <svg className="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   )}
@@ -330,7 +330,7 @@ export default function VideoWatchPage() {
                         {v.duration}
                       </div>
                     </div>
-                    <h3 className="font-medium text-sm mb-1 line-clamp-2 group-hover:text-[#00a86b] transition-colors">{v.title}</h3>
+                    <h3 className="font-medium text-sm mb-1 line-clamp-2 group-hover:text-brand transition-colors">{v.title}</h3>
                     <p className="text-xs text-gray-400">{v.views} views · {v.uploadedAt}</p>
                   </div>
                 ))}

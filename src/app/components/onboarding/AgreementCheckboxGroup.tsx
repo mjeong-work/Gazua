@@ -27,7 +27,7 @@ const AGREEMENT_ITEMS: AgreementItem[] = [
     label: (
       <>
         I agree to the{' '}
-        <Link to="/legal/terms" className="text-[#00a86b] hover:underline" target="_blank">
+        <Link to="/legal/terms" className="text-brand hover:underline" target="_blank">
           Terms of Service
         </Link>
         .
@@ -39,7 +39,7 @@ const AGREEMENT_ITEMS: AgreementItem[] = [
     label: (
       <>
         I agree to the{' '}
-        <Link to="/legal/privacy" className="text-[#00a86b] hover:underline" target="_blank">
+        <Link to="/legal/privacy" className="text-brand hover:underline" target="_blank">
           Privacy Policy
         </Link>
         .

@@ -328,7 +328,7 @@ export default function MainPageReels() {
                 <h2 className="text-3xl font-bold">
                   {tickerInfo?.price ?? '—'}
                 </h2>
-                <span className={`text-sm font-medium ${tickerInfo ? (tickerInfo.positive ? 'text-[#00a86b]' : 'text-red-500') : 'text-gray-400'}`}>
+                <span className={`text-sm font-medium ${tickerInfo ? (tickerInfo.positive ? 'text-brand' : 'text-red-500') : 'text-gray-400'}`}>
                   {tickerInfo ? `${tickerInfo.changeAmt} (${tickerInfo.change})` : ''}
                 </span>
               </div>
@@ -347,7 +347,7 @@ export default function MainPageReels() {
                     <Line
                       type="monotone"
                       dataKey="value"
-                      stroke={tickerInfo && !tickerInfo.positive ? '#ef4444' : '#00a86b'}
+                      stroke={tickerInfo && !tickerInfo.positive ? '#ef4444' : 'var(--brand)'}
                       strokeWidth={2}
                       dot={false}
                       isAnimationActive={false}
@@ -388,7 +388,7 @@ export default function MainPageReels() {
                     <div key={index.id} className="p-4 bg-gray-50 rounded-lg">
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">{index.name}</span>
-                        <span className={`text-xs font-medium ${index.positive ? 'text-[#00a86b]' : 'text-red-500'}`}>{index.change}</span>
+                        <span className={`text-xs font-medium ${index.positive ? 'text-brand' : 'text-red-500'}`}>{index.change}</span>
                       </div>
                       <p className="text-xl font-bold mt-1">{index.value}</p>
                     </div>
@@ -702,7 +702,7 @@ export default function MainPageReels() {
 
       {/* Toast */}
       {showToast && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 lg:bottom-8 bg-[#00a86b] text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3 z-50 animate-slide-up pointer-events-none">
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 lg:bottom-8 bg-brand text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3 z-50 animate-slide-up pointer-events-none">
           <div>
             <p className="font-bold">{toastMessage}</p>
             {toastSubtitle && <p className="text-sm opacity-90">{toastSubtitle}</p>}

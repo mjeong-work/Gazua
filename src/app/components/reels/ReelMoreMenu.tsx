@@ -91,7 +91,7 @@ export default function ReelMoreMenu({
           </button>
           {ticker && onToggleTickerSave && (
             <button onClick={onToggleTickerSave} className={ROW_CLASS}>
-              <TrendingUpIcon sx={{ fontSize: 20, color: isTickerSaved ? '#00a86b' : undefined }} />
+              <TrendingUpIcon sx={{ fontSize: 20, color: isTickerSaved ? 'var(--brand)' : undefined }} />
               {isTickerSaved ? `Remove $${ticker} from Watchlist` : `Add $${ticker} to Watchlist`}
             </button>
           )}

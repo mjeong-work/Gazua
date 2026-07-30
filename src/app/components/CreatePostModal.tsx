@@ -123,7 +123,7 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
               placeholder="e.g., NVDA, Bitcoin, S&P 500"
               value={ticker}
               onChange={(e) => setTicker(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]"
+              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
             />
           </div>
 
@@ -135,7 +135,7 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value as typeof CATEGORIES[number])}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]"
+              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
             >
               {CATEGORIES.map(c => <option key={c}>{c}</option>)}
             </select>
@@ -151,7 +151,7 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
               placeholder="Share your investment thesis, market insights, or analysis..."
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b] resize-none"
+              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand resize-none"
             />
             <p className="text-xs text-gray-500 mt-1">
               {content.length} / 500 characters
@@ -208,7 +208,7 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
             <select
               value={timeHorizon}
               onChange={(e) => setTimeHorizon(e.target.value as typeof timeHorizon)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]"
+              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
             >
               <option>Short-term</option>
               <option>Medium-term</option>
@@ -225,7 +225,7 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
               <select
                 value={riskLevel}
                 onChange={(e) => setRiskLevel(e.target.value as typeof riskLevel)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
               >
                 <option>Low</option>
                 <option>Medium</option>
@@ -241,7 +241,7 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
               <select
                 value={confidence}
                 onChange={(e) => setConfidence(e.target.value as typeof confidence)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]"
+                className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
               >
                 <option>Low</option>
                 <option>Medium</option>
@@ -260,7 +260,7 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
               placeholder="e.g., #stocks #tech #AI"
               value={tags}
               onChange={(e) => setTags(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#00a86b]"
+              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
             />
           </div>
 
