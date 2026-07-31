@@ -399,7 +399,7 @@ export default function CreatorProfileVideos() {
                   >
                     <div className="relative aspect-video rounded-xl overflow-hidden mb-3">
                       <div className="absolute inset-0" style={{ background: video.thumbnail }} />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity flex items-center justify-center">
                         <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center">
                           <PlayArrowIcon sx={{ fontSize: 32, color: '#000000', marginLeft: '4px' }} />
                         </div>

@@ -642,7 +642,7 @@ export default function CreatorsPage() {
             style={{ background: item.thumbnail }}
           />
 
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity flex items-center justify-center">
             <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center">
               <PlayArrowIcon sx={{ fontSize: 32, color: '#000000', marginLeft: '4px' }} />
             </div>
@@ -683,7 +683,7 @@ export default function CreatorsPage() {
             style={{ background: video.thumbnail.startsWith('http') ? `url(${video.thumbnail})` : video.thumbnail, backgroundSize: 'cover', backgroundPosition: 'center' }}
           />
 
-          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity flex items-center justify-center">
             <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center">
               <PlayArrowIcon sx={{ fontSize: 32, color: '#000000', marginLeft: '4px' }} />
             </div>

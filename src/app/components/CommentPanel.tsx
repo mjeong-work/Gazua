@@ -203,7 +203,7 @@ export default function CommentPanel({
               {user?.id === comment.user_id && !comment.id.startsWith('optimistic-') && (
                 <button
                   onClick={() => handleDelete(comment.id)}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-red-500 flex-shrink-0 self-start mt-0.5"
+                  className="opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity p-1 hover:bg-gray-100 rounded text-gray-400 hover:text-red-500 flex-shrink-0 self-start mt-0.5"
                   aria-label="Delete comment"
                 >
                   <DeleteOutlineIcon sx={{ fontSize: 16 }} />

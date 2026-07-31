@@ -947,7 +947,7 @@ export default function MainPagePosting() {
         title="Create Post"
       >
         <AddCircleOutlineIcon sx={{ fontSize: 28 }} />
-        <span className="absolute bottom-full right-0 mb-2 px-3 py-1 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+        <span className="absolute bottom-full right-0 mb-2 px-3 py-1 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 pointer-coarse:hidden transition-opacity whitespace-nowrap pointer-events-none">
           Create Post
         </span>
       </button>

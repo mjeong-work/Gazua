@@ -321,7 +321,7 @@ export default function VideoWatchPage() {
                   <div key={v.id} onClick={() => navigate(`/watch/${v.id}`)} className="flex-shrink-0 w-64 group cursor-pointer">
                     <div className="relative aspect-video rounded-xl overflow-hidden mb-2">
                       <div className="absolute inset-0" style={{ background: v.thumbnail }} />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity flex items-center justify-center">
                         <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center">
                           <PlayArrowIcon sx={{ fontSize: 24, color: '#000000', marginLeft: '3px' }} />
                         </div>

@@ -519,7 +519,7 @@ export default function MyProfilePage() {
                 <div className={`w-20 h-20 rounded-full flex items-center justify-center text-white font-bold text-xl ring-4 ring-white shadow-md overflow-hidden ${displayAvatarUrl ? '' : `bg-gradient-to-br ${avatarGradient}`}`}>
                   {displayAvatarUrl ? <img src={displayAvatarUrl} alt="Your avatar" className="w-full h-full object-cover" /> : initials}
                 </div>
-                <button onClick={handleAvatarClick} className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <button onClick={handleAvatarClick} className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity flex items-center justify-center">
                   <EditIcon sx={{ fontSize: 18, color: 'white' }} />
                 </button>
                 <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
@@ -883,7 +883,7 @@ export default function MyProfilePage() {
                       ) : (
                         <div className="relative aspect-video rounded-xl overflow-hidden mb-2.5">
                           <div className="absolute inset-0" style={{ background: video.thumbnail }} />
-                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity flex items-center justify-center gap-3">
                             <button onClick={() => handleStartEditVideo(video)} className="p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors" title="Edit title">
                               <EditIcon sx={{ fontSize: 18, color: 'white' }} />
                             </button>
@@ -1044,7 +1044,7 @@ export default function MyProfilePage() {
                           style={{ background: item.thumbnail }}
                           onClick={() => handleOpenSavedItem(item)}
                         >
-                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity flex items-center justify-center gap-3">
                             <button onClick={() => handleOpenSavedItem(item)} className="p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors" title="Open">
                               <PlayArrowIcon sx={{ fontSize: 18, color: 'white' }} />
                             </button>
