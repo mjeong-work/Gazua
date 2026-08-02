@@ -6,12 +6,12 @@ function ModelsRedirect() {
   return <Navigate to={`/profile/${creatorId}/videos`} replace />;
 }
 
-/** Redirect /watchlist → own profile's Watching tab */
+/** Redirect /watchlist → My Profile's Watching tab */
 function WatchlistRedirect() {
   const { profile, isLoading } = useAuth();
   if (isLoading) return null;
   if (profile?.username) {
-    return <Navigate to={`/profile/${profile.username}/investment?tab=watching`} replace />;
+    return <Navigate to="/my-profile?tab=watching" replace />;
   }
   return <Navigate to="/main" replace />;
 }

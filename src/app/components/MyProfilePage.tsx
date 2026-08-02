@@ -1,5 +1,5 @@
 import { useState, useMemo, useRef, useEffect, type ChangeEvent, type ReactNode } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 import { useAuth } from '../contexts/AuthContext';
 import { getVideosByCreator, createVideo } from '../../lib/services/reels.service';
 import { updateProfile } from '../../lib/services/profiles.service';
@@ -21,9 +21,10 @@ import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell
 import { CHART_TOOLTIP_STYLE, chartCurrencyFormatter, hideChartLabel } from '../utils/chartTooltip';
 import { ACTUAL_PORTFOLIO_ENABLED } from '../featureFlags';
 import AppHeader from './AppHeader';
+import WatchingTab from './WatchingTab';
 import { useSavedContent, type SavedContentItem } from '../contexts/SavedContentContext';
 
-type Tab = 'investment' | 'videos' | 'posts' | 'saved' | 'about' | 'analytics';
+type Tab = 'investment' | 'videos' | 'posts' | 'saved' | 'watching' | 'about' | 'analytics';
 
 const TAGS = ['📈 Portfolio Update', '💡 Investing Insight', '🏦 Macro Watch', '📊 Earnings', '🎓 Beginner Tips'];
 
@@ -125,9 +126,13 @@ export default function MyProfilePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { savedItems, removeSavedContent } = useSavedContent();
   const { profile, refreshProfile } = useAuth();
+  const [searchParams] = useSearchParams();
 
-  // Core UI state
-  const [activeTab, setActiveTab] = useState<Tab>('investment');
+  // Core UI state — ?tab=watching lands here directly (e.g. from the /watchlist redirect).
+  const [activeTab, setActiveTab] = useState<Tab>(() => {
+    const t = searchParams.get('tab');
+    return t === 'watching' ? 'watching' : 'investment';
+  });
   const [timeRange, setTimeRange] = useState<'1W' | '1M' | '3M' | '1Y' | 'ALL'>('1M');
   const [simulatorMode, setSimulatorMode] = useState(true);
   const [simulationExpanded, setSimulationExpanded] = useState(false);
@@ -598,7 +603,7 @@ export default function MyProfilePage() {
             {/* Tabs */}
             <div className="border-b border-gray-200 mb-8">
               <div className="flex gap-8 overflow-x-auto no-scrollbar">
-                {(['investment', 'videos', 'posts', 'saved', 'about', 'analytics'] as Tab[]).map((tab) => (
+                {(['investment', 'videos', 'posts', 'saved', 'watching', 'about', 'analytics'] as Tab[]).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
@@ -1065,6 +1070,9 @@ export default function MyProfilePage() {
                 )}
               </div>
             )}
+
+            {/* ── WATCHING TAB ── */}
+            {activeTab === 'watching' && <WatchingTab />}
 
             {/* ── ABOUT TAB ── */}
             {activeTab === 'about' && (

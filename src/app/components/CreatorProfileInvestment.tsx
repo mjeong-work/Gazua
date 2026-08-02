@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
@@ -18,8 +18,6 @@ import { getCommentCount } from '../../lib/services/comments.service';
 import { getFollowingCount } from '../../lib/services/follows.service';
 import type { Profile, PostWithCreator } from '../../types/database';
 import { useFollow } from '../contexts/FollowContext';
-import { useAuth } from '../contexts/AuthContext';
-import WatchingTab from './WatchingTab';
 import { SUBSCRIBE_ENABLED, ACTUAL_PORTFOLIO_ENABLED } from '../featureFlags';
 import type { Simulation } from '../data/simulations';
 import { MOCK_SIMULATIONS, filterChartData } from '../data/simulations';
@@ -78,8 +76,6 @@ async function normalizeDbPost(p: PostWithCreator): Promise<DisplayPost> {
 export default function CreatorProfileInvestment() {
   const navigate = useNavigate();
   const { creatorId = 'alex-rodriguez' } = useParams<{ creatorId: string }>();
-  const [searchParams] = useSearchParams();
-  const { profile: authProfile } = useAuth();
   const mockCreator = getCreator(creatorId);
 
   // ── Remote data ────────────────────────────────────────────────────
@@ -90,15 +86,8 @@ export default function CreatorProfileInvestment() {
   const [postCount, setPostCount] = useState<number | null>(null);
   const [dbPosts, setDbPosts] = useState<DisplayPost[] | null>(null);
 
-  // ── Own-profile detection ──────────────────────────────────────────
-  const isOwnProfile = Boolean(authProfile?.username && authProfile.username === creatorId);
-
   // ── UI state ───────────────────────────────────────────────────────
-  const [activeTab, setActiveTab] = useState<'investment' | 'videos' | 'posts' | 'about' | 'watching'>(() => {
-    const t = searchParams.get('tab');
-    if (t === 'watching') return 'watching';
-    return 'investment';
-  });
+  const [activeTab, setActiveTab] = useState<'investment' | 'videos' | 'posts' | 'about'>('investment');
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [notificationsOn, setNotificationsOn] = useState(() => {
@@ -404,17 +393,6 @@ export default function CreatorProfileInvestment() {
                     {tab}
                   </button>
                 ))}
-                {isOwnProfile && (
-                  <button
-                    onClick={() => setActiveTab('watching')}
-                    className={`pb-4 px-1 font-medium text-sm border-b-2 transition-colors whitespace-nowrap flex-shrink-0 flex items-center gap-1.5 ${activeTab === 'watching' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
-                  >
-                    Watching
-                    <svg className="w-3 h-3 opacity-60" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                    </svg>
-                  </button>
-                )}
               </div>
             </div>
 
@@ -688,9 +666,6 @@ export default function CreatorProfileInvestment() {
               )}
             </div>
             )}
-
-            {/* ── Watching Tab (own profile only) ── */}
-            {activeTab === 'watching' && isOwnProfile && <WatchingTab />}
 
             {/* ── Posts Tab ── */}
             {activeTab === 'posts' && (

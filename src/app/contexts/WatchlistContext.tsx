@@ -119,6 +119,12 @@ export function WatchlistProvider({ children }: { children: ReactNode }) {
         setWatchlistItems(prev =>
           prev.map(item => item.id === optimisticItem.id ? saved : item)
         );
+      }).catch(() => {
+        // Unexpected rejection (e.g. network failure before Supabase could return
+        // an error object) — same rollback as an explicit error, so a thrown
+        // exception can't leave a phantom "saved" item that vanishes on refetch.
+        setWatchlistItems(prev => prev.filter(item => item.id !== optimisticItem.id));
+        toast.error('Failed to save to watchlist. Please try again.');
       });
     }
   };
