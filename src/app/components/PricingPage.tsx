@@ -127,7 +127,7 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-[#7CFFB2] border-b border-black/10">
+      <header className="bg-mint border-b border-black/10">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <h1 className="text-2xl font-bold tracking-tight">Gazua</h1>
@@ -161,7 +161,7 @@ export default function PricingPage() {
         </p>
 
         {/* Beta Notice */}
-        <div className="mb-8 rounded-2xl border border-[#7CFFB2]/40 bg-[#7CFFB2]/10 px-6 py-5 text-left">
+        <div className="mb-8 rounded-2xl border border-mint/40 bg-mint/10 px-6 py-5 text-left">
           <p className="font-bold text-black">🚧 Gazua is currently in Beta</p>
           <p className="mt-1 text-sm text-gray-600">
             During the beta testing period, all premium features are available through the Free plan.
@@ -185,12 +185,12 @@ export default function PricingPage() {
                 key={tier.name}
                 className={`relative rounded-2xl border-2 p-8 text-left transition-all ${
                   tier.highlighted
-                    ? 'border-[#7CFFB2] shadow-xl scale-105 bg-gradient-to-b from-[#7CFFB2]/5 to-white'
+                    ? 'border-mint shadow-xl scale-105 bg-gradient-to-b from-mint/5 to-white'
                     : 'border-gray-200 hover:border-gray-300'
                 }`}
               >
                 {tier.highlighted && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#7CFFB2] text-black text-xs font-bold px-4 py-1 rounded-full">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-mint text-black text-xs font-bold px-4 py-1 rounded-full">
                     MOST POPULAR
                   </div>
                 )}

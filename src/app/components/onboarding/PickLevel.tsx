@@ -39,7 +39,7 @@ export default function PickLevel() {
             <span>50%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div className="bg-[#7CFFB2] h-2 rounded-full transition-all" style={{ width: '50%' }}></div>
+            <div className="bg-mint h-2 rounded-full transition-all" style={{ width: '50%' }}></div>
           </div>
         </div>
 
@@ -56,7 +56,7 @@ export default function PickLevel() {
               onClick={() => setSelectedLevel(level.id)}
               className={`w-full p-6 rounded-2xl border-2 transition-all text-left relative ${
                 selectedLevel === level.id
-                  ? 'border-[#7CFFB2] bg-[#7CFFB2]/5 shadow-md'
+                  ? 'border-mint bg-mint/5 shadow-md'
                   : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
               }`}
             >
@@ -67,7 +67,7 @@ export default function PickLevel() {
                   <p className="text-gray-600">{level.description}</p>
                 </div>
                 {selectedLevel === level.id && (
-                  <div className="w-8 h-8 bg-[#7CFFB2] rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-mint rounded-full flex items-center justify-center">
                     <Check className="w-5 h-5 text-black" strokeWidth={3} />
                   </div>
                 )}

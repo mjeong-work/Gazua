@@ -102,7 +102,7 @@ function PersonalityCard({ personality }: { personality: InvestmentInsights['per
   return (
     <div className="border border-gray-200 rounded-xl p-8">
       <div className="flex items-start gap-4 mb-5">
-        <div className="w-12 h-12 bg-[#7CFFB2] rounded-full flex items-center justify-center flex-shrink-0">
+        <div className="w-12 h-12 bg-mint rounded-full flex items-center justify-center flex-shrink-0">
           <AutoAwesomeIcon sx={{ fontSize: 22, color: '#000' }} />
         </div>
         <div>
@@ -114,7 +114,7 @@ function PersonalityCard({ personality }: { personality: InvestmentInsights['per
         {personality.traits.map(trait => (
           <span
             key={trait}
-            className="px-3 py-1.5 bg-[#7CFFB2]/15 text-brand text-sm font-medium rounded-full border border-[#7CFFB2]/30"
+            className="px-3 py-1.5 bg-mint/15 text-brand text-sm font-medium rounded-full border border-mint/30"
           >
             {trait}
           </span>

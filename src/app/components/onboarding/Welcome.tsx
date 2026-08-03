@@ -25,7 +25,7 @@ export default function Welcome() {
         {/* Logo */}
         <div className="mb-8">
           <h1 className="text-6xl font-bold tracking-tight mb-4">Gazua</h1>
-          <div className="w-16 h-1 bg-[#7CFFB2] mx-auto rounded-full"></div>
+          <div className="w-16 h-1 bg-mint mx-auto rounded-full"></div>
         </div>
 
         {/* Tagline */}

@@ -22,7 +22,7 @@ export interface AllocationEntry {
 
 export const DEFAULT_PORTFOLIO_ALLOCATION: AllocationEntry[] = [
   { name: 'Stocks', value: 45, color: '#00a86b' },
-  { name: 'ETFs', value: 30, color: '#7CFFB2' },
+  { name: 'ETFs', value: 30, color: 'var(--mint)' },
   { name: 'Crypto', value: 15, color: '#f43f5e' },
   { name: 'Cash', value: 10, color: '#e5e7eb' },
 ];

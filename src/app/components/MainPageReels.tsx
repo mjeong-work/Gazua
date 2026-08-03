@@ -397,7 +397,7 @@ export default function MainPageReels() {
             </div>
 
             {/* Ad Banner */}
-            <div className="mt-6 p-4 bg-[#7CFFB2] rounded-lg">
+            <div className="mt-6 p-4 bg-mint rounded-lg">
               <h3 className="font-bold mb-1">Get more out of Gazua</h3>
               <p className="text-sm mb-3">Options let you hedge, generate income, or trade based on your market outlook.</p>
               <button className="text-sm font-medium underline">Learn More</button>
@@ -608,7 +608,7 @@ export default function MainPageReels() {
                                 </button>
                                 {reel.verified && (
                                   <span title="Portfolio allocation verified by Gazua" className="inline-flex">
-                                    <svg className="w-4 h-4 text-[#7CFFB2]" viewBox="0 0 24 24" fill="currentColor">
+                                    <svg className="w-4 h-4 text-mint" viewBox="0 0 24 24" fill="currentColor">
                                       <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                   </span>
@@ -636,7 +636,7 @@ export default function MainPageReels() {
                           {hasProfile && (
                             <button
                               onClick={() => navigate(`/profile/${reel.creator_id}/investment`)}
-                              className="text-xs text-[#7CFFB2] hover:underline mt-2 block"
+                              className="text-xs text-mint hover:underline mt-2 block"
                             >
                               See {reel.creator}'s portfolio →
                             </button>
@@ -690,7 +690,7 @@ export default function MainPageReels() {
       {!isCommentsOpen && (
       <button
         onClick={() => setShowCreateReel(true)}
-        className="fixed bottom-24 right-4 lg:bottom-8 lg:right-8 w-14 h-14 bg-[#7CFFB2] text-black rounded-full shadow-lg hover:bg-[#6EEEA8] transition-all hover:scale-110 flex items-center justify-center z-40 group"
+        className="fixed bottom-24 right-4 lg:bottom-8 lg:right-8 w-14 h-14 bg-mint text-black rounded-full shadow-lg hover:bg-mint-hover transition-all hover:scale-110 flex items-center justify-center z-40 group"
         title="Create Reel"
       >
         <AddCircleOutlineIcon sx={{ fontSize: 28 }} />

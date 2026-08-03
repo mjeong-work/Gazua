@@ -43,7 +43,7 @@ export default function ResetPassword() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center px-6">
         <div className="flex flex-col items-center gap-4 text-center">
-          <div className="w-16 h-16 bg-[#7CFFB2] rounded-full flex items-center justify-center">
+          <div className="w-16 h-16 bg-mint rounded-full flex items-center justify-center">
             <svg className="w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
             </svg>
@@ -85,7 +85,7 @@ export default function ResetPassword() {
               onChange={e => { setPassword(e.target.value); setError(null); }}
               required
               minLength={6}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7CFFB2]/50"
+              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-mint/50"
             />
           </div>
 
@@ -98,7 +98,7 @@ export default function ResetPassword() {
               value={confirm}
               onChange={e => { setConfirm(e.target.value); setError(null); }}
               required
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7CFFB2]/50"
+              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-mint/50"
             />
           </div>
 

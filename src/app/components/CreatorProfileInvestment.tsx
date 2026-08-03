@@ -29,7 +29,7 @@ import SimulationInsights from './SimulationInsights';
 
 // Same 4-color default palette the hardcoded allocation used, extended for portfolios with
 // more than 4 real slices.
-const ALLOCATION_COLORS = ['var(--brand)', '#7CFFB2', '#f43f5e', '#e5e7eb', '#60a5fa', '#a78bfa'];
+const ALLOCATION_COLORS = ['var(--brand)', 'var(--mint)', '#f43f5e', '#e5e7eb', '#60a5fa', '#a78bfa'];
 
 interface DisplayPost {
   id: string;
@@ -142,7 +142,7 @@ export default function CreatorProfileInvestment() {
     }
     return [
       { name: 'Stocks', value: 45, color: 'var(--brand)' },
-      { name: 'ETFs', value: 30, color: '#7CFFB2' },
+      { name: 'ETFs', value: 30, color: 'var(--mint)' },
       { name: 'Crypto', value: 15, color: '#f43f5e' },
       { name: 'Cash', value: 10, color: '#e5e7eb' },
     ];
@@ -361,7 +361,7 @@ export default function CreatorProfileInvestment() {
                   {SUBSCRIBE_ENABLED && (
                     <button
                       onClick={() => setShowSubscribeModal(true)}
-                      className="px-6 sm:px-8 py-2.5 bg-[#7CFFB2] text-black font-medium text-sm rounded-full hover:bg-[#6EEEA8] transition-colors"
+                      className="px-6 sm:px-8 py-2.5 bg-mint text-black font-medium text-sm rounded-full hover:bg-mint-hover transition-colors"
                     >
                       Subscribe
                     </button>

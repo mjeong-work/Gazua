@@ -149,115 +149,112 @@ export default function CreateReelModal({ onClose, onSuccess }: CreateReelModalP
     onSuccess?.('Reel published!');
   };
 
+  const canSubmit = !!file && !!caption.trim() && !processingFile && !submitting;
+
   return (
-    <div
-      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-      onClick={onClose}
-    >
-      <div
-        className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold">Create Reel</h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+    <div className="fixed inset-0 bg-white z-50 flex flex-col">
+      {/* Top bar */}
+      <div className="flex-shrink-0 flex items-center justify-between px-4 py-3">
+        <button
+          onClick={onClose}
+          className="p-1.5 -ml-1.5 hover:bg-gray-100 rounded-full transition-colors"
+          aria-label="Close"
+        >
+          <CloseIcon sx={{ fontSize: 22 }} />
+        </button>
+        <h1 className="text-sm font-semibold">New Reel</h1>
+        <button
+          onClick={handleSubmit}
+          disabled={!canSubmit}
+          className="text-sm font-semibold text-brand disabled:text-gray-400 transition-colors px-1.5"
+        >
+          {submitting ? 'Posting…' : 'Next'}
+        </button>
+      </div>
+
+      {/* Scrollable content */}
+      <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-5">
+        {/* Video upload / preview */}
+        <div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="video/mp4,video/quicktime,video/webm"
+            className="absolute w-px h-px opacity-0 overflow-hidden pointer-events-none -z-10"
+            onChange={(e) => handleFileSelected(e.target.files?.[0])}
+          />
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+            onDragLeave={() => setIsDragging(false)}
+            onDrop={(e) => { e.preventDefault(); setIsDragging(false); handleFileSelected(e.dataTransfer.files?.[0]); }}
+            className={`relative aspect-[9/16] w-full max-w-sm mx-auto rounded-2xl cursor-pointer overflow-hidden transition-colors ${
+              thumbnailPreviewUrl
+                ? ''
+                : `flex flex-col items-center justify-center border border-dashed ${isDragging ? 'border-brand bg-green-50' : 'border-gray-200 hover:border-gray-300'}`
+            }`}
           >
-            <CloseIcon sx={{ fontSize: 20 }} />
-          </button>
+            {thumbnailPreviewUrl ? (
+              <>
+                <img src={thumbnailPreviewUrl} alt="Video thumbnail preview" className="absolute inset-0 w-full h-full object-cover" />
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent px-3 pt-8 pb-3">
+                  <p className="text-xs text-white/90 truncate">{file?.name} · Tap to change</p>
+                </div>
+              </>
+            ) : (
+              <>
+                <VideoLibraryIcon sx={{ fontSize: 48, color: '#c1c7cf' }} />
+                <p className="text-sm text-gray-500 mt-3 mb-1">
+                  {processingFile ? 'Processing video…' : 'Click to upload or drag and drop'}
+                </p>
+                <p className="text-xs text-gray-400">
+                  MP4, MOV, or WEBM (max 100MB, under 60 seconds)
+                </p>
+              </>
+            )}
+          </div>
+          {fileError && <p className="text-sm text-red-500 mt-2 text-center">{fileError}</p>}
         </div>
 
-        {/* Content */}
-        <div className="p-6 space-y-5">
-          {/* Upload Video */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-3">
-              Upload Video
-            </label>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="video/mp4,video/quicktime,video/webm"
-              className="absolute w-px h-px opacity-0 overflow-hidden pointer-events-none -z-10"
-              onChange={(e) => handleFileSelected(e.target.files?.[0])}
-            />
-            <div
-              onClick={() => fileInputRef.current?.click()}
-              onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-              onDragLeave={() => setIsDragging(false)}
-              onDrop={(e) => { e.preventDefault(); setIsDragging(false); handleFileSelected(e.dataTransfer.files?.[0]); }}
-              className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors cursor-pointer ${
-                isDragging ? 'border-brand bg-green-50' : 'border-gray-300 hover:border-gray-400'
-              }`}
-            >
-              {thumbnailPreviewUrl ? (
-                <div className="flex flex-col items-center gap-3">
-                  <img src={thumbnailPreviewUrl} alt="Video thumbnail preview" className="max-h-40 rounded-lg" />
-                  <p className="text-sm text-gray-600">{file?.name}</p>
-                </div>
-              ) : (
-                <>
-                  <VideoLibraryIcon sx={{ fontSize: 64, color: '#9ca3af' }} />
-                  <p className="text-sm text-gray-600 mt-3 mb-1">
-                    {processingFile ? 'Processing video…' : 'Click to upload or drag and drop'}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    MP4, MOV, or WEBM (max 100MB, under 60 seconds)
-                  </p>
-                </>
-              )}
-            </div>
-            {fileError && <p className="text-sm text-red-500 mt-2">{fileError}</p>}
-          </div>
-
-          {/* Ticker or Topic */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">
-              Ticker or Topic
-            </label>
+        {/* Ticker or Topic */}
+        <div>
+          <label className="block text-[11px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
+            Ticker or Topic
+          </label>
+          <div className="relative">
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">#</span>
             <input
               type="text"
-              placeholder="e.g., NVDA, Bitcoin, Market Update"
+              placeholder="NVDA, Bitcoin, Market Update"
               value={ticker}
               onChange={(e) => setTicker(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+              className="w-full pl-8 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
             />
           </div>
-
-          {/* Caption */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">
-              Caption
-            </label>
-            <textarea
-              rows={4}
-              placeholder="Describe what your reel is about..."
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand resize-none"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              {caption.length} / 2200 characters
-            </p>
-          </div>
-
-          {submitError && (
-            <p className="text-sm text-red-500 text-center">{submitError}</p>
-          )}
-
-          <PublishReminder />
-
-          {/* Submit */}
-          <button
-            onClick={handleSubmit}
-            disabled={!file || !caption.trim() || processingFile || submitting}
-            className="w-full py-4 bg-black text-white font-bold rounded-full hover:bg-black/80 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
-          >
-            {submitting ? 'Publishing…' : 'Publish Reel'}
-          </button>
         </div>
+
+        {/* Caption */}
+        <div>
+          <textarea
+            rows={3}
+            placeholder="Write a caption..."
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
+            className="w-full text-sm focus:outline-none resize-none placeholder:text-gray-400"
+          />
+          <p className="text-[11px] text-gray-400 text-right">
+            {caption.length} / 2200
+          </p>
+        </div>
+
+        {submitError && (
+          <p className="text-sm text-red-500 text-center">{submitError}</p>
+        )}
+      </div>
+
+      {/* Footer — pinned below the scroll area, not the viewport, so it never covers content */}
+      <div className="flex-shrink-0 px-4 py-3">
+        <PublishReminder variant="footer" />
       </div>
 
       {showCompliance && (

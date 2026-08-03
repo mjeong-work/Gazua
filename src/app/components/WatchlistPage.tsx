@@ -89,7 +89,7 @@ export default function WatchlistPage() {
     switch (level) {
       case 'Low': return 'bg-gray-100 text-gray-600';
       case 'Medium': return 'bg-blue-100 text-blue-700';
-      case 'High': return 'bg-[#7CFFB2] text-black';
+      case 'High': return 'bg-mint text-black';
       default: return 'bg-gray-100 text-gray-700';
     }
   };

@@ -34,7 +34,7 @@ export default function SaveButton({ isSaved, onToggle, variant = 'rail' }: Save
       onClick={handleClick}
       variant={variant}
       active={isSaved}
-      activeBgClass="bg-[#7CFFB2]"
+      activeBgClass="bg-mint"
       pop={pop}
     >
       {rail ? (

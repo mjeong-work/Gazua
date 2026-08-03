@@ -20,7 +20,7 @@ const TIER_CONFIG: Record<string, { label: string; badge: string; features: stri
   },
   analyst: {
     label: 'Analyst',
-    badge: 'bg-[#7CFFB2]/30 text-green-800',
+    badge: 'bg-mint/30 text-green-800',
     features: [
       'Everything in Explorer',
       'Unlimited creator content',
@@ -158,7 +158,7 @@ export default function AccountPage() {
                 className="w-16 h-16 rounded-full object-cover shrink-0"
               />
             ) : (
-              <div className="w-16 h-16 rounded-full bg-[#7CFFB2] flex items-center justify-center text-xl font-bold text-gray-800 shrink-0">
+              <div className="w-16 h-16 rounded-full bg-mint flex items-center justify-center text-xl font-bold text-gray-800 shrink-0">
                 {initials}
               </div>
             )}
@@ -249,7 +249,7 @@ export default function AccountPage() {
                   {onboarding.interests.map(i => (
                     <span
                       key={i}
-                      className="text-xs px-2.5 py-1 bg-[#7CFFB2]/30 text-green-800 rounded-full font-medium"
+                      className="text-xs px-2.5 py-1 bg-mint/30 text-green-800 rounded-full font-medium"
                     >
                       {i}
                     </span>

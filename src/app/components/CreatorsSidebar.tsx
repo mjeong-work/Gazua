@@ -33,7 +33,7 @@ export default function CreatorsSidebar() {
       {/* Mobile toggle — same floating-action-button treatment as the app's other FABs */}
       <button
         onClick={() => setIsOpen(true)}
-        className="lg:hidden fixed bottom-24 right-4 w-14 h-14 bg-[#7CFFB2] text-black rounded-full shadow-lg hover:bg-[#6EEEA8] transition-all flex items-center justify-center z-30"
+        className="lg:hidden fixed bottom-24 right-4 w-14 h-14 bg-mint text-black rounded-full shadow-lg hover:bg-mint-hover transition-all flex items-center justify-center z-30"
         aria-label="Open my creators and watchlist"
       >
         <MenuIcon sx={{ fontSize: 22 }} />

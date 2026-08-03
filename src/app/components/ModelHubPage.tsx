@@ -253,7 +253,7 @@ export default function ModelHubPage() {
               </button>
               <button
                 onClick={() => setShowUploadModal(true)}
-                className="px-8 py-3 bg-[#7CFFB2] text-black font-medium rounded-full hover:bg-[#6EEEA8] transition-colors flex items-center gap-2"
+                className="px-8 py-3 bg-mint text-black font-medium rounded-full hover:bg-mint-hover transition-colors flex items-center gap-2"
               >
                 <UploadIcon sx={{ fontSize: 20 }} />
                 Upload Model

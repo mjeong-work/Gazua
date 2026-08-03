@@ -63,7 +63,7 @@ export default function SubscriptionWelcome() {
         }`}
       >
         {/* Plan badge */}
-        <div className="inline-flex items-center bg-[#7CFFB2]/20 border border-[#7CFFB2]/50 px-4 py-1.5 rounded-full text-xs font-medium text-brand mb-4">
+        <div className="inline-flex items-center bg-mint/20 border border-mint/50 px-4 py-1.5 rounded-full text-xs font-medium text-brand mb-4">
           {config.name} Plan activated
         </div>
 
@@ -88,7 +88,7 @@ export default function SubscriptionWelcome() {
           <ul className="space-y-3">
             {config.features.map(feature => (
               <li key={feature} className="flex items-center gap-3">
-                <span className="flex-shrink-0 w-5 h-5 bg-[#7CFFB2] rounded-full flex items-center justify-center">
+                <span className="flex-shrink-0 w-5 h-5 bg-mint rounded-full flex items-center justify-center">
                   <Check className="w-3 h-3 text-black" strokeWidth={3} />
                 </span>
                 <span className="text-sm text-gray-700">{feature}</span>

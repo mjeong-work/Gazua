@@ -47,7 +47,7 @@ export default function PickInterests() {
             <span>75%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div className="bg-[#7CFFB2] h-2 rounded-full transition-all" style={{ width: '75%' }}></div>
+            <div className="bg-mint h-2 rounded-full transition-all" style={{ width: '75%' }}></div>
           </div>
         </div>
 
@@ -67,7 +67,7 @@ export default function PickInterests() {
               onClick={() => toggleInterest(interest)}
               className={`px-6 py-3 rounded-full border-2 transition-all font-medium ${
                 selectedInterests.includes(interest)
-                  ? 'bg-[#7CFFB2] border-[#7CFFB2] text-black shadow-md'
+                  ? 'bg-mint border-mint text-black shadow-md'
                   : 'border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'
               }`}
             >

@@ -81,7 +81,7 @@ export default function SignIn() {
 
           {resetSent ? (
             <div className="text-center">
-              <div className="w-16 h-16 bg-[#7CFFB2] rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-16 h-16 bg-mint rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg className="w-8 h-8 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                 </svg>
@@ -108,7 +108,7 @@ export default function SignIn() {
                   value={resetEmail}
                   onChange={e => setResetEmail(e.target.value)}
                   required
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7CFFB2]/50"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-mint/50"
                 />
               </div>
 
@@ -163,7 +163,7 @@ export default function SignIn() {
               value={email}
               onChange={e => { setEmail(e.target.value); setAuthError(null); }}
               required
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7CFFB2]/50"
+              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-mint/50"
             />
           </div>
 
@@ -185,7 +185,7 @@ export default function SignIn() {
               value={password}
               onChange={e => { setPassword(e.target.value); setAuthError(null); }}
               required
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#7CFFB2]/50"
+              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-mint/50"
             />
           </div>
 

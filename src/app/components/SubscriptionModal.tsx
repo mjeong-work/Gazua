@@ -88,7 +88,7 @@ export default function SubscriptionModal({ onClose, creatorName }: Subscription
                 }`}
               >
                 {tier.badge && (
-                  <div className="absolute -top-3 left-6 bg-[#7CFFB2] text-black text-xs font-bold px-3 py-1 rounded-full">
+                  <div className="absolute -top-3 left-6 bg-mint text-black text-xs font-bold px-3 py-1 rounded-full">
                     {tier.badge}
                   </div>
                 )}

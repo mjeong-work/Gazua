@@ -601,7 +601,7 @@ export default function MainPagePosting() {
             </div>
 
             {/* Personalized Banner */}
-            <div className="mt-4 p-4 bg-[#7CFFB2] rounded-lg">
+            <div className="mt-4 p-4 bg-mint rounded-lg">
               <h3 className="font-bold mb-1">
                 {isOnboarded && onboardingData.riskStyle
                   ? `${onboardingData.riskStyle === 'conservative' ? 'Safe & Steady' : onboardingData.riskStyle === 'balanced' ? 'Balanced Growth' : onboardingData.riskStyle === 'aggressive' ? 'High Growth' : 'High Risk, High Reward'} Resources`
@@ -705,7 +705,7 @@ export default function MainPagePosting() {
 
                     {/* ── Posting tab: personalised onboarding banner ───────── */}
                     {!isFollowingTab && isOnboarded && onboardingData.level && activeTab === 'posting' && !ticker && (
-                      <div className="bg-gradient-to-r from-[#7CFFB2]/10 to-emerald-500/10 border border-[#7CFFB2]/30 rounded-xl p-5 mb-6">
+                      <div className="bg-gradient-to-r from-mint/10 to-emerald-500/10 border border-mint/30 rounded-xl p-5 mb-6">
                         <div className="flex items-start justify-between mb-3">
                           <div>
                             <h3 className="text-lg font-bold mb-1">
@@ -722,7 +722,7 @@ export default function MainPagePosting() {
                           <div className="flex flex-wrap gap-2 mb-2">
                             <span className="text-xs text-gray-600">Your interests:</span>
                             {onboardingData.interests.map(interest => (
-                              <span key={interest} className="px-2 py-1 bg-[#7CFFB2]/20 text-brand text-xs font-medium rounded-full border border-[#7CFFB2]/30">
+                              <span key={interest} className="px-2 py-1 bg-mint/20 text-brand text-xs font-medium rounded-full border border-mint/30">
                                 {interest}
                               </span>
                             ))}
@@ -838,7 +838,7 @@ export default function MainPagePosting() {
                                   ${post.asset}
                                 </button>
                                 {isOnboarded && onboardingData.interests.includes(post.category) && (
-                                  <span className="inline-block px-2 py-0.5 bg-[#7CFFB2]/20 text-brand text-xs font-medium rounded border border-[#7CFFB2]/30">✨ For you</span>
+                                  <span className="inline-block px-2 py-0.5 bg-mint/20 text-brand text-xs font-medium rounded border border-mint/30">✨ For you</span>
                                 )}
                                 {algoLabel && <AlgorithmicLabel label={algoLabel} />}
                               </div>
@@ -943,7 +943,7 @@ export default function MainPagePosting() {
       {/* Floating Create Button */}
       <button
         onClick={() => setShowCreatePost(true)}
-        className="fixed bottom-24 right-4 lg:bottom-8 lg:right-8 w-14 h-14 bg-[#7CFFB2] text-black rounded-full shadow-lg hover:bg-[#6EEEA8] transition-all hover:scale-110 flex items-center justify-center z-40 group"
+        className="fixed bottom-24 right-4 lg:bottom-8 lg:right-8 w-14 h-14 bg-mint text-black rounded-full shadow-lg hover:bg-mint-hover transition-all hover:scale-110 flex items-center justify-center z-40 group"
         title="Create Post"
       >
         <AddCircleOutlineIcon sx={{ fontSize: 28 }} />

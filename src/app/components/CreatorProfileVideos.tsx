@@ -341,7 +341,7 @@ export default function CreatorProfileVideos() {
                 {SUBSCRIBE_ENABLED && (
                   <button
                     onClick={() => setShowSubscribeModal(true)}
-                    className="px-6 sm:px-8 py-2.5 bg-[#7CFFB2] text-black font-medium text-sm rounded-full hover:bg-[#6EEEA8] transition-colors"
+                    className="px-6 sm:px-8 py-2.5 bg-mint text-black font-medium text-sm rounded-full hover:bg-mint-hover transition-colors"
                   >
                     Subscribe
                   </button>

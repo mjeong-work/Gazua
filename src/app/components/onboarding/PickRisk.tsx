@@ -39,7 +39,7 @@ export default function PickRisk() {
             <span>100%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div className="bg-[#7CFFB2] h-2 rounded-full transition-all" style={{ width: '100%' }}></div>
+            <div className="bg-mint h-2 rounded-full transition-all" style={{ width: '100%' }}></div>
           </div>
         </div>
 
@@ -63,7 +63,7 @@ export default function PickRisk() {
               <div className="flex items-start justify-between mb-3">
                 <span className="text-3xl">{style.emoji}</span>
                 {selectedRisk === style.id && (
-                  <div className="w-7 h-7 bg-[#7CFFB2] rounded-full flex items-center justify-center">
+                  <div className="w-7 h-7 bg-mint rounded-full flex items-center justify-center">
                     <Check className="w-4 h-4 text-black" strokeWidth={3} />
                   </div>
                 )}

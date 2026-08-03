@@ -87,7 +87,7 @@ const INIT_SIMULATIONS: Simulation[] = [
 
 const ALLOCATION_DATA = [
   { name: 'Stocks', value: 45, color: 'var(--brand)' },
-  { name: 'ETFs', value: 30, color: '#7CFFB2' },
+  { name: 'ETFs', value: 30, color: 'var(--mint)' },
   { name: 'Crypto', value: 15, color: '#f43f5e' },
   { name: 'Cash', value: 10, color: '#e5e7eb' },
 ];
@@ -594,7 +594,7 @@ export default function MyProfilePage() {
               </button>
               <button
                 onClick={() => navigate('/profile/investment')}
-                className="px-6 py-2 bg-[#7CFFB2] text-black font-medium text-sm rounded-full hover:bg-[#6EEEA8] transition-colors"
+                className="px-6 py-2 bg-mint text-black font-medium text-sm rounded-full hover:bg-mint-hover transition-colors"
               >
                 Preview Public Page
               </button>
@@ -1310,7 +1310,7 @@ export default function MyProfilePage() {
                             <XAxis dataKey="day" hide key="analytics-followers-xaxis" />
                             <YAxis hide key="analytics-followers-yaxis" />
                             <Tooltip contentStyle={{ fontSize: 11, borderRadius: 8, padding: '6px 10px' }} formatter={(v: number) => [v.toLocaleString(), 'Followers']} labelFormatter={() => ''} />
-                            <Line type="monotone" dataKey="followers" stroke="#7CFFB2" strokeWidth={2} dot={false} isAnimationActive={false} key="analytics-followers-line" />
+                            <Line type="monotone" dataKey="followers" stroke="var(--mint)" strokeWidth={2} dot={false} isAnimationActive={false} key="analytics-followers-line" />
                           </LineChart>
                         </ResponsiveContainer>
                       </div>

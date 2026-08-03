@@ -30,11 +30,11 @@ export default function Complete() {
         {/* Success Icon with Animation */}
         <div className="mb-8 flex justify-center">
           <div className="relative">
-            <div className="w-24 h-24 bg-[#7CFFB2] rounded-full flex items-center justify-center">
+            <div className="w-24 h-24 bg-mint rounded-full flex items-center justify-center">
               <Check className="w-12 h-12 text-black" strokeWidth={3} />
             </div>
             {/* Pulse rings */}
-            <div className="absolute inset-0 bg-[#7CFFB2] rounded-full animate-ping opacity-20"></div>
+            <div className="absolute inset-0 bg-mint rounded-full animate-ping opacity-20"></div>
           </div>
         </div>
 
@@ -48,7 +48,7 @@ export default function Complete() {
         </p>
 
         {/* Level Badge */}
-        <div className="inline-flex items-center gap-3 bg-gradient-to-r from-[#7CFFB2]/10 to-green-500/10 px-8 py-4 rounded-2xl border-2 border-[#7CFFB2]/30 mb-12">
+        <div className="inline-flex items-center gap-3 bg-gradient-to-r from-mint/10 to-green-500/10 px-8 py-4 rounded-2xl border-2 border-mint/30 mb-12">
           <span className="text-3xl">{levelConfig.emoji}</span>
           <div className="text-left">
             <div className="text-xs text-gray-600 uppercase tracking-wide">Your Level</div>

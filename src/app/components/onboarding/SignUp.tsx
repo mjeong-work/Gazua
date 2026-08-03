@@ -150,7 +150,7 @@ export default function SignUp() {
             <span>25%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div className="bg-[#7CFFB2] h-2 rounded-full transition-all" style={{ width: '25%' }}></div>
+            <div className="bg-mint h-2 rounded-full transition-all" style={{ width: '25%' }}></div>
           </div>
         </div>
 
@@ -167,7 +167,7 @@ export default function SignUp() {
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7CFFB2]/50"
+              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-mint/50"
             />
           </div>
 
@@ -182,7 +182,7 @@ export default function SignUp() {
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               required
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7CFFB2]/50"
+              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-mint/50"
             />
           </div>
 
@@ -197,7 +197,7 @@ export default function SignUp() {
               value={formData.confirmPassword}
               onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
               required
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7CFFB2]/50"
+              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-mint/50"
             />
           </div>
 

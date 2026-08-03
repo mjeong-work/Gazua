@@ -66,7 +66,7 @@ export default function AppHeader() {
   return (
     <>
       {/* Announcement banner — desktop only */}
-      <div className="hidden lg:block bg-[#7CFFB2] py-2 px-4 text-center text-sm font-medium border-b border-black/10 shrink-0">
+      <div className="hidden lg:block bg-mint py-2 px-4 text-center text-sm font-medium border-b border-black/10 shrink-0">
         Learn from verified creators, track your investment thesis, and build real conviction.
       </div>
 
