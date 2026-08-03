@@ -172,10 +172,13 @@ export default function CreateReelModal({ onClose, onSuccess }: CreateReelModalP
         </button>
       </div>
 
-      {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-5">
-        {/* Video upload / preview */}
-        <div>
+      {/* Content — flex column so Caption can absorb any leftover vertical space instead of
+          leaving a dead gap above the footer; overflow-y-auto is just a safety net for short
+          viewports, not the primary layout mechanism. */}
+      <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-4 flex flex-col gap-4">
+        {/* Video upload / preview — ~35-40% of viewport height, short/near-square rather than
+            a full 9:16 reel frame, so the fields below are visible without scrolling. */}
+        <div className="flex-shrink-0">
           <input
             ref={fileInputRef}
             type="file"
@@ -188,26 +191,26 @@ export default function CreateReelModal({ onClose, onSuccess }: CreateReelModalP
             onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
             onDragLeave={() => setIsDragging(false)}
             onDrop={(e) => { e.preventDefault(); setIsDragging(false); handleFileSelected(e.dataTransfer.files?.[0]); }}
-            className={`relative aspect-[9/16] w-full max-w-sm mx-auto rounded-2xl cursor-pointer overflow-hidden transition-colors ${
+            className={`relative aspect-[4/5] h-[36vh] max-h-72 mx-auto rounded-2xl cursor-pointer overflow-hidden transition-colors ${
               thumbnailPreviewUrl
                 ? ''
-                : `flex flex-col items-center justify-center border border-dashed ${isDragging ? 'border-brand bg-green-50' : 'border-gray-200 hover:border-gray-300'}`
+                : `flex flex-col items-center justify-center px-4 border border-dashed ${isDragging ? 'border-brand bg-green-50' : 'border-gray-200 hover:border-gray-300'}`
             }`}
           >
             {thumbnailPreviewUrl ? (
               <>
                 <img src={thumbnailPreviewUrl} alt="Video thumbnail preview" className="absolute inset-0 w-full h-full object-cover" />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent px-3 pt-8 pb-3">
-                  <p className="text-xs text-white/90 truncate">{file?.name} · Tap to change</p>
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent px-3 pt-6 pb-2">
+                  <p className="text-[11px] text-white/90 truncate">{file?.name} · Tap to change</p>
                 </div>
               </>
             ) : (
               <>
-                <VideoLibraryIcon sx={{ fontSize: 48, color: '#c1c7cf' }} />
-                <p className="text-sm text-gray-500 mt-3 mb-1">
+                <VideoLibraryIcon sx={{ fontSize: 32, color: '#c1c7cf' }} />
+                <p className="text-xs text-gray-500 mt-2 mb-0.5 text-center leading-snug">
                   {processingFile ? 'Processing video…' : 'Click to upload or drag and drop'}
                 </p>
-                <p className="text-xs text-gray-400">
+                <p className="text-[11px] text-gray-400 text-center leading-snug">
                   MP4, MOV, or WEBM (max 100MB, under 60 seconds)
                 </p>
               </>
@@ -217,7 +220,7 @@ export default function CreateReelModal({ onClose, onSuccess }: CreateReelModalP
         </div>
 
         {/* Ticker or Topic */}
-        <div>
+        <div className="flex-shrink-0">
           <label className="block text-[11px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
             Ticker or Topic
           </label>
@@ -233,22 +236,22 @@ export default function CreateReelModal({ onClose, onSuccess }: CreateReelModalP
           </div>
         </div>
 
-        {/* Caption */}
-        <div>
+        {/* Caption — grows to fill whatever vertical space is left, like the rest of this
+            page's fields, instead of a fixed row count leaving empty space beneath it. */}
+        <div className="flex-1 min-h-[80px] flex flex-col">
           <textarea
-            rows={3}
             placeholder="Write a caption..."
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
-            className="w-full text-sm focus:outline-none resize-none placeholder:text-gray-400"
+            className="w-full flex-1 min-h-0 text-sm focus:outline-none resize-none placeholder:text-gray-400"
           />
-          <p className="text-[11px] text-gray-400 text-right">
+          <p className="text-[11px] text-gray-400 text-right flex-shrink-0">
             {caption.length} / 2200
           </p>
         </div>
 
         {submitError && (
-          <p className="text-sm text-red-500 text-center">{submitError}</p>
+          <p className="text-sm text-red-500 text-center flex-shrink-0">{submitError}</p>
         )}
       </div>
 

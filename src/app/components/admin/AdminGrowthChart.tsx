@@ -39,8 +39,8 @@ export default function AdminGrowthChart({ data, bucket, onBucketChange }: Admin
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={data}>
               <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-              <XAxis dataKey="bucket" tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} axisLine={false} tickLine={false} allowDecimals={false} />
+              <XAxis dataKey="bucket" tick={{ fontSize: 11, fill: 'var(--icon-muted)' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: 'var(--icon-muted)' }} axisLine={false} tickLine={false} allowDecimals={false} />
               <Tooltip contentStyle={CHART_TOOLTIP_STYLE} labelFormatter={showChartLabel} />
               <Line type="monotone" dataKey="newUsers" name="New users" stroke="var(--brand)" strokeWidth={2} dot={false} isAnimationActive={false} />
               <Line type="monotone" dataKey="newCreators" name="New creators" stroke="#7c3aed" strokeWidth={2} strokeDasharray="5 5" dot={false} isAnimationActive={false} />

@@ -1015,10 +1015,10 @@ export default function MyProfilePage() {
                             )}
                             <div className="flex items-center gap-1">
                               <button onClick={() => handleOpenEditPost(post)} className="p-1.5 hover:bg-gray-100 rounded-full transition-colors" title="Edit">
-                                <EditIcon sx={{ fontSize: 14, color: '#9ca3af' }} />
+                                <EditIcon sx={{ fontSize: 14, color: 'var(--icon-muted)' }} />
                               </button>
                               <button onClick={() => setDeletePostId(post.id)} className="p-1.5 hover:bg-red-50 rounded-full transition-colors" title="Delete">
-                                <DeleteOutlineIcon sx={{ fontSize: 14, color: '#9ca3af' }} />
+                                <DeleteOutlineIcon sx={{ fontSize: 14, color: 'var(--icon-muted)' }} />
                               </button>
                             </div>
                           </div>

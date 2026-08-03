@@ -18,7 +18,7 @@ export default function PublishReminder({
   if (variant === 'footer') {
     return (
       <div className={`flex items-start gap-1.5 ${className}`}>
-        <InfoOutlinedIcon sx={{ fontSize: 14, color: '#9ca3af' }} className="mt-0.5 flex-shrink-0" />
+        <InfoOutlinedIcon sx={{ fontSize: 14, color: 'var(--icon-muted)' }} className="mt-0.5 flex-shrink-0" />
         <p className="text-[11px] text-gray-400 leading-snug">
           Please share research, not investment recommendations. Avoid misleading claims or guarantees of returns.
         </p>

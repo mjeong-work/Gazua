@@ -332,17 +332,17 @@ export default function WatchlistPage() {
                 <h3 className="font-bold mb-3">Related Content</h3>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="p-4 bg-gray-50 rounded-lg text-center">
-                    <ArticleIcon sx={{ fontSize: 32, color: '#9ca3af', marginBottom: 1 }} />
+                    <ArticleIcon sx={{ fontSize: 32, color: 'var(--icon-muted)', marginBottom: 1 }} />
                     <p className="text-sm text-gray-400 mb-1">Coming soon</p>
                     <p className="text-sm text-gray-600">Posts</p>
                   </div>
                   <div className="p-4 bg-gray-50 rounded-lg text-center">
-                    <VideoLibraryIcon sx={{ fontSize: 32, color: '#9ca3af', marginBottom: 1 }} />
+                    <VideoLibraryIcon sx={{ fontSize: 32, color: 'var(--icon-muted)', marginBottom: 1 }} />
                     <p className="text-sm text-gray-400 mb-1">Coming soon</p>
                     <p className="text-sm text-gray-600">Reels</p>
                   </div>
                   <div className="p-4 bg-gray-50 rounded-lg text-center">
-                    <InsertChartIcon sx={{ fontSize: 32, color: '#9ca3af', marginBottom: 1 }} />
+                    <InsertChartIcon sx={{ fontSize: 32, color: 'var(--icon-muted)', marginBottom: 1 }} />
                     <p className="text-sm text-gray-400 mb-1">Coming soon</p>
                     <p className="text-sm text-gray-600">Models</p>
                   </div>

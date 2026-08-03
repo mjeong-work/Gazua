@@ -265,7 +265,7 @@ export default function ModelHubPage() {
           <div className="mb-8 bg-gray-50 rounded-xl p-6">
             <div className="mb-4">
               <div className="relative">
-                <SearchIcon sx={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', fontSize: 20, color: '#9ca3af' }} />
+                <SearchIcon sx={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', fontSize: 20, color: 'var(--icon-muted)' }} />
                 <input
                   type="text"
                   placeholder="Search models by title or description..."
@@ -477,7 +477,7 @@ export default function ModelHubPage() {
           ) : (
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-                <SearchIcon sx={{ fontSize: 40, color: '#9ca3af' }} />
+                <SearchIcon sx={{ fontSize: 40, color: 'var(--icon-muted)' }} />
               </div>
               <h3 className="text-xl font-bold mb-2">No models found</h3>
               <p className="text-gray-600 max-w-sm mb-6">
@@ -636,7 +636,7 @@ export default function ModelHubPage() {
                       htmlFor="model-file-input"
                       className="block border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors cursor-pointer"
                     >
-                      <UploadIcon sx={{ fontSize: 48, color: '#9ca3af' }} />
+                      <UploadIcon sx={{ fontSize: 48, color: 'var(--icon-muted)' }} />
                       <p className="text-sm text-gray-600 mt-2">
                         {uploadFile ? `Selected: ${uploadFile.name}` : 'Click to upload or drag and drop'}
                       </p>

@@ -82,7 +82,7 @@ function ErrorCard({ onRetry }: { onRetry: () => void }) {
   return (
     <div className="border border-gray-200 rounded-xl p-10 text-center max-w-xl mx-auto">
       <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-        <AutoAwesomeIcon sx={{ fontSize: 32, color: '#9ca3af' }} />
+        <AutoAwesomeIcon sx={{ fontSize: 32, color: 'var(--icon-muted)' }} />
       </div>
       <h3 className="text-xl font-semibold mb-2">Analysis temporarily unavailable</h3>
       <p className="text-gray-600 mb-6 text-sm leading-relaxed">

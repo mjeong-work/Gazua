@@ -26,7 +26,7 @@ export default function AdminSearchFilterBar({
     <div className="flex flex-col lg:flex-row lg:items-center gap-3 mb-6">
       {onSearchChange && (
         <div className="relative flex-1 lg:max-w-xs">
-          <SearchIcon sx={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 16, color: '#9ca3af' }} />
+          <SearchIcon sx={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', fontSize: 16, color: 'var(--icon-muted)' }} />
           <input
             type="text"
             value={search ?? ''}

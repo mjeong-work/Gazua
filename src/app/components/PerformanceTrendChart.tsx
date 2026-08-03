@@ -94,13 +94,13 @@ export default function PerformanceTrendChart({ chartData, timeRange, onTimeRang
               dataKey="date"
               tickFormatter={tickFormatter}
               interval={interval}
-              tick={{ fontSize: 10, fill: '#9ca3af' }}
+              tick={{ fontSize: 10, fill: 'var(--icon-muted)' }}
               tickLine={false}
               axisLine={false}
             />
             <YAxis
               tickFormatter={yTickFormatter}
-              tick={{ fontSize: 10, fill: '#9ca3af' }}
+              tick={{ fontSize: 10, fill: 'var(--icon-muted)' }}
               tickLine={false}
               axisLine={false}
               width={52}

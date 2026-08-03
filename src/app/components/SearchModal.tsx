@@ -195,7 +195,7 @@ export default function SearchModal({ onClose }: SearchModalProps) {
       >
         {/* Search Input */}
         <div className="p-4 border-b border-gray-200 flex items-center gap-3">
-          <SearchIcon sx={{ fontSize: 24, color: '#9ca3af' }} />
+          <SearchIcon sx={{ fontSize: 24, color: 'var(--icon-muted)' }} />
           <input
             type="text"
             placeholder="Search creators, stocks, topics..."

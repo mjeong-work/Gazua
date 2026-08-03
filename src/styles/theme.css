@@ -43,6 +43,7 @@
   --brand-hover: #009660;
   --mint: #7cffb2;
   --mint-hover: #6eeea8;
+  --icon-muted: #9ca3af;
 }
 
 .dark {
@@ -125,6 +126,7 @@
   --color-brand-hover: var(--brand-hover);
   --color-mint: var(--mint);
   --color-mint-hover: var(--mint-hover);
+  --color-icon-muted: var(--icon-muted);
 }
 
 @layer base {

@@ -98,7 +98,7 @@ export default function NotificationsPage() {
           {!loading && notifications.length === 0 && (
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                <NotificationsIcon sx={{ fontSize: 32, color: '#9ca3af' }} />
+                <NotificationsIcon sx={{ fontSize: 32, color: 'var(--icon-muted)' }} />
               </div>
               <h3 className="text-lg font-bold mb-1">No notifications yet</h3>
               <p className="text-gray-600 text-sm max-w-sm">
