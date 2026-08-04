@@ -8,6 +8,10 @@ import Footer from './Footer';
 
 type StripeTier = 'analyst' | 'educator'
 
+// All paid tiers are $0 during beta (see the Beta Notice banner below) — badge % is derived
+// from each tier's normal price so it stays correct if that price ever changes.
+const BETA_PRICE = 0
+
 export default function PricingPage() {
   const [checkoutLoading, setCheckoutLoading] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -198,17 +202,21 @@ export default function PricingPage() {
                 <div className="mb-6">
                   <h3 className="text-2xl font-bold mb-2">{tier.name}</h3>
                   <p className="text-sm text-gray-600 mb-4">{tier.description}</p>
-                  <div className="flex items-baseline gap-1">
-                    {tier.price === 0 ? (
+                  {tier.price === 0 ? (
+                    <div className="flex items-baseline gap-1">
                       <span className="text-4xl font-bold">Free</span>
-                    ) : (
-                      <>
-                        <span className="text-2xl font-bold">$</span>
-                        <span className="text-5xl font-bold">{tier.price}</span>
-                        <span className="text-gray-600">{tier.period}</span>
-                      </>
-                    )}
-                  </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-baseline gap-2 flex-wrap">
+                        <span className="text-lg text-gray-400 line-through">${tier.price}{tier.period}</span>
+                        <span className="text-4xl font-bold">Beta: $0{tier.period}</span>
+                      </div>
+                      <span className="inline-block mt-2 bg-brand/15 text-brand text-xs font-bold px-2.5 py-1 rounded-full">
+                        베타 기간 {Math.round((1 - BETA_PRICE / tier.price) * 100)}% 할인
+                      </span>
+                    </>
+                  )}
                 </div>
 
                 {isActivePlan ? (
