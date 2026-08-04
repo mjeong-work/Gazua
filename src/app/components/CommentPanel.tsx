@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
+import { motion } from 'motion/react';
 import SendIcon from '@mui/icons-material/Send';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { useAuth } from '../contexts/AuthContext';
+import { useDragToDismissSheet } from '../hooks/useDragToDismissSheet';
 import { getComments, addComment, deleteComment, type CommentWithAuthor } from '../../lib/services/comments.service';
 
 function formatRelative(iso: string): string {
@@ -80,6 +82,9 @@ export default function CommentPanel({
     setTimeout(onClose, 300);
   };
 
+  const { dragControls, handleDragEnd, handlePointerDownOnHandle, listPointerHandlers } =
+    useDragToDismissSheet({ onDismiss: handleClose });
+
   const handleSubmit = async () => {
     const trimmed = text.trim();
     if (!trimmed || !user || !profile || submitting) return;
@@ -144,14 +149,27 @@ export default function CommentPanel({
         onClick={handleClose}
       />
 
-      {/* Bottom sheet */}
-      <div
-        className={`absolute inset-x-0 bottom-0 h-[75vh] bg-white rounded-t-2xl shadow-2xl flex flex-col transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${show ? 'translate-y-0' : 'translate-y-full'}`}
+      {/* Bottom sheet — draggable via the handle or by pulling down on the list once it's
+          scrolled to the top (see useDragToDismissSheet). `show` (not AnimatePresence) drives
+          open/close since the call site conditionally mounts this with a plain `&&`. */}
+      <motion.div
+        drag="y"
+        dragControls={dragControls}
+        dragListener={false}
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={{ top: 0, bottom: 0.6 }}
+        onDragEnd={handleDragEnd}
+        animate={{ y: show ? 0 : '100%' }}
+        transition={{ type: 'spring', damping: 32, stiffness: 300 }}
+        className="absolute inset-x-0 bottom-0 h-[75vh] bg-white rounded-t-2xl shadow-2xl flex flex-col touch-none"
         onClick={e => e.stopPropagation()}
       >
         {/* Drag handle */}
-        <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
-          <div className="w-10 h-1 bg-gray-300 rounded-full" />
+        <div
+          onPointerDown={handlePointerDownOnHandle}
+          className="flex justify-center pt-3 pb-2 flex-shrink-0 cursor-grab active:cursor-grabbing"
+        >
+          <div className="w-10 h-1.5 bg-gray-300 rounded-full" />
         </div>
 
         {/* Header */}
@@ -161,7 +179,7 @@ export default function CommentPanel({
         </div>
 
         {/* Comment list */}
-        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5 touch-auto" {...listPointerHandlers}>
           {loading && (
             <div className="space-y-4">
               {[1, 2, 3].map(n => (
@@ -245,7 +263,7 @@ export default function CommentPanel({
             </>
           )}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

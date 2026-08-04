@@ -1,5 +1,6 @@
-import { motion, useDragControls } from 'motion/react';
+import { motion } from 'motion/react';
 import { useEscapeKey } from '../../hooks/useEscapeKey';
+import { useDragToDismissSheet } from '../../hooks/useDragToDismissSheet';
 import CommentBody from './CommentBody';
 import type { ReelCommentItem } from './types';
 
@@ -17,12 +18,9 @@ interface ReelInlineCommentsSheetProps {
 // viewport's), and never touches page-level layout or scroll. The Reel stays the "app" the
 // sheet lives inside, per Instagram's own reel-comments behavior.
 export default function ReelInlineCommentsSheet({ comments, commentCount, onAddComment, onClose }: ReelInlineCommentsSheetProps) {
-  const dragControls = useDragControls();
   useEscapeKey(onClose);
-
-  const handleDragEnd = (_event: unknown, info: { offset: { y: number }; velocity: { y: number } }) => {
-    if (info.offset.y > 80 || info.velocity.y > 600) onClose();
-  };
+  const { dragControls, handleDragEnd, handlePointerDownOnHandle, listPointerHandlers } =
+    useDragToDismissSheet({ onDismiss: onClose, distanceThreshold: 80 });
 
   return (
     <div className="absolute inset-0 z-30" role="dialog" aria-modal="true" aria-label="Comments">
@@ -49,7 +47,7 @@ export default function ReelInlineCommentsSheet({ comments, commentCount, onAddC
         onClick={(e) => e.stopPropagation()}
       >
         <div
-          onPointerDown={(e) => dragControls.start(e)}
+          onPointerDown={handlePointerDownOnHandle}
           className="flex justify-center pt-3 pb-2 flex-shrink-0 cursor-grab active:cursor-grabbing"
         >
           <div className="w-10 h-1.5 bg-gray-300 rounded-full" />
@@ -60,7 +58,7 @@ export default function ReelInlineCommentsSheet({ comments, commentCount, onAddC
         </div>
         {/* Only this list scrolls — the reel/page behind never does. */}
         <div className="flex-1 flex flex-col min-h-0 touch-auto">
-          <CommentBody theme="light" comments={comments} onAddComment={onAddComment} />
+          <CommentBody theme="light" comments={comments} onAddComment={onAddComment} listPointerHandlers={listPointerHandlers} />
         </div>
       </motion.div>
     </div>
