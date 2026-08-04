@@ -21,11 +21,7 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
   const [ticker, setTicker] = useState('');
   const [content, setContent] = useState('');
   const [category, setCategory] = useState<typeof CATEGORIES[number]>('Stocks');
-  const [timeHorizon, setTimeHorizon] = useState<'Short-term' | 'Medium-term' | 'Long-term'>('Medium-term');
-  const [riskLevel, setRiskLevel] = useState<'Low' | 'Medium' | 'High'>('Medium');
-  const [confidence, setConfidence] = useState<'Low' | 'Medium' | 'High'>('Medium');
   const [sentiment, setSentiment] = useState<'Bullish' | 'Neutral' | 'Bearish'>('Neutral');
-  const [tags, setTags] = useState('');
   const [showCompliance, setShowCompliance] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -45,18 +41,12 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
     setSubmitting(true);
     setSubmitError(null);
 
-    const parsedTags = tags.split(/\s+/).filter(t => t.startsWith('#'));
-
     const { data: newPost, error } = await createPost({
       creator_id: profile.id,
       asset: ticker.trim().toUpperCase(),
       category,
       content,
-      tags: parsedTags,
       sentiment,
-      time_horizon: timeHorizon,
-      risk_level: riskLevel,
-      confidence,
     });
 
     // Fire-and-forget compliance log — never blocks publishing
@@ -97,184 +87,112 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold">Create Post</h2>
+        <div className="flex items-center justify-between px-5 py-4">
+          <h2 className="text-base font-semibold">Create Post</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
           >
             <CloseIcon sx={{ fontSize: 20 }} />
           </button>
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-5">
-          {/* Ticker or Topic */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">
-              Ticker or Topic
-            </label>
-            <input
-              type="text"
-              placeholder="e.g., NVDA, Bitcoin, S&P 500"
-              value={ticker}
-              onChange={(e) => setTicker(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
-            />
+        <div className="px-5 pb-5 space-y-4">
+          {/* Identity row — who's posting + category, standing in for LinkedIn's avatar/name
+              + audience-selector row (this app has no post-visibility concept, so category
+              fills that "context for this post" slot instead of a fake control). */}
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-full bg-gray-200 flex-shrink-0 flex items-center justify-center text-sm font-semibold text-gray-600 overflow-hidden">
+              {profile?.avatar_url
+                ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                : (profile?.full_name?.[0]?.toUpperCase() ?? '?')}
+            </div>
+            <div>
+              <p className="text-sm font-semibold">{profile?.full_name ?? 'You'}</p>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value as typeof CATEGORIES[number])}
+                className="text-xs text-gray-500 bg-gray-100 rounded-full px-2.5 py-0.5 mt-0.5 border-none focus:outline-none cursor-pointer"
+              >
+                {CATEGORIES.map(c => <option key={c}>{c}</option>)}
+              </select>
+            </div>
           </div>
 
-          {/* Category */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">
-              Category
-            </label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value as typeof CATEGORIES[number])}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
-            >
-              {CATEGORIES.map(c => <option key={c}>{c}</option>)}
-            </select>
-          </div>
+          {/* Post text — the dominant element, borderless like the rest of this modal */}
+          <textarea
+            rows={5}
+            placeholder="Share your investment thesis, market insights, or analysis..."
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            autoFocus
+            className="w-full text-[15px] focus:outline-none resize-none placeholder:text-gray-400 min-h-[120px]"
+          />
+          <p className="text-[11px] text-gray-400 text-right -mt-3">
+            {content.length} / 500
+          </p>
 
-          {/* Post Content */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">
-              What's your take?
-            </label>
-            <textarea
-              rows={5}
-              placeholder="Share your investment thesis, market insights, or analysis..."
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand resize-none"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              {content.length} / 500 characters
-            </p>
-          </div>
+          {/* Ticker + Sentiment — the two pieces of investment context every post needs,
+              kept as one compact row instead of two separate labeled sections. */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-medium">$</span>
+              <input
+                type="text"
+                placeholder="Ticker"
+                value={ticker}
+                onChange={(e) => setTicker(e.target.value)}
+                className="w-28 pl-6 pr-3 py-1.5 border border-gray-200 rounded-full text-xs focus:outline-none focus:border-brand"
+              />
+            </div>
 
-          {/* Sentiment */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-3">
-              Sentiment
-            </label>
-            <div className="flex gap-3">
+            <div className="flex items-center gap-1 ml-auto">
               <button
                 onClick={() => setSentiment('Bullish')}
-                className={`flex-1 px-4 py-3 rounded-lg border-2 transition-all flex items-center justify-center gap-2 ${
-                  sentiment === 'Bullish'
-                    ? 'border-green-500 bg-green-50 text-green-700'
-                    : 'border-gray-200 hover:border-gray-300'
+                title="Bullish"
+                className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                  sentiment === 'Bullish' ? 'bg-green-100 text-green-700' : 'text-gray-400 hover:bg-gray-100'
                 }`}
               >
-                <TrendingUpIcon sx={{ fontSize: 20 }} />
-                Bullish
+                <TrendingUpIcon sx={{ fontSize: 18 }} />
               </button>
               <button
                 onClick={() => setSentiment('Neutral')}
-                className={`flex-1 px-4 py-3 rounded-lg border-2 transition-all flex items-center justify-center gap-2 ${
-                  sentiment === 'Neutral'
-                    ? 'border-blue-500 bg-blue-50 text-blue-700'
-                    : 'border-gray-200 hover:border-gray-300'
+                title="Neutral"
+                className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                  sentiment === 'Neutral' ? 'bg-blue-100 text-blue-700' : 'text-gray-400 hover:bg-gray-100'
                 }`}
               >
-                <TrendingFlatIcon sx={{ fontSize: 20 }} />
-                Neutral
+                <TrendingFlatIcon sx={{ fontSize: 18 }} />
               </button>
               <button
                 onClick={() => setSentiment('Bearish')}
-                className={`flex-1 px-4 py-3 rounded-lg border-2 transition-all flex items-center justify-center gap-2 ${
-                  sentiment === 'Bearish'
-                    ? 'border-red-500 bg-red-50 text-red-700'
-                    : 'border-gray-200 hover:border-gray-300'
+                title="Bearish"
+                className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                  sentiment === 'Bearish' ? 'bg-red-100 text-red-700' : 'text-gray-400 hover:bg-gray-100'
                 }`}
               >
-                <TrendingDownIcon sx={{ fontSize: 20 }} />
-                Bearish
+                <TrendingDownIcon sx={{ fontSize: 18 }} />
               </button>
             </div>
-          </div>
-
-          {/* Time Horizon */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">
-              Time Horizon
-            </label>
-            <select
-              value={timeHorizon}
-              onChange={(e) => setTimeHorizon(e.target.value as typeof timeHorizon)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
-            >
-              <option>Short-term</option>
-              <option>Medium-term</option>
-              <option>Long-term</option>
-            </select>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            {/* Risk Level */}
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
-                Risk Level
-              </label>
-              <select
-                value={riskLevel}
-                onChange={(e) => setRiskLevel(e.target.value as typeof riskLevel)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
-              >
-                <option>Low</option>
-                <option>Medium</option>
-                <option>High</option>
-              </select>
-            </div>
-
-            {/* Confidence */}
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">
-                Confidence
-              </label>
-              <select
-                value={confidence}
-                onChange={(e) => setConfidence(e.target.value as typeof confidence)}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
-              >
-                <option>Low</option>
-                <option>Medium</option>
-                <option>High</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Tags */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">
-              Tags (optional)
-            </label>
-            <input
-              type="text"
-              placeholder="e.g., #stocks #tech #AI"
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
-            />
           </div>
 
           {submitError && (
             <p className="text-sm text-red-500 text-center">{submitError}</p>
           )}
 
-          <PublishReminder className="mb-2" />
+          <PublishReminder variant="footer" />
 
           {/* Submit */}
           <button
             onClick={handleSubmit}
             disabled={!ticker.trim() || !content.trim() || submitting}
-            className="w-full py-4 bg-black text-white font-bold rounded-full hover:bg-black/80 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="w-full py-3 bg-black text-white font-bold rounded-full hover:bg-black/80 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             {submitting ? 'Publishing…' : 'Publish Post'}
           </button>
