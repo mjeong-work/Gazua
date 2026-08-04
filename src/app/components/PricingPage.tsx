@@ -213,7 +213,7 @@ export default function PricingPage() {
                         <span className="text-4xl font-bold">Beta: $0{tier.period}</span>
                       </div>
                       <span className="inline-block mt-2 bg-brand/15 text-brand text-xs font-bold px-2.5 py-1 rounded-full">
-                        베타 기간 {Math.round((1 - BETA_PRICE / tier.price) * 100)}% 할인
+                        {Math.round((1 - BETA_PRICE / tier.price) * 100)}% off during beta
                       </span>
                     </>
                   )}
