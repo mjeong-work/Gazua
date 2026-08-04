@@ -23,7 +23,6 @@ import { useWatchlist, categoryToAssetType } from '../contexts/WatchlistContext'
 import { getCreator } from '../data/creators';
 import { useSwipePanel } from '../hooks/useSwipePanel';
 import ReportButton from './compliance/ReportButton';
-import ContentDisclaimer from './compliance/ContentDisclaimer';
 import { AlgorithmicLabel, derivePostLabel } from './compliance/AlgorithmicLabel';
 import SendIcon from '@mui/icons-material/Send';
 import { getComments, addComment, type CommentWithAuthor } from '../../lib/services/comments.service';
@@ -856,8 +855,6 @@ export default function MainPagePosting() {
                               See {post.creator}'s portfolio →
                             </button>
                           )}
-
-                          <ContentDisclaimer collapsible />
 
                           <div className="flex items-center gap-6 text-gray-500">
                             <button
