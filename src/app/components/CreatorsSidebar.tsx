@@ -28,6 +28,16 @@ export default function CreatorsSidebar() {
     navigate(`/profile/${id}/investment`);
   };
 
+  // There's no standalone single-post page in this app (posts only render inline in the main
+  // feed) and WatchlistItem doesn't carry the source creator, so "go to the original post"
+  // resolves to the same ticker-filtered feed view every $TICKER badge elsewhere navigates to
+  // (e.g. MainPagePosting's asset badge) — the closest real destination for "show me the
+  // content behind this watchlist entry" with the data actually available on the row.
+  const handleSelectWatchlistItem = (ticker: string) => {
+    setIsOpen(false);
+    navigate(`/main?ticker=${encodeURIComponent(ticker)}`);
+  };
+
   return (
     <>
       {/* Mobile toggle — same floating-action-button treatment as the app's other FABs */}
@@ -123,10 +133,11 @@ export default function CreatorsSidebar() {
                   const change = (item as unknown as { change1D?: number }).change1D;
                   const isUp = typeof change === 'number' ? change >= 0 : null;
                   return (
-                    <div
+                    <button
                       key={item.id}
+                      onClick={() => handleSelectWatchlistItem(item.ticker)}
                       title={!isExpanded ? item.ticker : undefined}
-                      className={`flex items-center gap-2.5 py-2 rounded-full hover:bg-gray-100 transition-colors ${
+                      className={`w-full flex items-center gap-2.5 py-2 rounded-full text-left hover:bg-gray-100 transition-colors ${
                         isExpanded ? 'px-2.5' : 'px-2.5 lg:px-0 lg:justify-center'
                       }`}
                     >
@@ -144,7 +155,7 @@ export default function CreatorsSidebar() {
                           {isUp ? '+' : ''}{change!.toFixed(1)}%
                         </span>
                       )}
-                    </div>
+                    </button>
                   );
                 })}
               </div>
