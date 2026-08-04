@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import type { DisclosureType } from '../../../types/compliance'
 
 const BADGE_LABEL: Partial<Record<DisclosureType, string>> = {
@@ -33,21 +34,45 @@ function DisclosureBadges({ disclosures }: { disclosures: DisclosureType[] }) {
  * compact=false → multi-line with heading, for standalone use
  * disclosures   → optional creator-disclosed items (sponsored, position held, etc.),
  *                 rendered as small badges above the disclaimer text
+ * collapsible   → compact-mode only. Starts collapsed behind a "더보기" toggle instead of
+ *                 always showing the full sentence — used in the main feed where every post
+ *                 repeats the same disclaimer and it reads as noise at full length.
  */
 export default function ContentDisclaimer({
   compact = true,
   disclosures,
+  collapsible = false,
 }: {
   compact?: boolean
   disclosures?: DisclosureType[]
+  collapsible?: boolean
 }) {
+  const [expanded, setExpanded] = useState(!collapsible)
+
   if (compact) {
     return (
       <div className="mt-3 pt-3 border-t border-gray-100">
         {disclosures && <DisclosureBadges disclosures={disclosures} />}
-        <p className="text-[10px] text-gray-400 leading-tight">
-          User-generated content · Not investment advice · Gazua does not endorse or guarantee this content.
-        </p>
+        {collapsible && !expanded ? (
+          <button
+            onClick={() => setExpanded(true)}
+            className="text-[10px] text-gray-400 hover:text-gray-600 underline underline-offset-2"
+          >
+            더보기
+          </button>
+        ) : (
+          <p className="text-[10px] text-gray-400 leading-tight">
+            User-generated content · Not investment advice · Gazua does not endorse or guarantee this content.
+            {collapsible && (
+              <button
+                onClick={() => setExpanded(false)}
+                className="ml-1.5 text-gray-400 hover:text-gray-600 underline underline-offset-2"
+              >
+                접기
+              </button>
+            )}
+          </p>
+        )}
       </div>
     )
   }

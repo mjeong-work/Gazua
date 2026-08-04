@@ -857,6 +857,8 @@ export default function MainPagePosting() {
                             </button>
                           )}
 
+                          <ContentDisclaimer collapsible />
+
                           <div className="flex items-center gap-6 text-gray-500">
                             <button
                               onClick={() => toggleLike(post)}
@@ -913,7 +915,6 @@ export default function MainPagePosting() {
                               )}
                             </button>
                           </div>
-                          <ContentDisclaimer />
                           <div className={`overflow-hidden transition-all duration-200 ${expandedCommentPostId === likeKey ? 'max-h-[600px]' : 'max-h-0'}`}>
                             <InlineComments
                               postId={post.db_id ?? ''}
