@@ -686,11 +686,16 @@ export default function MainPageReels() {
       )}
 
       {/* Floating Create Button — hidden while the comments panel is open, since it
-          otherwise sits directly on top of the comment composer's send button. */}
+          otherwise sits directly on top of the comment composer's send button.
+          On mobile the engagement rail (Like/Comment/Save/More, see railClassName above)
+          occupies right-3 from bottom-24 up to roughly bottom-24+~15rem, so this needs to sit
+          above all of it rather than sharing bottom-24 like the equivalent button on the
+          Posting feed (which has no competing right-side rail). Desktop's rail sits higher
+          (lg:bottom-32) with more room below it, so lg:bottom-8 already clears it. */}
       {!isCommentsOpen && (
       <button
         onClick={() => setShowCreateReel(true)}
-        className="fixed bottom-24 right-4 lg:bottom-8 lg:right-8 w-14 h-14 bg-mint text-black rounded-full shadow-lg hover:bg-mint-hover transition-all hover:scale-110 flex items-center justify-center z-40 group"
+        className="fixed bottom-[22rem] right-4 lg:bottom-8 lg:right-8 w-14 h-14 bg-mint text-black rounded-full shadow-lg hover:bg-mint-hover transition-all hover:scale-110 flex items-center justify-center z-40 group"
         title="Create Reel"
       >
         <AddCircleOutlineIcon sx={{ fontSize: 28 }} />
