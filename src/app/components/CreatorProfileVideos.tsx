@@ -165,7 +165,10 @@ export default function CreatorProfileVideos() {
         handle: dbProfile.handle ? `@${dbProfile.handle}` : `@${dbProfile.username}`,
         avatar: mockCreator?.avatar ?? (dbProfile.full_name?.[0] ?? '?').toUpperCase(),
         bio: dbProfile.bio ?? mockCreator?.bio ?? '',
-        verified: dbProfile.is_verified,
+        // The "verified" badge is credibility_level === 'verified_pro' only (decision 1) — not
+        // is_verified, which is now an internal due-diligence flag, not a badge trigger.
+        verified: dbProfile.credibility_level === 'verified_pro',
+        credibilityLevel: dbProfile.credibility_level,
         followers: mockCreator?.followers ?? '—',
         following: mockCreator?.following ?? '—',
         posts: mockCreator?.posts ?? '—',
