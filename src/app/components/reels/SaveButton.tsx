@@ -40,7 +40,7 @@ export default function SaveButton({ isSaved, onToggle, variant = 'rail' }: Save
       {rail ? (
         isSaved && <span className="text-[10px] font-medium text-white">Saved</span>
       ) : (
-        <span className={`text-sm font-medium ${isSaved ? 'text-brand' : 'text-gray-700'}`}>
+        <span className={`text-sm font-medium ${isSaved ? 'text-brand' : 'text-neutral-700'}`}>
           {isSaved ? 'Saved' : 'Save'}
         </span>
       )}
