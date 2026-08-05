@@ -42,6 +42,22 @@
   --mint: #7cffb2;
   --mint-hover: #6eeea8;
   --icon-muted: #9ca3af;
+
+  /* Neutral (gray) ramp — same values as Tailwind's default gray-50..900, now centralized as
+     tokens instead of scattered raw gray utility literals across the app (see audit Issue 8).
+     Converting a raw shade to its matching neutral-N token is a pure rename with no visual
+     change; it's what lets this app's gray scale ever be swapped or audited from one place
+     instead of relying on Tailwind's un-branded defaults everywhere. */
+  --neutral-50: #f9fafb;
+  --neutral-100: #f3f4f6;
+  --neutral-200: #e5e7eb;
+  --neutral-300: #d1d5db;
+  --neutral-400: #9ca3af;
+  --neutral-500: #6b7280;
+  --neutral-600: #4b5563;
+  --neutral-700: #374151;
+  --neutral-800: #1f2937;
+  --neutral-900: #111827;
 }
 
 @theme inline {
@@ -88,6 +104,16 @@
   --color-mint: var(--mint);
   --color-mint-hover: var(--mint-hover);
   --color-icon-muted: var(--icon-muted);
+  --color-neutral-50: var(--neutral-50);
+  --color-neutral-100: var(--neutral-100);
+  --color-neutral-200: var(--neutral-200);
+  --color-neutral-300: var(--neutral-300);
+  --color-neutral-400: var(--neutral-400);
+  --color-neutral-500: var(--neutral-500);
+  --color-neutral-600: var(--neutral-600);
+  --color-neutral-700: var(--neutral-700);
+  --color-neutral-800: var(--neutral-800);
+  --color-neutral-900: var(--neutral-900);
 }
 
 @layer base {
