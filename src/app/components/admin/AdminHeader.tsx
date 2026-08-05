@@ -14,12 +14,12 @@ export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
   const { profile } = useAuth();
 
   return (
-    <header className="border-b border-gray-200 bg-white shrink-0">
+    <header className="border-b border-neutral-200 bg-white shrink-0">
       <div className="px-4 lg:px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
             onClick={onMenuClick}
-            className="lg:hidden p-2 -ml-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="lg:hidden p-2 -ml-2 hover:bg-neutral-100 rounded-full transition-colors"
             aria-label="Open menu"
           >
             <MenuIcon sx={{ fontSize: 22 }} />
@@ -28,10 +28,10 @@ export default function AdminHeader({ onMenuClick }: AdminHeaderProps) {
         </div>
 
         <div className="flex items-center gap-4">
-          <span className="hidden sm:inline text-sm text-gray-500">{profile?.full_name}</span>
+          <span className="hidden sm:inline text-sm text-neutral-500">{profile?.full_name}</span>
           <button
             onClick={() => navigate('/main')}
-            className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
+            className="text-sm font-medium text-neutral-600 hover:text-black transition-colors"
           >
             Back to app
           </button>

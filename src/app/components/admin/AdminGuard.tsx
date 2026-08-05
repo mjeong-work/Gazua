@@ -17,7 +17,7 @@ export default function AdminGuard({ children }: { children: ReactNode }) {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="w-10 h-10 border-2 border-gray-200 border-t-black rounded-full animate-spin" />
+        <div className="w-10 h-10 border-2 border-neutral-200 border-t-black rounded-full animate-spin" />
       </div>
     );
   }
@@ -27,7 +27,7 @@ export default function AdminGuard({ children }: { children: ReactNode }) {
       <div className="min-h-screen bg-white flex items-center justify-center px-6">
         <div className="text-center max-w-sm">
           <h1 className="text-xl font-bold mb-2">Access Denied</h1>
-          <p className="text-sm text-gray-500 mb-6">
+          <p className="text-sm text-neutral-500 mb-6">
             You don't have permission to view this page.
           </p>
           <button
