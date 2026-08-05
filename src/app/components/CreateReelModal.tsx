@@ -158,7 +158,7 @@ export default function CreateReelModal({ onClose, onSuccess }: CreateReelModalP
         <div className="flex-shrink-0 flex items-center justify-between px-4 py-3">
           <button
             onClick={onClose}
-            className="icon-tap-target p-1.5 -ml-1.5 hover:bg-gray-100 rounded-full transition-colors"
+            className="icon-tap-target p-1.5 -ml-1.5 hover:bg-neutral-100 rounded-full transition-colors"
             aria-label="Close"
           >
             <CloseIcon sx={{ fontSize: 22 }} />
@@ -167,7 +167,7 @@ export default function CreateReelModal({ onClose, onSuccess }: CreateReelModalP
           <button
             onClick={handleSubmit}
             disabled={!canSubmit}
-            className="text-sm font-semibold text-brand disabled:text-gray-400 transition-colors px-1.5"
+            className="text-sm font-semibold text-brand disabled:text-neutral-400 transition-colors px-1.5"
           >
             {submitting ? 'Posting…' : 'Next'}
           </button>
@@ -197,7 +197,7 @@ export default function CreateReelModal({ onClose, onSuccess }: CreateReelModalP
               className={`relative aspect-[4/5] h-[36vh] max-h-72 mx-auto lg:h-[60vh] lg:max-h-[520px] lg:mx-0 rounded-2xl cursor-pointer overflow-hidden transition-colors ${
                 thumbnailPreviewUrl
                   ? ''
-                  : `flex flex-col items-center justify-center px-4 border border-dashed ${isDragging ? 'border-brand bg-green-50' : 'border-gray-200 hover:border-gray-300'}`
+                  : `flex flex-col items-center justify-center px-4 border border-dashed ${isDragging ? 'border-brand bg-green-50' : 'border-neutral-200 hover:border-neutral-300'}`
               }`}
             >
               {thumbnailPreviewUrl ? (
@@ -210,10 +210,10 @@ export default function CreateReelModal({ onClose, onSuccess }: CreateReelModalP
               ) : (
                 <>
                   <VideoLibraryIcon sx={{ fontSize: 32, color: '#c1c7cf' }} />
-                  <p className="text-xs text-gray-500 mt-2 mb-0.5 text-center leading-snug">
+                  <p className="text-xs text-neutral-500 mt-2 mb-0.5 text-center leading-snug">
                     {processingFile ? 'Processing video…' : 'Click to upload or drag and drop'}
                   </p>
-                  <p className="text-[11px] text-gray-400 text-center leading-snug">
+                  <p className="text-[11px] text-neutral-400 text-center leading-snug">
                     MP4, MOV, or WEBM (max 100MB, under 60 seconds)
                   </p>
                 </>
@@ -228,17 +228,17 @@ export default function CreateReelModal({ onClose, onSuccess }: CreateReelModalP
           <div className="flex-1 min-h-0 flex flex-col gap-4 lg:flex-none lg:w-80 lg:h-[60vh] lg:max-h-[520px]">
             {/* Ticker or Topic */}
             <div className="flex-shrink-0">
-              <label className="block text-[11px] font-medium text-gray-400 uppercase tracking-wide mb-1.5">
+              <label className="block text-[11px] font-medium text-neutral-400 uppercase tracking-wide mb-1.5">
                 Ticker or Topic
               </label>
               <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">#</span>
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 text-sm font-medium">#</span>
                 <input
                   type="text"
                   placeholder="NVDA, Bitcoin, Market Update"
                   value={ticker}
                   onChange={(e) => setTicker(e.target.value)}
-                  className="w-full pl-8 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                  className="w-full pl-8 pr-4 py-2.5 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                 />
               </div>
             </div>
@@ -250,9 +250,9 @@ export default function CreateReelModal({ onClose, onSuccess }: CreateReelModalP
                 placeholder="Write a caption..."
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
-                className="w-full flex-1 min-h-0 text-sm focus:outline-none resize-none placeholder:text-gray-400"
+                className="w-full flex-1 min-h-0 text-sm focus:outline-none resize-none placeholder:text-neutral-400"
               />
-              <p className="text-[11px] text-gray-400 text-right flex-shrink-0">
+              <p className="text-[11px] text-neutral-400 text-right flex-shrink-0">
                 {caption.length} / 2200
               </p>
             </div>

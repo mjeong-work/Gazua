@@ -41,14 +41,14 @@ function OptionsList({ onSelect }: { onSelect: (type: CreateContentType) => void
         <button
           key={opt.type}
           onClick={() => onSelect(opt.type)}
-          className="w-full flex items-center gap-4 px-3 py-3.5 rounded-xl hover:bg-gray-50 active:bg-gray-100 transition-colors text-left"
+          className="w-full flex items-center gap-4 px-3 py-3.5 rounded-xl hover:bg-neutral-50 active:bg-neutral-100 transition-colors text-left"
         >
-          <div className="w-11 h-11 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 text-gray-800">
+          <div className="w-11 h-11 rounded-full bg-neutral-100 flex items-center justify-center flex-shrink-0 text-neutral-800">
             {opt.icon}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-gray-900">{opt.label}</p>
-            <p className="text-xs text-gray-500 truncate">{opt.description}</p>
+            <p className="text-sm font-semibold text-neutral-900">{opt.label}</p>
+            <p className="text-xs text-neutral-500 truncate">{opt.description}</p>
           </div>
         </button>
       ))}
@@ -112,7 +112,7 @@ export default function CreateOptionsSheet({ onClose, onSelect }: CreateOptionsS
             <h2 className="text-base font-bold">Create</h2>
             <button
               onClick={onClose}
-              className="icon-tap-target p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+              className="icon-tap-target p-1.5 hover:bg-neutral-100 rounded-full transition-colors"
               aria-label="Close"
             >
               <CloseIcon sx={{ fontSize: 18 }} />
@@ -141,7 +141,7 @@ export default function CreateOptionsSheet({ onClose, onSelect }: CreateOptionsS
             onPointerDown={handlePointerDownOnHandle}
             className="flex justify-center pt-3 pb-2 cursor-grab active:cursor-grabbing"
           >
-            <div className="w-10 h-1.5 bg-gray-300 rounded-full" />
+            <div className="w-10 h-1.5 bg-neutral-300 rounded-full" />
           </div>
 
           <h2 className="text-base font-bold text-center mb-2 px-5">Create</h2>
