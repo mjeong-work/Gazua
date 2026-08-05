@@ -29,7 +29,7 @@ export default function Welcome() {
         </div>
 
         {/* Tagline */}
-        <p className="text-2xl text-gray-700 mb-12 leading-relaxed">
+        <p className="text-2xl text-neutral-700 mb-12 leading-relaxed">
           The trusted social layer for investment learning
         </p>
 
@@ -43,7 +43,7 @@ export default function Welcome() {
           </button>
           <button
             onClick={() => navigate('/signin')}
-            className="w-full px-8 py-4 border-2 border-gray-200 text-gray-700 rounded-full hover:border-gray-300 hover:bg-gray-50 transition-colors"
+            className="w-full px-8 py-4 border-2 border-neutral-200 text-neutral-700 rounded-full hover:border-neutral-300 hover:bg-neutral-50 transition-colors"
           >
             Sign In
           </button>
@@ -51,12 +51,12 @@ export default function Welcome() {
 
         {/* Additional info */}
         <div className="mt-8 flex flex-col items-center gap-2">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-neutral-500">
             Join thousands learning to invest with confidence
           </p>
           <button
             onClick={() => navigate('/')}
-            className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-xs text-neutral-400 hover:text-neutral-600 transition-colors"
           >
             ← Back to pricing
           </button>

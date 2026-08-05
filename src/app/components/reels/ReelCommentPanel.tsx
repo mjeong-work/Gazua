@@ -48,11 +48,11 @@ export default function ReelCommentPanel({ comments, commentCount, onAddComment,
           onPointerDown={handlePointerDownOnHandle}
           className="flex justify-center pt-3 pb-2 flex-shrink-0 cursor-grab active:cursor-grabbing"
         >
-          <div className="w-10 h-1.5 bg-gray-300 rounded-full" />
+          <div className="w-10 h-1.5 bg-neutral-300 rounded-full" />
         </div>
-        <div className="flex items-center justify-between px-5 pb-3 border-b border-gray-100 flex-shrink-0">
+        <div className="flex items-center justify-between px-5 pb-3 border-b border-neutral-100 flex-shrink-0">
           <h2 className="text-base font-bold">Comments</h2>
-          <span className="text-sm text-gray-400 font-medium">{commentCount}</span>
+          <span className="text-sm text-neutral-400 font-medium">{commentCount}</span>
         </div>
         <div className="flex-1 flex flex-col min-h-0 touch-auto">
           <CommentBody theme="light" comments={comments} onAddComment={onAddComment} listPointerHandlers={listPointerHandlers} />
