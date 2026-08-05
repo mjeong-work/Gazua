@@ -50,8 +50,8 @@ export default function AuthCallback() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-4 text-center px-6">
-          <p className="text-sm text-gray-700 font-medium">Sign-in failed</p>
-          <p className="text-sm text-gray-500">The link may have expired. Please try signing in again.</p>
+          <p className="text-sm text-neutral-700 font-medium">Sign-in failed</p>
+          <p className="text-sm text-neutral-500">The link may have expired. Please try signing in again.</p>
           <button
             onClick={() => navigate('/signin', { replace: true })}
             className="px-6 py-2 bg-black text-white rounded-full text-sm hover:bg-black/90 transition-colors"
@@ -66,8 +66,8 @@ export default function AuthCallback() {
   return (
     <div className="min-h-screen bg-white flex items-center justify-center">
       <div className="flex flex-col items-center gap-4">
-        <div className="w-10 h-10 border-2 border-gray-200 border-t-black rounded-full animate-spin" />
-        <p className="text-sm text-gray-500">Signing you in…</p>
+        <div className="w-10 h-10 border-2 border-neutral-200 border-t-black rounded-full animate-spin" />
+        <p className="text-sm text-neutral-500">Signing you in…</p>
       </div>
     </div>
   );

@@ -49,7 +49,7 @@ export default function ResetPassword() {
             </svg>
           </div>
           <h2 className="text-xl font-bold">Password updated</h2>
-          <p className="text-sm text-gray-500">Redirecting you to the app…</p>
+          <p className="text-sm text-neutral-500">Redirecting you to the app…</p>
         </div>
       </div>
     );
@@ -59,8 +59,8 @@ export default function ResetPassword() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-2 border-gray-200 border-t-black rounded-full animate-spin" />
-          <p className="text-sm text-gray-500">Verifying your reset link…</p>
+          <div className="w-10 h-10 border-2 border-neutral-200 border-t-black rounded-full animate-spin" />
+          <p className="text-sm text-neutral-500">Verifying your reset link…</p>
         </div>
       </div>
     );
@@ -71,7 +71,7 @@ export default function ResetPassword() {
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold tracking-tight mb-2">Gazua</h1>
-          <p className="text-gray-600">Choose a new password</p>
+          <p className="text-neutral-600">Choose a new password</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -85,7 +85,7 @@ export default function ResetPassword() {
               onChange={e => { setPassword(e.target.value); setError(null); }}
               required
               minLength={6}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-mint/50"
+              className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-mint/50"
             />
           </div>
 
@@ -98,7 +98,7 @@ export default function ResetPassword() {
               value={confirm}
               onChange={e => { setConfirm(e.target.value); setError(null); }}
               required
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-mint/50"
+              className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-mint/50"
             />
           </div>
 

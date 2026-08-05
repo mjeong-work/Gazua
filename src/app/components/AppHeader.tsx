@@ -93,7 +93,7 @@ export default function AppHeader() {
       </div>
 
       {/* Mobile top bar */}
-      <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 shrink-0">
+      <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-neutral-200 shrink-0">
         <h1
           onClick={() => navigate('/main')}
           className="text-xl font-bold tracking-tight cursor-pointer"
@@ -115,14 +115,14 @@ export default function AppHeader() {
           )}
           <button
             onClick={() => setShowSearch(true)}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-neutral-100 rounded-full transition-colors"
             aria-label="Search"
           >
             <SearchIcon sx={{ fontSize: 22 }} />
           </button>
           <button
             onClick={() => navigate('/notifications')}
-            className="relative p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="relative p-2 hover:bg-neutral-100 rounded-full transition-colors"
             aria-label="Notifications"
           >
             {active(['/notifications'])
@@ -136,7 +136,7 @@ export default function AppHeader() {
       </div>
 
       {/* Desktop header */}
-      <header className="hidden lg:block border-b border-gray-200 bg-white shrink-0">
+      <header className="hidden lg:block border-b border-neutral-200 bg-white shrink-0">
         <div className="px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <h1
@@ -160,7 +160,7 @@ export default function AppHeader() {
                     color: 'var(--icon-muted)',
                   }}
                 />
-                <div className="pl-10 pr-4 py-2 w-full border border-gray-200 rounded-full text-sm text-left text-gray-500 hover:border-gray-300 transition-colors cursor-pointer">
+                <div className="pl-10 pr-4 py-2 w-full border border-neutral-200 rounded-full text-sm text-left text-neutral-500 hover:border-neutral-300 transition-colors cursor-pointer">
                   Search
                 </div>
               </button>
@@ -205,7 +205,7 @@ export default function AppHeader() {
             )}
             <button
               onClick={() => navigate('/notifications')}
-              className={`relative p-2 -m-2 rounded-full hover:bg-gray-100 transition-colors ${active(['/notifications']) ? 'text-brand' : ''}`}
+              className={`relative p-2 -m-2 rounded-full hover:bg-neutral-100 transition-colors ${active(['/notifications']) ? 'text-brand' : ''}`}
               aria-label="Notifications"
             >
               {active(['/notifications'])
@@ -224,11 +224,11 @@ export default function AppHeader() {
       {/* Mobile bottom nav — Home, Creators, [+ Create], Messages, Profile. Account no longer
           lives here; its content moved to My Profile > Settings (gear icon), reached the same
           way as before but nested under Profile instead of being its own tab. */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30 pb-[env(safe-area-inset-bottom)]">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 z-30 pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-center justify-around h-16">
           <button
             onClick={() => navigate('/main')}
-            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/main', '/home']) ? 'text-brand' : 'text-gray-500'}`}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/main', '/home']) ? 'text-brand' : 'text-neutral-500'}`}
           >
             {active(['/main', '/home'])
               ? <HomeIcon sx={{ fontSize: 24 }} />
@@ -237,7 +237,7 @@ export default function AppHeader() {
           </button>
           <button
             onClick={() => navigate('/creators')}
-            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/creators', '/profile']) ? 'text-brand' : 'text-gray-500'}`}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/creators', '/profile']) ? 'text-brand' : 'text-neutral-500'}`}
           >
             {active(['/creators', '/profile'])
               ? <PeopleIcon sx={{ fontSize: 24 }} />
@@ -247,7 +247,7 @@ export default function AppHeader() {
 
           <button
             onClick={() => setShowCreateSheet(true)}
-            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${showCreateSheet || activeCreateModal ? 'text-brand' : 'text-gray-500'}`}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${showCreateSheet || activeCreateModal ? 'text-brand' : 'text-neutral-500'}`}
           >
             {showCreateSheet || activeCreateModal
               ? <AddCircleIcon sx={{ fontSize: 24 }} />
@@ -257,7 +257,7 @@ export default function AppHeader() {
 
           <button
             onClick={() => navigate('/messages')}
-            className={`relative flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/messages']) ? 'text-brand' : 'text-gray-500'}`}
+            className={`relative flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/messages']) ? 'text-brand' : 'text-neutral-500'}`}
           >
             {active(['/messages'])
               ? <ChatBubbleIcon sx={{ fontSize: 24 }} />
@@ -269,7 +269,7 @@ export default function AppHeader() {
           </button>
           <button
             onClick={() => navigate('/my-profile')}
-            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/my-profile']) ? 'text-brand' : 'text-gray-500'}`}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/my-profile']) ? 'text-brand' : 'text-neutral-500'}`}
           >
             {active(['/my-profile'])
               ? <PersonIcon sx={{ fontSize: 24 }} />
