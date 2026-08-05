@@ -219,7 +219,7 @@ export default function AppHeader() {
       {/* Mobile bottom nav — Home, Creators, [+ Create], Messages, Profile. Account no longer
           lives here; its content moved to My Profile > Settings (gear icon), reached the same
           way as before but nested under Profile instead of being its own tab. */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30 pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-center justify-around h-16">
           <button
             onClick={() => navigate('/main')}
