@@ -7,6 +7,7 @@ import { getVideosByCreator } from '../../lib/services/reels.service';
 import { updateProfile } from '../../lib/services/profiles.service';
 import { formatDurationSeconds, formatCount } from './reels/format';
 import UploadVideoModal from './UploadVideoModal';
+import { Button } from './ui/button';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ShareIcon from '@mui/icons-material/Share';
@@ -1404,14 +1405,16 @@ export default function MyProfilePage() {
               </div>
 
               <div className="flex items-center gap-2 mt-6">
-                <button
+                <Button
                   onClick={handleCreateSimulation}
                   disabled={!canCreate}
-                  className="flex-1 py-2.5 bg-black text-white text-sm font-medium rounded-full hover:bg-black/80 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  variant="pill"
+                  size="pill"
+                  className="flex-1 disabled:opacity-40"
                 >
                   Create Simulation
-                </button>
-                <button onClick={handleCloseNewSimForm} className="flex-1 py-2.5 border border-neutral-200 text-sm font-medium rounded-full hover:bg-neutral-50 transition-colors">Cancel</button>
+                </Button>
+                <Button onClick={handleCloseNewSimForm} variant="pillOutline" size="pill" className="flex-1">Cancel</Button>
               </div>
             </div>
           </Overlay>
@@ -1454,10 +1457,10 @@ export default function MyProfilePage() {
             </div>
             {profileSaveError && <p className="text-sm text-red-500 mt-3">{profileSaveError}</p>}
             <div className="flex items-center gap-2 mt-6">
-              <button onClick={handleSaveProfile} disabled={savingProfile} className="flex-1 py-2.5 bg-black text-white text-sm font-medium rounded-full hover:bg-black/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+              <Button onClick={handleSaveProfile} disabled={savingProfile} variant="pill" size="pill" className="flex-1 disabled:opacity-50">
                 {savingProfile ? 'Saving…' : 'Save Changes'}
-              </button>
-              <button onClick={() => setShowEditProfile(false)} className="flex-1 py-2.5 border border-neutral-200 text-sm font-medium rounded-full hover:bg-neutral-50 transition-colors">Cancel</button>
+              </Button>
+              <Button onClick={() => setShowEditProfile(false)} variant="pillOutline" size="pill" className="flex-1">Cancel</Button>
             </div>
           </div>
         </Overlay>

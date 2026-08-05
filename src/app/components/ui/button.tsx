@@ -19,12 +19,21 @@ const buttonVariants = cva(
         ghost:
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
+        // Gazua's own recurring CTA styles (Save/Publish/Upload buttons app-wide) — same
+        // rounded-full pill shape and colors the app already hand-rolled everywhere, just
+        // centralized here instead of copy-pasted per modal (see audit Issue 9).
+        pill: "bg-black text-white hover:bg-black/80 rounded-full",
+        pillOutline:
+          "border border-neutral-200 text-foreground hover:bg-neutral-50 rounded-full",
+        pillMint: "bg-mint text-black hover:bg-mint-hover rounded-full",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",
         sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
         lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
         icon: "size-9 rounded-md",
+        // Matches the app's modal Save/Cancel pill buttons (py-2.5, full width via className).
+        pill: "h-auto py-2.5 px-5 text-sm",
       },
     },
     defaultVariants: {

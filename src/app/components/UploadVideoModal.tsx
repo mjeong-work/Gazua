@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
+import { Button } from './ui/button';
 import { useAuth } from '../contexts/AuthContext';
 import { createVideo } from '../../lib/services/reels.service';
 import { BUCKETS, buildOwnerPath, uploadToBucket } from '../../lib/storage';
@@ -146,16 +147,18 @@ export default function UploadVideoModal({ onClose, onSuccess }: UploadVideoModa
         </div>
 
         <div className="flex items-center gap-2 mt-6">
-          <button
+          <Button
             onClick={handleUpload}
             disabled={!title.trim() || !file || uploading}
-            className="flex-1 py-2.5 bg-black text-white text-sm font-medium rounded-full hover:bg-black/80 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            variant="pill"
+            size="pill"
+            className="flex-1 disabled:opacity-40"
           >
             {uploading ? 'Uploading…' : 'Upload'}
-          </button>
-          <button onClick={onClose} className="flex-1 py-2.5 border border-neutral-200 text-sm font-medium rounded-full hover:bg-neutral-50 transition-colors">
+          </Button>
+          <Button onClick={onClose} variant="pillOutline" size="pill" className="flex-1">
             Cancel
-          </button>
+          </Button>
         </div>
       </div>
     </div>
