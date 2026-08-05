@@ -38,14 +38,14 @@ function CustomTooltip({ active, payload, label }: TooltipProps<number, string>)
     : label;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-3 shadow-lg text-xs">
-      <p className="font-semibold text-gray-700 mb-2">{dateStr}</p>
+    <div className="bg-white border border-neutral-200 rounded-xl p-3 shadow-lg text-xs">
+      <p className="font-semibold text-neutral-700 mb-2">{dateStr}</p>
       {payload.map(p => (
         <div key={p.dataKey} className="flex justify-between gap-4">
           <span style={{ color: p.color }}>
             {p.dataKey === 'hypothesisValue' ? 'Hypothesis' : 'Actual'}
           </span>
-          <span className="font-medium text-gray-800">
+          <span className="font-medium text-neutral-800">
             {formatCurrency(p.value as number)}
           </span>
         </div>
@@ -66,9 +66,9 @@ export default function PerformanceTrendChart({ chartData, timeRange, onTimeRang
   const interval = Math.max(1, Math.floor((chartData.length - 1) / (tickCount - 1)));
 
   return (
-    <div className="border border-gray-200 rounded-2xl p-5">
+    <div className="border border-neutral-200 rounded-2xl p-5">
       <div className="flex items-center justify-between mb-5">
-        <h3 className="font-semibold text-gray-900">Performance Trend</h3>
+        <h3 className="font-semibold text-neutral-900">Performance Trend</h3>
         <div className="flex gap-1">
           {TIME_RANGES.map(r => (
             <button
@@ -76,8 +76,8 @@ export default function PerformanceTrendChart({ chartData, timeRange, onTimeRang
               onClick={() => onTimeRangeChange(r)}
               className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
                 timeRange === r
-                  ? 'bg-gray-900 text-white'
-                  : 'text-gray-500 hover:bg-gray-100'
+                  ? 'bg-neutral-900 text-white'
+                  : 'text-neutral-500 hover:bg-neutral-100'
               }`}
             >
               {r}
@@ -129,7 +129,7 @@ export default function PerformanceTrendChart({ chartData, timeRange, onTimeRang
       </div>
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-6 mt-4 text-xs text-gray-500">
+      <div className="flex items-center justify-center gap-6 mt-4 text-xs text-neutral-500">
         <div className="flex items-center gap-2">
           <svg width="24" height="8">
             <line

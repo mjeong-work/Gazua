@@ -423,7 +423,7 @@ export default function MyProfilePage() {
 
         <div className="flex-1 overflow-y-auto">
           <div className="max-w-5xl mx-auto px-6 pt-6">
-            <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-gray-600 hover:text-black transition-colors">
+            <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-neutral-600 hover:text-black transition-colors">
               <ArrowBackIcon sx={{ fontSize: 16 }} />
               Back
             </button>
@@ -454,23 +454,23 @@ export default function MyProfilePage() {
                         </svg>
                       )}
                     </div>
-                    <p className="text-gray-500 text-sm mb-3">{displayHandle}</p>
+                    <p className="text-neutral-500 text-sm mb-3">{displayHandle}</p>
                     <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm">
-                      <div className="whitespace-nowrap"><span className="font-bold">127K</span><span className="text-gray-500 ml-1">followers</span></div>
-                      <div className="whitespace-nowrap"><span className="font-bold">342</span><span className="text-gray-500 ml-1">following</span></div>
-                      <div className="whitespace-nowrap"><span className="font-bold">{posts.filter(p => !p.draft).length + videos.length}</span><span className="text-gray-500 ml-1">posts</span></div>
+                      <div className="whitespace-nowrap"><span className="font-bold">127K</span><span className="text-neutral-500 ml-1">followers</span></div>
+                      <div className="whitespace-nowrap"><span className="font-bold">342</span><span className="text-neutral-500 ml-1">following</span></div>
+                      <div className="whitespace-nowrap"><span className="font-bold">{posts.filter(p => !p.draft).length + videos.length}</span><span className="text-neutral-500 ml-1">posts</span></div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <button
                       onClick={handleShare}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${shareCopied ? 'bg-brand/10 text-brand' : 'hover:bg-gray-100 text-gray-500'}`}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${shareCopied ? 'bg-brand/10 text-brand' : 'hover:bg-neutral-100 text-neutral-500'}`}
                       title="Share profile"
                     >
                       {shareCopied ? <CheckIcon sx={{ fontSize: 15 }} /> : <ShareIcon sx={{ fontSize: 15 }} />}
                       {shareCopied ? 'Copied!' : 'Share'}
                     </button>
-                    <button onClick={() => navigate('/my-profile/settings')} className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0" title="Settings">
+                    <button onClick={() => navigate('/my-profile/settings')} className="p-2 hover:bg-neutral-100 rounded-full transition-colors flex-shrink-0" title="Settings">
                       <SettingsIcon sx={{ fontSize: 20, color: '#6b7280' }} />
                     </button>
                   </div>
@@ -479,23 +479,23 @@ export default function MyProfilePage() {
             </div>
 
             {/* Bio */}
-            <p className="text-sm leading-relaxed text-gray-600 mb-4 max-w-2xl">
-              {bioText || <span className="text-gray-400 italic">Tell people about yourself</span>}
-              <span className="text-gray-400"> · Not financial advice.</span>
+            <p className="text-sm leading-relaxed text-neutral-600 mb-4 max-w-2xl">
+              {bioText || <span className="text-neutral-400 italic">Tell people about yourself</span>}
+              <span className="text-neutral-400"> · Not financial advice.</span>
             </p>
 
             {/* Private Stats Bar */}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-5 p-3 bg-gray-50 rounded-xl border border-gray-200">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-5 p-3 bg-neutral-50 rounded-xl border border-neutral-200">
               <div className="flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-brand flex-shrink-0" />
-                <span className="text-xs text-gray-500 whitespace-nowrap">Visible to you only</span>
+                <span className="text-xs text-neutral-500 whitespace-nowrap">Visible to you only</span>
               </div>
-              <div className="h-3 w-px bg-gray-300 hidden sm:block" />
+              <div className="h-3 w-px bg-neutral-300 hidden sm:block" />
               <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs">
-                <div className="whitespace-nowrap"><span className="font-semibold text-black">$2,340</span><span className="text-gray-500 ml-1">earned this month</span></div>
-                <div className="whitespace-nowrap"><span className="font-semibold text-black">1.2K</span><span className="text-gray-500 ml-1">subscribers</span></div>
-                <div className="whitespace-nowrap"><span className="font-semibold text-black">8,432</span><span className="text-gray-500 ml-1">profile views</span></div>
-                <div className="whitespace-nowrap"><span className="font-semibold text-black">4.8%</span><span className="text-gray-500 ml-1">engagement rate</span></div>
+                <div className="whitespace-nowrap"><span className="font-semibold text-black">$2,340</span><span className="text-neutral-500 ml-1">earned this month</span></div>
+                <div className="whitespace-nowrap"><span className="font-semibold text-black">1.2K</span><span className="text-neutral-500 ml-1">subscribers</span></div>
+                <div className="whitespace-nowrap"><span className="font-semibold text-black">8,432</span><span className="text-neutral-500 ml-1">profile views</span></div>
+                <div className="whitespace-nowrap"><span className="font-semibold text-black">4.8%</span><span className="text-neutral-500 ml-1">engagement rate</span></div>
               </div>
             </div>
 
@@ -517,13 +517,13 @@ export default function MyProfilePage() {
             </div>
 
             {/* Tabs */}
-            <div className="border-b border-gray-200 mb-8">
+            <div className="border-b border-neutral-200 mb-8">
               <div className="flex gap-8 overflow-x-auto no-scrollbar">
                 {(['investment', 'videos', 'posts', 'saved', 'watching', 'about', 'analytics'] as Tab[]).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
-                    className={`flex-shrink-0 whitespace-nowrap pb-3 px-1 font-medium text-sm border-b-2 transition-colors capitalize ${activeTab === tab ? 'border-black text-black' : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                    className={`flex-shrink-0 whitespace-nowrap pb-3 px-1 font-medium text-sm border-b-2 transition-colors capitalize ${activeTab === tab ? 'border-black text-black' : 'border-transparent text-neutral-400 hover:text-neutral-600'}`}
                   >
                     {tab}
                   </button>
@@ -536,15 +536,15 @@ export default function MyProfilePage() {
               <div className="space-y-4">
 
                 {/* Simulator Toggle */}
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg border border-neutral-200">
                   <div>
                     <h3 className="font-medium text-sm mb-0.5">Portfolio Simulator</h3>
-                    <p className="text-xs text-gray-500">Test hypothetical investment scenarios</p>
+                    <p className="text-xs text-neutral-500">Test hypothetical investment scenarios</p>
                   </div>
                   {ACTUAL_PORTFOLIO_ENABLED && (
                     <button
                       onClick={() => setSimulatorMode(!simulatorMode)}
-                      className={`relative w-11 h-6 rounded-full transition-colors ${simulatorMode ? 'bg-brand' : 'bg-gray-300'}`}
+                      className={`relative w-11 h-6 rounded-full transition-colors ${simulatorMode ? 'bg-brand' : 'bg-neutral-300'}`}
                     >
                       <div className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform ${simulatorMode ? 'translate-x-5' : 'translate-x-0'}`} />
                     </button>
@@ -562,7 +562,7 @@ export default function MyProfilePage() {
                             key={sim.id}
                             onClick={() => { setSelectedSimulationId(sim.id); setSimulationExpanded(false); }}
                             className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
-                              sim.id === selectedSimulationId ? 'bg-black text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                              sim.id === selectedSimulationId ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
                             }`}
                           >
                             {sim.name}
@@ -579,55 +579,55 @@ export default function MyProfilePage() {
                     </div>
 
                     {/* Simulation Setup */}
-                    <div onClick={() => setSimulationExpanded(!simulationExpanded)} className="p-4 bg-white rounded-lg border border-gray-200 cursor-pointer hover:border-gray-300 transition-colors">
+                    <div onClick={() => setSimulationExpanded(!simulationExpanded)} className="p-4 bg-white rounded-lg border border-neutral-200 cursor-pointer hover:border-neutral-300 transition-colors">
                       <div className="flex items-center justify-between mb-3">
                         <h2 className="text-base font-semibold">{selectedSimulation.name}</h2>
-                        <svg className={`w-4 h-4 text-gray-500 transition-transform flex-shrink-0 ${simulationExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className={`w-4 h-4 text-neutral-500 transition-transform flex-shrink-0 ${simulationExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
                       </div>
                       {!simulationExpanded ? (
                         <div className="space-y-1">
-                          <p className="text-xs text-gray-600"><span className="font-medium">Period:</span> {selectedSimulation.startDate}{selectedSimulation.endDate ? ` – ${selectedSimulation.endDate}` : ' – Present'}</p>
-                          <p className="text-xs text-gray-600">
+                          <p className="text-xs text-neutral-600"><span className="font-medium">Period:</span> {selectedSimulation.startDate}{selectedSimulation.endDate ? ` – ${selectedSimulation.endDate}` : ' – Present'}</p>
+                          <p className="text-xs text-neutral-600">
                             <span className="font-medium">Holdings:</span>{' '}
                             {selectedSimulation.holdings.length > 0
                               ? `${selectedSimulation.holdings.length} stock${selectedSimulation.holdings.length > 1 ? 's' : ''} (${selectedSimulation.holdings.map(h => h.symbol).join(', ')}) + Cash`
                               : 'All cash'}
                           </p>
-                          <p className="text-xs text-gray-600"><span className="font-medium">Capital:</span> ${selectedSimulation.capital.toLocaleString()}</p>
+                          <p className="text-xs text-neutral-600"><span className="font-medium">Capital:</span> ${selectedSimulation.capital.toLocaleString()}</p>
                         </div>
                       ) : (
                         <div className="space-y-3">
                           <div className="grid grid-cols-2 gap-3">
                             <div>
-                              <label className="block text-xs font-medium text-gray-600 mb-1.5">Start Date</label>
-                              <div className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded text-xs">{selectedSimulation.startDate}</div>
+                              <label className="block text-xs font-medium text-neutral-600 mb-1.5">Start Date</label>
+                              <div className="px-3 py-1.5 bg-neutral-50 border border-neutral-200 rounded text-xs">{selectedSimulation.startDate}</div>
                             </div>
                             <div>
-                              <label className="block text-xs font-medium text-gray-600 mb-1.5">Initial Capital</label>
-                              <div className="px-3 py-1.5 bg-gray-50 border border-gray-200 rounded text-xs">${selectedSimulation.capital.toLocaleString()}</div>
+                              <label className="block text-xs font-medium text-neutral-600 mb-1.5">Initial Capital</label>
+                              <div className="px-3 py-1.5 bg-neutral-50 border border-neutral-200 rounded text-xs">${selectedSimulation.capital.toLocaleString()}</div>
                             </div>
                           </div>
                           <div>
-                            <label className="block text-xs font-medium text-gray-600 mb-1.5">Hypothetical Holdings</label>
+                            <label className="block text-xs font-medium text-neutral-600 mb-1.5">Hypothetical Holdings</label>
                             <div className="space-y-1.5">
                               {selectedSimulation.holdings.map(h => (
-                                <div key={h.symbol} className="px-3 py-2 bg-gray-50 border border-gray-200 rounded text-xs flex items-center justify-between">
-                                  <span>{h.symbol}</span><span className="text-gray-500">${h.amount.toLocaleString()}</span>
+                                <div key={h.symbol} className="px-3 py-2 bg-neutral-50 border border-neutral-200 rounded text-xs flex items-center justify-between">
+                                  <span>{h.symbol}</span><span className="text-neutral-500">${h.amount.toLocaleString()}</span>
                                 </div>
                               ))}
                               {selectedSimCash > 0 && (
-                                <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded text-xs flex items-center justify-between">
-                                  <span>Cash</span><span className="text-gray-500">${selectedSimCash.toLocaleString()}</span>
+                                <div className="px-3 py-2 bg-neutral-50 border border-neutral-200 rounded text-xs flex items-center justify-between">
+                                  <span>Cash</span><span className="text-neutral-500">${selectedSimCash.toLocaleString()}</span>
                                 </div>
                               )}
                             </div>
                           </div>
                           {selectedSimulation.rationale && (
                             <div>
-                              <label className="block text-xs font-medium text-gray-600 mb-1.5">Rationale</label>
-                              <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded text-xs text-gray-600">{selectedSimulation.rationale}</div>
+                              <label className="block text-xs font-medium text-neutral-600 mb-1.5">Rationale</label>
+                              <div className="px-3 py-2 bg-neutral-50 border border-neutral-200 rounded text-xs text-neutral-600">{selectedSimulation.rationale}</div>
                             </div>
                           )}
                         </div>
@@ -638,30 +638,30 @@ export default function MyProfilePage() {
                     <div>
                       <h2 className="text-base font-semibold mb-3">Hypothesis vs Actual Performance</h2>
                       {!hasSimPerformance ? (
-                        <div className="p-6 bg-gray-50 rounded-lg border border-gray-200 text-center">
-                          <p className="text-sm font-medium text-gray-700 mb-1">This simulation just started</p>
-                          <p className="text-xs text-gray-500">Performance data will appear here once enough time has passed to compare your hypothesis against the market.</p>
+                        <div className="p-6 bg-neutral-50 rounded-lg border border-neutral-200 text-center">
+                          <p className="text-sm font-medium text-neutral-700 mb-1">This simulation just started</p>
+                          <p className="text-xs text-neutral-500">Performance data will appear here once enough time has passed to compare your hypothesis against the market.</p>
                         </div>
                       ) : (
                         <>
                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
                             <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
-                              <p className="text-xs text-gray-600 mb-1">Your Hypothesis</p>
+                              <p className="text-xs text-neutral-600 mb-1">Your Hypothesis</p>
                               <p className="text-xl font-bold text-purple-700 mb-0.5">{selectedSimulation.hypothesisPercent! >= 0 ? '+' : ''}{selectedSimulation.hypothesisPercent!.toFixed(1)}%</p>
-                              <p className="text-xs text-gray-500">${simHypothesisValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+                              <p className="text-xs text-neutral-500">${simHypothesisValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
                             </div>
                             <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                              <p className="text-xs text-gray-600 mb-1">Actual Performance</p>
+                              <p className="text-xs text-neutral-600 mb-1">Actual Performance</p>
                               <p className="text-xl font-bold text-brand mb-0.5">{selectedSimulation.actualPercent! >= 0 ? '+' : ''}{selectedSimulation.actualPercent!.toFixed(1)}%</p>
-                              <p className="text-xs text-gray-500">${simActualValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+                              <p className="text-xs text-neutral-500">${simActualValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
                             </div>
                             <div className={`p-3 rounded-lg border ${simDiffPercent >= 0 ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
-                              <p className="text-xs text-gray-600 mb-1">Difference</p>
+                              <p className="text-xs text-neutral-600 mb-1">Difference</p>
                               <p className={`text-xl font-bold mb-0.5 ${simDiffPercent >= 0 ? 'text-brand' : 'text-red-700'}`}>{simDiffPercent >= 0 ? '+' : ''}{simDiffPercent.toFixed(1)}%</p>
-                              <p className="text-xs text-gray-500">{simDiffValue >= 0 ? '+' : '-'}${Math.abs(simDiffValue).toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+                              <p className="text-xs text-neutral-500">{simDiffValue >= 0 ? '+' : '-'}${Math.abs(simDiffValue).toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
                             </div>
                           </div>
-                          <div className="bg-gray-50 rounded-lg p-4">
+                          <div className="bg-neutral-50 rounded-lg p-4">
                             <div className="h-48 w-full">
                               <ResponsiveContainer width="100%" height={192}>
                                 <LineChart key="sim-chart">
@@ -683,31 +683,31 @@ export default function MyProfilePage() {
                     </div>
 
                     {/* Past Simulations */}
-                    <button onClick={() => setShowSimulationList(!showSimulationList)} className="w-full p-3 bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-gray-600">
+                    <button onClick={() => setShowSimulationList(!showSimulationList)} className="w-full p-3 bg-white rounded-lg border border-neutral-200 hover:border-neutral-300 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-neutral-600">
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
                       {showSimulationList ? 'Hide Past Simulations' : 'View Past Simulations'}
                     </button>
 
                     {showSimulationList && (
-                      <div className="p-4 bg-white rounded-lg border border-gray-200 space-y-2.5">
+                      <div className="p-4 bg-white rounded-lg border border-neutral-200 space-y-2.5">
                         <h3 className="font-semibold text-sm mb-3">Past Simulations</h3>
                         {[
                           { name: 'Tech Growth Portfolio', date: 'Dec 1, 2025 – Mar 1, 2026', holdings: '3 Holdings', capital: '$75,000', hypo: '+22.0%', actual: '+18.5%', diff: '-3.5%', diffPos: false },
                           { name: 'Conservative Value Play', date: 'Sep 1, 2025 – Dec 1, 2025', holdings: '4 Holdings', capital: '$100,000', hypo: '+8.0%', actual: '+11.2%', diff: '+3.2%', diffPos: true },
                           { name: 'Crypto Diversification Test', date: 'Jun 1, 2025 – Sep 1, 2025', holdings: '5 Holdings', capital: '$25,000', hypo: '+35.0%', actual: '-5.2%', diff: '-40.2%', diffPos: false },
                         ].map((sim) => (
-                          <div key={sim.name} className="p-3 bg-gray-50 rounded border border-gray-200 hover:border-gray-300 transition-colors cursor-pointer">
+                          <div key={sim.name} className="p-3 bg-neutral-50 rounded border border-neutral-200 hover:border-neutral-300 transition-colors cursor-pointer">
                             <div className="flex items-center justify-between mb-1.5">
                               <h4 className="font-medium text-sm">{sim.name}</h4>
-                              <span className="text-xs text-gray-500">{sim.date}</span>
+                              <span className="text-xs text-neutral-500">{sim.date}</span>
                             </div>
-                            <div className="flex items-center gap-3 text-xs text-gray-600 mb-1.5">
+                            <div className="flex items-center gap-3 text-xs text-neutral-600 mb-1.5">
                               <span>{sim.holdings}</span><span>·</span><span>{sim.capital}</span>
                             </div>
                             <div className="flex items-center gap-3 text-xs">
-                              <div className="flex items-center gap-1.5"><span className="text-gray-500">Hypothesis:</span><span className="font-medium text-purple-700">{sim.hypo}</span></div>
-                              <div className="flex items-center gap-1.5"><span className="text-gray-500">Actual:</span><span className={`font-medium ${sim.diffPos ? 'text-brand' : 'text-red-700'}`}>{sim.actual}</span></div>
-                              <div className="flex items-center gap-1.5"><span className="text-gray-500">Diff:</span><span className={`font-medium ${sim.diffPos ? 'text-brand' : 'text-red-700'}`}>{sim.diff}</span></div>
+                              <div className="flex items-center gap-1.5"><span className="text-neutral-500">Hypothesis:</span><span className="font-medium text-purple-700">{sim.hypo}</span></div>
+                              <div className="flex items-center gap-1.5"><span className="text-neutral-500">Actual:</span><span className={`font-medium ${sim.diffPos ? 'text-brand' : 'text-red-700'}`}>{sim.actual}</span></div>
+                              <div className="flex items-center gap-1.5"><span className="text-neutral-500">Diff:</span><span className={`font-medium ${sim.diffPos ? 'text-brand' : 'text-red-700'}`}>{sim.diff}</span></div>
                             </div>
                           </div>
                         ))}
@@ -722,7 +722,7 @@ export default function MyProfilePage() {
                         <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         Actual Portfolio
                       </span>
-                      <span className="text-xs text-gray-400">Real positions · Updated daily</span>
+                      <span className="text-xs text-neutral-400">Real positions · Updated daily</span>
                     </div>
 
                     <div>
@@ -730,7 +730,7 @@ export default function MyProfilePage() {
                         <h2 className="text-base font-semibold">Performance Chart</h2>
                         <p className="text-base font-medium text-brand">+2.66%</p>
                       </div>
-                      <div className="bg-gray-50 rounded-xl p-4">
+                      <div className="bg-neutral-50 rounded-xl p-4">
                         <div className="h-48 w-full">
                           <ResponsiveContainer width="100%" height={192}>
                             <LineChart data={portfolioData} key="my-profile-line-chart">
@@ -743,7 +743,7 @@ export default function MyProfilePage() {
                         </div>
                         <div className="flex items-center justify-center gap-3 mt-3 text-xs font-medium">
                           {(['1W', '1M', '3M', '1Y', 'ALL'] as const).map((r) => (
-                            <button key={r} onClick={() => setTimeRange(r)} className={`px-2.5 py-1 rounded transition-colors ${timeRange === r ? 'bg-white shadow-sm text-black' : 'text-gray-500 hover:bg-white hover:text-black'}`}>{r}</button>
+                            <button key={r} onClick={() => setTimeRange(r)} className={`px-2.5 py-1 rounded transition-colors ${timeRange === r ? 'bg-white shadow-sm text-black' : 'text-neutral-500 hover:bg-white hover:text-black'}`}>{r}</button>
                           ))}
                         </div>
                       </div>
@@ -783,7 +783,7 @@ export default function MyProfilePage() {
             {activeTab === 'videos' && (
               <div>
                 <div className="flex items-center justify-between mb-5">
-                  <h2 className="text-base font-semibold">Your Videos <span className="text-gray-400 font-normal text-sm ml-1">({videos.length})</span></h2>
+                  <h2 className="text-base font-semibold">Your Videos <span className="text-neutral-400 font-normal text-sm ml-1">({videos.length})</span></h2>
                   <button onClick={() => setShowUploadModal(true)} className="flex items-center gap-1.5 px-4 py-2 bg-black text-white text-sm font-medium rounded-full hover:bg-black/80 transition-colors">
                     <AddIcon sx={{ fontSize: 16 }} />
                     Upload Video
@@ -798,7 +798,7 @@ export default function MyProfilePage() {
                           <p className="text-sm font-medium text-red-700 text-center">Delete "{video.title}"?</p>
                           <div className="flex items-center gap-2">
                             <button onClick={() => handleConfirmDeleteVideo(video.id)} className="px-4 py-1.5 bg-red-600 text-white text-xs font-medium rounded-full hover:bg-red-700 transition-colors">Delete</button>
-                            <button onClick={() => setDeleteVideoId(null)} className="px-4 py-1.5 border border-gray-300 text-xs font-medium rounded-full hover:bg-gray-50 transition-colors">Cancel</button>
+                            <button onClick={() => setDeleteVideoId(null)} className="px-4 py-1.5 border border-neutral-300 text-xs font-medium rounded-full hover:bg-neutral-50 transition-colors">Cancel</button>
                           </div>
                         </div>
                       ) : (
@@ -827,20 +827,20 @@ export default function MyProfilePage() {
                             value={editingVideoTitle}
                             onChange={e => setEditingVideoTitle(e.target.value)}
                             onKeyDown={e => { if (e.key === 'Enter') handleSaveVideoTitle(video.id); if (e.key === 'Escape') setEditingVideoId(null); }}
-                            className="flex-1 text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:border-black"
+                            className="flex-1 text-sm border border-neutral-300 rounded px-2 py-1 focus:outline-none focus:border-black"
                           />
                           <button onClick={() => handleSaveVideoTitle(video.id)} className="p-1 text-brand hover:bg-green-50 rounded transition-colors"><CheckIcon sx={{ fontSize: 16 }} /></button>
-                          <button onClick={() => setEditingVideoId(null)} className="p-1 text-gray-400 hover:bg-gray-100 rounded transition-colors"><CloseIcon sx={{ fontSize: 16 }} /></button>
+                          <button onClick={() => setEditingVideoId(null)} className="p-1 text-neutral-400 hover:bg-neutral-100 rounded transition-colors"><CloseIcon sx={{ fontSize: 16 }} /></button>
                         </div>
                       ) : (
                         <h3 className="font-medium text-sm mb-1 line-clamp-2 leading-snug">{video.title}</h3>
                       )}
-                      <p className="text-xs text-gray-400">{video.views} views · {video.uploadedAt}</p>
+                      <p className="text-xs text-neutral-400">{video.views} views · {video.uploadedAt}</p>
 
                       {/* Analytics panel */}
                       {analyticsVideoId === video.id && (
-                        <div className="mt-3 p-3 bg-gray-50 rounded-xl border border-gray-200">
-                          <p className="text-xs font-semibold mb-2 text-gray-700">7-day views</p>
+                        <div className="mt-3 p-3 bg-neutral-50 rounded-xl border border-neutral-200">
+                          <p className="text-xs font-semibold mb-2 text-neutral-700">7-day views</p>
                           <div className="h-20">
                             <ResponsiveContainer width="100%" height="100%">
                               <BarChart data={ANALYTICS_DATA} barSize={12} key={`analytics-bar-${video.id}`}>
@@ -851,7 +851,7 @@ export default function MyProfilePage() {
                               </BarChart>
                             </ResponsiveContainer>
                           </div>
-                          <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
+                          <div className="flex items-center justify-between mt-2 text-xs text-neutral-500">
                             <span>Avg watch time: <strong className="text-black">7:42</strong></span>
                             <span>CTR: <strong className="text-black">4.2%</strong></span>
                           </div>
@@ -867,7 +867,7 @@ export default function MyProfilePage() {
             {activeTab === 'posts' && (
               <div>
                 <div className="flex items-center justify-between mb-5">
-                  <h2 className="text-base font-semibold">Your Posts <span className="text-gray-400 font-normal text-sm ml-1">({posts.filter(p => !p.draft).length} published · {posts.filter(p => p.draft).length} drafts)</span></h2>
+                  <h2 className="text-base font-semibold">Your Posts <span className="text-neutral-400 font-normal text-sm ml-1">({posts.filter(p => !p.draft).length} published · {posts.filter(p => p.draft).length} drafts)</span></h2>
                   <button onClick={handleOpenComposer} className="flex items-center gap-1.5 px-4 py-2 bg-black text-white text-sm font-medium rounded-full hover:bg-black/80 transition-colors">
                     <AddIcon sx={{ fontSize: 16 }} />
                     New Post
@@ -875,14 +875,14 @@ export default function MyProfilePage() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {posts.map((post) => (
-                    <div key={post.id} className={`bg-white border rounded-xl flex flex-col transition-colors ${post.draft ? 'border-dashed border-gray-300 bg-gray-50/50' : 'border-gray-200 hover:border-gray-300'}`}>
+                    <div key={post.id} className={`bg-white border rounded-xl flex flex-col transition-colors ${post.draft ? 'border-dashed border-neutral-300 bg-neutral-50/50' : 'border-neutral-200 hover:border-neutral-300'}`}>
                       {/* Delete confirmation */}
                       {deletePostId === post.id ? (
                         <div className="flex-1 flex flex-col items-center justify-center gap-3 p-6">
                           <p className="text-sm font-medium text-red-700 text-center">Delete this post?</p>
                           <div className="flex items-center gap-2">
                             <button onClick={() => handleConfirmDeletePost(post.id)} className="px-4 py-1.5 bg-red-600 text-white text-xs font-medium rounded-full hover:bg-red-700 transition-colors">Delete</button>
-                            <button onClick={() => setDeletePostId(null)} className="px-4 py-1.5 border border-gray-300 text-xs font-medium rounded-full hover:bg-gray-50 transition-colors">Cancel</button>
+                            <button onClick={() => setDeletePostId(null)} className="px-4 py-1.5 border border-neutral-300 text-xs font-medium rounded-full hover:bg-neutral-50 transition-colors">Cancel</button>
                           </div>
                         </div>
                       ) : (
@@ -894,27 +894,27 @@ export default function MyProfilePage() {
                                 <span className="font-semibold text-sm">{displayName}</span>
                                 {!post.draft && <svg className="w-3.5 h-3.5 text-brand" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
                               </div>
-                              <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                              <div className="flex items-center gap-1.5 text-xs text-neutral-400">
                                 <span>{displayHandle}</span><span>·</span>
                                 <span className={post.draft ? 'text-amber-500 font-medium' : ''}>{post.time}</span>
                               </div>
                             </div>
                             <div className="flex items-center gap-1 flex-shrink-0">
                               {post.draft && <span className="text-xs font-medium px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full">Draft</span>}
-                              <span className="text-xs font-medium px-2 py-1 bg-gray-100 rounded-full text-gray-500">{post.tag}</span>
+                              <span className="text-xs font-medium px-2 py-1 bg-neutral-100 rounded-full text-neutral-500">{post.tag}</span>
                             </div>
                           </div>
 
-                          <p className="text-sm text-gray-800 leading-relaxed flex-1 mb-3">{post.content}</p>
+                          <p className="text-sm text-neutral-800 leading-relaxed flex-1 mb-3">{post.content}</p>
 
-                          <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto">
+                          <div className="flex items-center justify-between pt-3 border-t border-neutral-100 mt-auto">
                             {post.draft ? (
                               <div className="flex items-center gap-2">
                                 <button onClick={() => handlePublishDraft(post.id)} className="text-xs font-medium px-3 py-1.5 bg-black text-white rounded-full hover:bg-black/80 transition-colors">Publish</button>
-                                <button onClick={() => handleOpenEditPost(post)} className="text-xs font-medium px-3 py-1.5 border border-gray-200 rounded-full hover:bg-gray-50 transition-colors">Edit</button>
+                                <button onClick={() => handleOpenEditPost(post)} className="text-xs font-medium px-3 py-1.5 border border-neutral-200 rounded-full hover:bg-neutral-50 transition-colors">Edit</button>
                               </div>
                             ) : (
-                              <div className="flex items-center gap-4 text-xs text-gray-400">
+                              <div className="flex items-center gap-4 text-xs text-neutral-400">
                                 <span className="flex items-center gap-1">
                                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
                                   {post.likes.toLocaleString()}
@@ -930,7 +930,7 @@ export default function MyProfilePage() {
                               </div>
                             )}
                             <div className="flex items-center gap-1">
-                              <button onClick={() => handleOpenEditPost(post)} className="icon-tap-target p-1.5 hover:bg-gray-100 rounded-full transition-colors" title="Edit">
+                              <button onClick={() => handleOpenEditPost(post)} className="icon-tap-target p-1.5 hover:bg-neutral-100 rounded-full transition-colors" title="Edit">
                                 <EditIcon sx={{ fontSize: 14, color: 'var(--icon-muted)' }} />
                               </button>
                               <button onClick={() => setDeletePostId(post.id)} className="icon-tap-target p-1.5 hover:bg-red-50 rounded-full transition-colors" title="Delete">
@@ -949,12 +949,12 @@ export default function MyProfilePage() {
             {/* ── SAVED TAB ── */}
             {activeTab === 'saved' && (
               <div>
-                <h2 className="text-base font-semibold mb-5">Saved <span className="text-gray-400 font-normal text-sm ml-1">({savedItems.length})</span></h2>
+                <h2 className="text-base font-semibold mb-5">Saved <span className="text-neutral-400 font-normal text-sm ml-1">({savedItems.length})</span></h2>
                 {savedItems.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-20 text-center">
                     <BookmarkIcon sx={{ fontSize: 40, color: '#d1d5db' }} className="mb-3" />
-                    <p className="text-sm font-medium text-gray-700 mb-1">No saved Reels yet.</p>
-                    <p className="text-xs text-gray-500">Tap the bookmark icon on a Reel to save it here.</p>
+                    <p className="text-sm font-medium text-neutral-700 mb-1">No saved Reels yet.</p>
+                    <p className="text-xs text-neutral-500">Tap the bookmark icon on a Reel to save it here.</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
@@ -979,7 +979,7 @@ export default function MyProfilePage() {
                           </div>
                         </div>
                         <h3 className="font-medium text-sm mb-1 line-clamp-2 leading-snug">{item.title}</h3>
-                        <p className="text-xs text-gray-400">{item.creatorName}{item.meta ? ` · ${item.meta}` : ''}</p>
+                        <p className="text-xs text-neutral-400">{item.creatorName}{item.meta ? ` · ${item.meta}` : ''}</p>
                       </div>
                     ))}
                   </div>
@@ -996,32 +996,32 @@ export default function MyProfilePage() {
                 <div className="sm:col-span-2 space-y-5">
                   {/* Bio — editing lives in the Edit Profile modal (single source of truth
                       for profile.bio) rather than a second inline editor here. */}
-                  <div className="p-5 bg-white border border-gray-200 rounded-xl">
+                  <div className="p-5 bg-white border border-neutral-200 rounded-xl">
                     <div className="flex items-center justify-between mb-3">
                       <h2 className="text-base font-semibold">About</h2>
                       <button
                         onClick={() => { setEditName(displayName); setEditHandle(displayHandle); setEditBio(bioText); setProfileSaveError(null); setShowEditProfile(true); }}
-                        className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-black transition-colors"
+                        className="flex items-center gap-1.5 text-xs font-medium text-neutral-500 hover:text-black transition-colors"
                       >
                         <EditIcon sx={{ fontSize: 13 }} />Edit
                       </button>
                     </div>
-                    <p className="text-sm text-gray-700 leading-relaxed">
-                      {bioText || <span className="text-gray-400 italic">Tell people about yourself</span>}
+                    <p className="text-sm text-neutral-700 leading-relaxed">
+                      {bioText || <span className="text-neutral-400 italic">Tell people about yourself</span>}
                     </p>
                   </div>
 
                   {/* Experience */}
-                  <div className="p-5 bg-white border border-gray-200 rounded-xl">
+                  <div className="p-5 bg-white border border-neutral-200 rounded-xl">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="text-base font-semibold">Experience</h3>
                       {isEditingExperience ? (
                         <div className="flex items-center gap-2">
                           <button onClick={handleSaveExperience} className="text-xs font-medium px-3 py-1.5 bg-black text-white rounded-full hover:bg-black/80 transition-colors">Save</button>
-                          <button onClick={() => setIsEditingExperience(false)} className="text-xs font-medium px-3 py-1.5 border border-gray-200 rounded-full hover:bg-gray-50 transition-colors">Cancel</button>
+                          <button onClick={() => setIsEditingExperience(false)} className="text-xs font-medium px-3 py-1.5 border border-neutral-200 rounded-full hover:bg-neutral-50 transition-colors">Cancel</button>
                         </div>
                       ) : (
-                        <button onClick={handleStartEditExperience} className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-black transition-colors">
+                        <button onClick={handleStartEditExperience} className="flex items-center gap-1.5 text-xs font-medium text-neutral-500 hover:text-black transition-colors">
                           <EditIcon sx={{ fontSize: 13 }} />Edit
                         </button>
                       )}
@@ -1031,17 +1031,17 @@ export default function MyProfilePage() {
                         <div key={i} className={`${isEditingExperience ? 'grid grid-cols-3 gap-2' : 'flex items-start justify-between'}`}>
                           {isEditingExperience ? (
                             <>
-                              <input value={item.role} onChange={e => { const ex = [...editExperience]; ex[i] = { ...ex[i], role: e.target.value }; setEditExperience(ex); }} className="text-sm border border-gray-200 rounded px-2 py-1 focus:outline-none focus:border-black" placeholder="Role" />
-                              <input value={item.org} onChange={e => { const ex = [...editExperience]; ex[i] = { ...ex[i], org: e.target.value }; setEditExperience(ex); }} className="text-sm border border-gray-200 rounded px-2 py-1 focus:outline-none focus:border-black" placeholder="Organization" />
-                              <input value={item.years} onChange={e => { const ex = [...editExperience]; ex[i] = { ...ex[i], years: e.target.value }; setEditExperience(ex); }} className="text-sm border border-gray-200 rounded px-2 py-1 focus:outline-none focus:border-black" placeholder="Years" />
+                              <input value={item.role} onChange={e => { const ex = [...editExperience]; ex[i] = { ...ex[i], role: e.target.value }; setEditExperience(ex); }} className="text-sm border border-neutral-200 rounded px-2 py-1 focus:outline-none focus:border-black" placeholder="Role" />
+                              <input value={item.org} onChange={e => { const ex = [...editExperience]; ex[i] = { ...ex[i], org: e.target.value }; setEditExperience(ex); }} className="text-sm border border-neutral-200 rounded px-2 py-1 focus:outline-none focus:border-black" placeholder="Organization" />
+                              <input value={item.years} onChange={e => { const ex = [...editExperience]; ex[i] = { ...ex[i], years: e.target.value }; setEditExperience(ex); }} className="text-sm border border-neutral-200 rounded px-2 py-1 focus:outline-none focus:border-black" placeholder="Years" />
                             </>
                           ) : (
                             <>
                               <div>
                                 <p className="text-sm font-medium">{item.role}</p>
-                                <p className="text-xs text-gray-500">{item.org}</p>
+                                <p className="text-xs text-neutral-500">{item.org}</p>
                               </div>
-                              <span className="text-xs text-gray-400 whitespace-nowrap">{item.years}</span>
+                              <span className="text-xs text-neutral-400 whitespace-nowrap">{item.years}</span>
                             </>
                           )}
                         </div>
@@ -1058,19 +1058,19 @@ export default function MyProfilePage() {
 
                 <div className="space-y-4">
                   {/* Focus Areas */}
-                  <div className="p-5 bg-white border border-gray-200 rounded-xl">
+                  <div className="p-5 bg-white border border-neutral-200 rounded-xl">
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="text-base font-semibold">Focus Areas</h3>
-                      <button onClick={() => setIsEditingFocusAreas(prev => !prev)} className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-black transition-colors">
+                      <button onClick={() => setIsEditingFocusAreas(prev => !prev)} className="flex items-center gap-1.5 text-xs font-medium text-neutral-500 hover:text-black transition-colors">
                         {isEditingFocusAreas ? <><CheckIcon sx={{ fontSize: 13 }} />Done</> : <><EditIcon sx={{ fontSize: 13 }} />Edit</>}
                       </button>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {focusAreas.map((tag) => (
-                        <span key={tag} className="inline-flex items-center gap-1 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+                        <span key={tag} className="inline-flex items-center gap-1 px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-xs font-medium">
                           {tag}
                           {isEditingFocusAreas && (
-                            <button onClick={() => handleRemoveFocusArea(tag)} className="text-gray-400 hover:text-red-500 transition-colors ml-0.5">
+                            <button onClick={() => handleRemoveFocusArea(tag)} className="text-neutral-400 hover:text-red-500 transition-colors ml-0.5">
                               <CloseIcon sx={{ fontSize: 11 }} />
                             </button>
                           )}
@@ -1084,7 +1084,7 @@ export default function MyProfilePage() {
                           onChange={e => setNewFocusArea(e.target.value)}
                           onKeyDown={e => { if (e.key === 'Enter') handleAddFocusArea(); }}
                           placeholder="Add area..."
-                          className="flex-1 text-xs border border-gray-200 rounded-full px-3 py-1.5 focus:outline-none focus:border-black"
+                          className="flex-1 text-xs border border-neutral-200 rounded-full px-3 py-1.5 focus:outline-none focus:border-black"
                         />
                         <button onClick={handleAddFocusArea} className="icon-tap-target p-1.5 bg-black text-white rounded-full hover:bg-black/80 transition-colors">
                           <AddIcon sx={{ fontSize: 14 }} />
@@ -1094,7 +1094,7 @@ export default function MyProfilePage() {
                   </div>
 
                   {/* Stats */}
-                  <div className="p-5 bg-white border border-gray-200 rounded-xl space-y-3">
+                  <div className="p-5 bg-white border border-neutral-200 rounded-xl space-y-3">
                     <h3 className="text-base font-semibold">By the numbers</h3>
                     {[
                       { label: 'Followers', value: '127K' },
@@ -1103,7 +1103,7 @@ export default function MyProfilePage() {
                       { label: 'Joined', value: 'Jan 2020' },
                     ].map((stat) => (
                       <div key={stat.label} className="flex items-center justify-between text-sm">
-                        <span className="text-gray-500">{stat.label}</span>
+                        <span className="text-neutral-500">{stat.label}</span>
                         <span className="font-semibold">{stat.value}</span>
                       </div>
                     ))}
@@ -1160,8 +1160,8 @@ export default function MyProfilePage() {
                       { label: 'Subscribers gained', value: '+6,840', delta: '+21%', pos: true },
                       { label: 'Revenue (30d)', value: '$2,340', delta: '-3%', pos: false },
                     ].map((card) => (
-                      <div key={card.label} className="p-4 bg-white border border-gray-200 rounded-xl">
-                        <p className="text-xs text-gray-500 mb-1">{card.label}</p>
+                      <div key={card.label} className="p-4 bg-white border border-neutral-200 rounded-xl">
+                        <p className="text-xs text-neutral-500 mb-1">{card.label}</p>
                         <p className="text-xl font-bold mb-0.5">{card.value}</p>
                         <span className={`text-xs font-medium ${card.pos ? 'text-brand' : 'text-red-500'}`}>{card.delta} vs last month</span>
                       </div>
@@ -1169,10 +1169,10 @@ export default function MyProfilePage() {
                   </div>
 
                   {/* Video view trend */}
-                  <div className="p-5 bg-white border border-gray-200 rounded-xl">
+                  <div className="p-5 bg-white border border-neutral-200 rounded-xl">
                     <div className="flex items-center justify-between mb-4">
                       <h2 className="text-base font-semibold">Video Views — Last 30 days</h2>
-                      <span className="text-xs text-gray-400">184,320 total</span>
+                      <span className="text-xs text-neutral-400">184,320 total</span>
                     </div>
                     <div className="h-48">
                       <ResponsiveContainer width="100%" height="100%">
@@ -1188,15 +1188,15 @@ export default function MyProfilePage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     {/* Top videos */}
-                    <div className="p-5 bg-white border border-gray-200 rounded-xl">
+                    <div className="p-5 bg-white border border-neutral-200 rounded-xl">
                       <h2 className="text-base font-semibold mb-4">Top Videos</h2>
                       <div className="space-y-3">
                         {topVideos.map((v, i) => (
                           <div key={v.title} className="flex items-center gap-3">
-                            <span className="text-xs font-bold text-gray-400 w-4 flex-shrink-0">{i + 1}</span>
+                            <span className="text-xs font-bold text-neutral-400 w-4 flex-shrink-0">{i + 1}</span>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium truncate">{v.title}</p>
-                              <div className="flex items-center gap-3 text-xs text-gray-400 mt-0.5">
+                              <div className="flex items-center gap-3 text-xs text-neutral-400 mt-0.5">
                                 <span>{v.views} views</span>
                                 <span>·</span>
                                 <span>{v.watchTime}</span>
@@ -1211,10 +1211,10 @@ export default function MyProfilePage() {
                     </div>
 
                     {/* Follower growth */}
-                    <div className="p-5 bg-white border border-gray-200 rounded-xl">
+                    <div className="p-5 bg-white border border-neutral-200 rounded-xl">
                       <div className="flex items-center justify-between mb-4">
                         <h2 className="text-base font-semibold">Follower Growth</h2>
-                        <span className="text-xs text-gray-400">+6,840 this month</span>
+                        <span className="text-xs text-neutral-400">+6,840 this month</span>
                       </div>
                       <div className="h-36">
                         <ResponsiveContainer width="100%" height="100%">
@@ -1226,7 +1226,7 @@ export default function MyProfilePage() {
                           </LineChart>
                         </ResponsiveContainer>
                       </div>
-                      <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100 text-xs text-gray-500">
+                      <div className="flex items-center justify-between mt-3 pt-3 border-t border-neutral-100 text-xs text-neutral-500">
                         <span>Start: <strong className="text-black">120K</strong></span>
                         <span>Now: <strong className="text-black">127K</strong></span>
                         <span>Peak day: <strong className="text-black">+312</strong></span>
@@ -1235,7 +1235,7 @@ export default function MyProfilePage() {
                   </div>
 
                   {/* Post engagement trends */}
-                  <div className="p-5 bg-white border border-gray-200 rounded-xl">
+                  <div className="p-5 bg-white border border-neutral-200 rounded-xl">
                     <div className="flex items-center justify-between mb-4">
                       <h2 className="text-base font-semibold">Post Engagement — Last 14 days</h2>
                       <div className="flex items-center gap-4 text-xs">
@@ -1260,16 +1260,16 @@ export default function MyProfilePage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     {/* Traffic sources */}
-                    <div className="p-5 bg-white border border-gray-200 rounded-xl">
+                    <div className="p-5 bg-white border border-neutral-200 rounded-xl">
                       <h2 className="text-base font-semibold mb-4">Traffic Sources</h2>
                       <div className="space-y-3">
                         {trafficSources.map((s) => (
                           <div key={s.source}>
                             <div className="flex items-center justify-between text-sm mb-1">
-                              <span className="text-gray-700">{s.source}</span>
+                              <span className="text-neutral-700">{s.source}</span>
                               <span className="font-semibold">{s.pct}%</span>
                             </div>
-                            <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div className="h-1.5 bg-neutral-100 rounded-full overflow-hidden">
                               <div className="h-full bg-brand rounded-full transition-all" style={{ width: `${s.pct}%` }} />
                             </div>
                           </div>
@@ -1278,7 +1278,7 @@ export default function MyProfilePage() {
                     </div>
 
                     {/* Recent milestones */}
-                    <div className="p-5 bg-white border border-gray-200 rounded-xl">
+                    <div className="p-5 bg-white border border-neutral-200 rounded-xl">
                       <h2 className="text-base font-semibold mb-4">Recent Milestones</h2>
                       <div className="space-y-3">
                         {milestones.map((m) => (
@@ -1286,7 +1286,7 @@ export default function MyProfilePage() {
                             <span className="text-lg leading-none mt-0.5">{m.icon}</span>
                             <div>
                               <p className="text-sm font-medium">{m.text}</p>
-                              <p className="text-xs text-gray-400">{m.time}</p>
+                              <p className="text-xs text-neutral-400">{m.time}</p>
                             </div>
                           </div>
                         ))}
@@ -1313,46 +1313,46 @@ export default function MyProfilePage() {
             <div className="bg-white rounded-2xl shadow-xl w-[min(520px,90vw)] max-h-[85vh] overflow-y-auto p-6">
               <div className="flex items-center justify-between mb-5">
                 <h2 className="text-lg font-bold">New Simulation</h2>
-                <button onClick={handleCloseNewSimForm} className="icon-tap-target p-1.5 hover:bg-gray-100 rounded-full transition-colors"><CloseIcon sx={{ fontSize: 18 }} /></button>
+                <button onClick={handleCloseNewSimForm} className="icon-tap-target p-1.5 hover:bg-neutral-100 rounded-full transition-colors"><CloseIcon sx={{ fontSize: 18 }} /></button>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1.5">Simulation Name <span className="text-red-400">*</span></label>
+                  <label className="block text-xs font-medium text-neutral-600 mb-1.5">Simulation Name <span className="text-red-400">*</span></label>
                   <input
                     value={newSimName}
                     onChange={e => setNewSimName(e.target.value)}
                     placeholder="e.g. AI Growth Thesis"
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors"
+                    className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1.5">Start Date</label>
+                    <label className="block text-xs font-medium text-neutral-600 mb-1.5">Start Date</label>
                     <input
                       type="date"
                       value={newSimStartDate}
                       min={getTodayISODate()}
                       onChange={e => setNewSimStartDate(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors"
+                      className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1.5">Initial Capital ($) <span className="text-red-400">*</span></label>
+                    <label className="block text-xs font-medium text-neutral-600 mb-1.5">Initial Capital ($) <span className="text-red-400">*</span></label>
                     <input
                       type="number"
                       min="0"
                       value={newSimCapital}
                       onChange={e => setNewSimCapital(e.target.value)}
                       placeholder="50000"
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors"
+                      className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1.5">Hypothetical Holdings</label>
+                  <label className="block text-xs font-medium text-neutral-600 mb-1.5">Hypothetical Holdings</label>
                   <div className="space-y-2">
                     {newSimHoldings.map((holding, i) => (
                       <div key={i} className="flex items-center gap-2">
@@ -1360,7 +1360,7 @@ export default function MyProfilePage() {
                           value={holding.symbol}
                           onChange={e => handleHoldingChange(i, 'symbol', e.target.value.toUpperCase())}
                           placeholder="Symbol (e.g. NVDA)"
-                          className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors"
+                          className="flex-1 px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors"
                         />
                         <input
                           type="number"
@@ -1368,22 +1368,22 @@ export default function MyProfilePage() {
                           value={holding.amount}
                           onChange={e => handleHoldingChange(i, 'amount', e.target.value)}
                           placeholder="$ Amount"
-                          className="w-32 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors"
+                          className="w-32 px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors"
                         />
                         {newSimHoldings.length > 1 && (
-                          <button onClick={() => handleRemoveHoldingRow(i)} className="p-2 text-gray-400 hover:text-red-500 transition-colors">
+                          <button onClick={() => handleRemoveHoldingRow(i)} className="p-2 text-neutral-400 hover:text-red-500 transition-colors">
                             <CloseIcon sx={{ fontSize: 16 }} />
                           </button>
                         )}
                       </div>
                     ))}
                   </div>
-                  <button onClick={handleAddHoldingRow} className="mt-2 flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-black transition-colors">
+                  <button onClick={handleAddHoldingRow} className="mt-2 flex items-center gap-1.5 text-xs font-medium text-neutral-500 hover:text-black transition-colors">
                     <AddIcon sx={{ fontSize: 14 }} />
                     Add holding
                   </button>
                   {newSimCapital && (
-                    <p className={`text-xs mt-2 ${remainingCash < 0 ? 'text-red-500' : 'text-gray-500'}`}>
+                    <p className={`text-xs mt-2 ${remainingCash < 0 ? 'text-red-500' : 'text-neutral-500'}`}>
                       {remainingCash < 0
                         ? `Holdings exceed capital by $${Math.abs(remainingCash).toLocaleString()}`
                         : `Remaining cash: $${remainingCash.toLocaleString()}`}
@@ -1392,13 +1392,13 @@ export default function MyProfilePage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1.5">Rationale (optional)</label>
+                  <label className="block text-xs font-medium text-neutral-600 mb-1.5">Rationale (optional)</label>
                   <textarea
                     value={newSimRationale}
                     onChange={e => setNewSimRationale(e.target.value)}
                     rows={3}
                     placeholder="Why are you testing this scenario?"
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors resize-none"
+                    className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors resize-none"
                   />
                 </div>
               </div>
@@ -1411,7 +1411,7 @@ export default function MyProfilePage() {
                 >
                   Create Simulation
                 </button>
-                <button onClick={handleCloseNewSimForm} className="flex-1 py-2.5 border border-gray-200 text-sm font-medium rounded-full hover:bg-gray-50 transition-colors">Cancel</button>
+                <button onClick={handleCloseNewSimForm} className="flex-1 py-2.5 border border-neutral-200 text-sm font-medium rounded-full hover:bg-neutral-50 transition-colors">Cancel</button>
               </div>
             </div>
           </Overlay>
@@ -1424,21 +1424,21 @@ export default function MyProfilePage() {
           <div className="bg-white rounded-2xl shadow-xl w-[min(480px,90vw)] p-6">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold">Edit Profile</h2>
-              <button onClick={() => setShowEditProfile(false)} className="icon-tap-target p-1.5 hover:bg-gray-100 rounded-full transition-colors"><CloseIcon sx={{ fontSize: 18 }} /></button>
+              <button onClick={() => setShowEditProfile(false)} className="icon-tap-target p-1.5 hover:bg-neutral-100 rounded-full transition-colors"><CloseIcon sx={{ fontSize: 18 }} /></button>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">Display Name</label>
-                <input value={editName} onChange={e => setEditName(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors" />
+                <label className="block text-xs font-medium text-neutral-600 mb-1.5">Display Name</label>
+                <input value={editName} onChange={e => setEditName(e.target.value)} className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">Handle</label>
-                <input value={editHandle} onChange={e => setEditHandle(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors" />
+                <label className="block text-xs font-medium text-neutral-600 mb-1.5">Handle</label>
+                <input value={editHandle} onChange={e => setEditHandle(e.target.value)} className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors" />
               </div>
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-xs font-medium text-gray-600">Bio</label>
-                  <span className={`text-xs ${editBio.length >= MAX_BIO_LENGTH ? 'text-red-500' : 'text-gray-400'}`}>
+                  <label className="block text-xs font-medium text-neutral-600">Bio</label>
+                  <span className={`text-xs ${editBio.length >= MAX_BIO_LENGTH ? 'text-red-500' : 'text-neutral-400'}`}>
                     {editBio.length}/{MAX_BIO_LENGTH}
                   </span>
                 </div>
@@ -1448,7 +1448,7 @@ export default function MyProfilePage() {
                   maxLength={MAX_BIO_LENGTH}
                   placeholder="Tell people about yourself"
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none focus:outline-none focus:border-black transition-colors"
+                  className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm resize-none focus:outline-none focus:border-black transition-colors"
                 />
               </div>
             </div>
@@ -1457,7 +1457,7 @@ export default function MyProfilePage() {
               <button onClick={handleSaveProfile} disabled={savingProfile} className="flex-1 py-2.5 bg-black text-white text-sm font-medium rounded-full hover:bg-black/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 {savingProfile ? 'Saving…' : 'Save Changes'}
               </button>
-              <button onClick={() => setShowEditProfile(false)} className="flex-1 py-2.5 border border-gray-200 text-sm font-medium rounded-full hover:bg-gray-50 transition-colors">Cancel</button>
+              <button onClick={() => setShowEditProfile(false)} className="flex-1 py-2.5 border border-neutral-200 text-sm font-medium rounded-full hover:bg-neutral-50 transition-colors">Cancel</button>
             </div>
           </div>
         </Overlay>
@@ -1477,14 +1477,14 @@ export default function MyProfilePage() {
           <div className="bg-white rounded-2xl shadow-xl w-[min(540px,90vw)] p-6">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold">{editingPostId ? 'Edit Post' : 'New Post'}</h2>
-              <button onClick={() => { setShowPostComposer(false); setEditingPostId(null); }} className="icon-tap-target p-1.5 hover:bg-gray-100 rounded-full transition-colors"><CloseIcon sx={{ fontSize: 18 }} /></button>
+              <button onClick={() => { setShowPostComposer(false); setEditingPostId(null); }} className="icon-tap-target p-1.5 hover:bg-neutral-100 rounded-full transition-colors"><CloseIcon sx={{ fontSize: 18 }} /></button>
             </div>
 
             <div className="flex items-start gap-3 mb-4">
               <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">{initials}</div>
               <div className="flex-1">
                 <p className="text-sm font-semibold">{displayName}</p>
-                <p className="text-xs text-gray-400">{displayHandle}</p>
+                <p className="text-xs text-neutral-400">{displayHandle}</p>
               </div>
             </div>
 
@@ -1494,17 +1494,17 @@ export default function MyProfilePage() {
               onChange={e => setComposerContent(e.target.value)}
               placeholder="What's on your mind? Share an investing insight..."
               rows={5}
-              className="w-full text-sm text-gray-800 border border-gray-200 rounded-xl p-3 resize-none focus:outline-none focus:border-black transition-colors mb-4"
+              className="w-full text-sm text-neutral-800 border border-neutral-200 rounded-xl p-3 resize-none focus:outline-none focus:border-black transition-colors mb-4"
             />
 
             <div className="mb-4">
-              <label className="block text-xs font-medium text-gray-600 mb-2">Tag</label>
+              <label className="block text-xs font-medium text-neutral-600 mb-2">Tag</label>
               <div className="flex flex-wrap gap-2">
                 {TAGS.map(t => (
                   <button
                     key={t}
                     onClick={() => setComposerTag(t)}
-                    className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${composerTag === t ? 'bg-black text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                    className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${composerTag === t ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'}`}
                   >
                     {t}
                   </button>
@@ -1513,9 +1513,9 @@ export default function MyProfilePage() {
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-400">{composerContent.length} / 500</span>
+              <span className="text-xs text-neutral-400">{composerContent.length} / 500</span>
               <div className="flex items-center gap-2">
-                <button onClick={() => { setShowPostComposer(false); setEditingPostId(null); }} className="px-5 py-2 border border-gray-200 text-sm font-medium rounded-full hover:bg-gray-50 transition-colors">Cancel</button>
+                <button onClick={() => { setShowPostComposer(false); setEditingPostId(null); }} className="px-5 py-2 border border-neutral-200 text-sm font-medium rounded-full hover:bg-neutral-50 transition-colors">Cancel</button>
                 <button onClick={handleSavePost} disabled={!composerContent.trim()} className="px-5 py-2 bg-black text-white text-sm font-medium rounded-full hover:bg-black/80 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
                   {editingPostId ? 'Save' : 'Publish'}
                 </button>

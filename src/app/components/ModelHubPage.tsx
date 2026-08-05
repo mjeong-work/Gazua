@@ -218,7 +218,7 @@ export default function ModelHubPage() {
       case 'Intermediate': return 'bg-blue-100 text-blue-700';
       case 'Advanced': return 'bg-purple-100 text-purple-700';
       case 'Expert': return 'bg-red-100 text-red-700';
-      default: return 'bg-gray-100 text-gray-700';
+      default: return 'bg-neutral-100 text-neutral-700';
     }
   };
 
@@ -243,7 +243,7 @@ export default function ModelHubPage() {
           {/* Hero Section */}
           <div className="text-center mb-12">
             <h1 className="text-5xl font-bold mb-4">Build smarter investing logic</h1>
-            <p className="text-xl text-gray-600 mb-8">
+            <p className="text-xl text-neutral-600 mb-8">
               Explore Excel models, quant templates, and community-built finance tools.
             </p>
             <div className="flex items-center justify-center gap-4">
@@ -264,7 +264,7 @@ export default function ModelHubPage() {
           </div>
 
           {/* Search and Filters */}
-          <div className="mb-8 bg-gray-50 rounded-xl p-6">
+          <div className="mb-8 bg-neutral-50 rounded-xl p-6">
             <div className="mb-4">
               <div className="relative">
                 <SearchIcon sx={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', fontSize: 20, color: 'var(--icon-muted)' }} />
@@ -273,18 +273,18 @@ export default function ModelHubPage() {
                   placeholder="Search models by title or description..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 pr-4 py-3 w-full border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                  className="pl-12 pr-4 py-3 w-full border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-4 gap-4">
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-2">Difficulty</label>
+                <label className="block text-xs font-medium text-neutral-700 mb-2">Difficulty</label>
                 <select
                   value={filters.difficulty}
                   onChange={(e) => setFilters(prev => ({ ...prev, difficulty: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                  className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                 >
                   <option>All</option>
                   <option>Beginner</option>
@@ -295,11 +295,11 @@ export default function ModelHubPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-2">File Type</label>
+                <label className="block text-xs font-medium text-neutral-700 mb-2">File Type</label>
                 <select
                   value={filters.fileType}
                   onChange={(e) => setFilters(prev => ({ ...prev, fileType: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                  className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                 >
                   <option>All</option>
                   <option>Excel</option>
@@ -311,11 +311,11 @@ export default function ModelHubPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-2">Category</label>
+                <label className="block text-xs font-medium text-neutral-700 mb-2">Category</label>
                 <select
                   value={filters.category}
                   onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                  className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                 >
                   <option>All</option>
                   <option>Valuation</option>
@@ -327,11 +327,11 @@ export default function ModelHubPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-gray-700 mb-2">Access</label>
+                <label className="block text-xs font-medium text-neutral-700 mb-2">Access</label>
                 <select
                   value={filters.access}
                   onChange={(e) => setFilters(prev => ({ ...prev, access: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                  className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                 >
                   <option>All</option>
                   <option>Free Preview</option>
@@ -344,7 +344,7 @@ export default function ModelHubPage() {
 
           {/* Results Count */}
           <div className="mb-6">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-neutral-600">
               Showing {filteredModels.length} {filteredModels.length === 1 ? 'model' : 'models'}
             </p>
           </div>
@@ -353,16 +353,16 @@ export default function ModelHubPage() {
           {modelsLoading && dbModels === null ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {[1, 2, 3, 4].map(n => (
-                <div key={n} className="border border-gray-200 rounded-xl p-6 animate-pulse">
+                <div key={n} className="border border-neutral-200 rounded-xl p-6 animate-pulse">
                   <div className="flex items-start gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0" />
+                    <div className="w-10 h-10 rounded-full bg-neutral-200 flex-shrink-0" />
                     <div className="flex-1 space-y-2">
-                      <div className="h-4 bg-gray-200 rounded w-3/4" />
-                      <div className="h-3 bg-gray-200 rounded w-1/2" />
+                      <div className="h-4 bg-neutral-200 rounded w-3/4" />
+                      <div className="h-3 bg-neutral-200 rounded w-1/2" />
                     </div>
                   </div>
-                  <div className="h-3 bg-gray-200 rounded w-full mb-2" />
-                  <div className="h-3 bg-gray-200 rounded w-5/6" />
+                  <div className="h-3 bg-neutral-200 rounded w-full mb-2" />
+                  <div className="h-3 bg-neutral-200 rounded w-5/6" />
                 </div>
               ))}
             </div>
@@ -375,20 +375,20 @@ export default function ModelHubPage() {
                 return (
                   <div
                     key={model.id}
-                    className="border border-gray-200 rounded-xl p-6 hover:border-gray-300 transition-colors bg-white"
+                    className="border border-neutral-200 rounded-xl p-6 hover:border-neutral-300 transition-colors bg-white"
                   >
                     {/* Header */}
                     <div className="flex items-start gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-xl flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-neutral-200 flex items-center justify-center text-xl flex-shrink-0">
                         {model.creatorAvatar}
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-bold text-lg mb-1 line-clamp-2">{model.title}</h3>
-                        <p className="text-sm text-gray-600">{model.creator}</p>
+                        <p className="text-sm text-neutral-600">{model.creator}</p>
                       </div>
                       <button
                         onClick={() => handleSave(model)}
-                        className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0"
+                        className="p-2 hover:bg-neutral-100 rounded-full transition-colors flex-shrink-0"
                         title={isModelSaved ? "Saved to Watchlist" : "Save to Watchlist"}
                       >
                         {isModelSaved ? (
@@ -404,7 +404,7 @@ export default function ModelHubPage() {
                       <span className={`px-3 py-1 rounded-full text-xs font-medium ${getDifficultyColor(model.difficulty)}`}>
                         {model.difficulty}
                       </span>
-                      <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium flex items-center gap-1">
+                      <span className="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-xs font-medium flex items-center gap-1">
                         <span>{getFileTypeIcon(model.fileType)}</span>
                         {model.fileType}
                       </span>
@@ -420,14 +420,14 @@ export default function ModelHubPage() {
                     </div>
 
                     {/* Description */}
-                    <p className="text-sm text-gray-700 mb-4 line-clamp-2">{model.description}</p>
+                    <p className="text-sm text-neutral-700 mb-4 line-clamp-2">{model.description}</p>
 
                     {/* What You'll Learn */}
                     <div className="mb-4">
-                      <p className="text-xs font-bold text-gray-700 mb-2">What you'll learn:</p>
+                      <p className="text-xs font-bold text-neutral-700 mb-2">What you'll learn:</p>
                       <ul className="space-y-1">
                         {model.learnings.slice(0, 3).map((learning, idx) => (
-                          <li key={idx} className="text-xs text-gray-600 flex items-start gap-2">
+                          <li key={idx} className="text-xs text-neutral-600 flex items-start gap-2">
                             <span className="text-brand mt-0.5">•</span>
                             <span>{learning}</span>
                           </li>
@@ -436,7 +436,7 @@ export default function ModelHubPage() {
                     </div>
 
                     {/* Stats */}
-                    <div className="flex items-center gap-4 mb-4 text-xs text-gray-600">
+                    <div className="flex items-center gap-4 mb-4 text-xs text-neutral-600">
                       <span>{model.downloads.toLocaleString()} downloads</span>
                       <span>•</span>
                       <span>{model.remixes} remixes</span>
@@ -446,7 +446,7 @@ export default function ModelHubPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handlePreview(model)}
-                        className="flex-1 px-4 py-2 border border-gray-200 rounded-full text-sm font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                        className="flex-1 px-4 py-2 border border-neutral-200 rounded-full text-sm font-medium hover:bg-neutral-50 transition-colors flex items-center justify-center gap-2"
                       >
                         <VisibilityIcon sx={{ fontSize: 16 }} />
                         Preview
@@ -478,11 +478,11 @@ export default function ModelHubPage() {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+              <div className="w-20 h-20 bg-neutral-100 rounded-full flex items-center justify-center mb-6">
                 <SearchIcon sx={{ fontSize: 40, color: 'var(--icon-muted)' }} />
               </div>
               <h3 className="text-xl font-bold mb-2">No models found</h3>
-              <p className="text-gray-600 max-w-sm mb-6">
+              <p className="text-neutral-600 max-w-sm mb-6">
                 Try adjusting your search or filters to find what you're looking for.
               </p>
               <button
@@ -510,14 +510,14 @@ export default function ModelHubPage() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-8 py-6 flex items-center justify-between">
+            <div className="sticky top-0 bg-white border-b border-neutral-200 px-8 py-6 flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-bold mb-1">Share Your Model</h2>
-                <p className="text-sm text-gray-600">Help the community learn with your finance models</p>
+                <p className="text-sm text-neutral-600">Help the community learn with your finance models</p>
               </div>
               <button
                 onClick={handleCloseUploadModal}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 hover:bg-neutral-100 rounded-full transition-colors"
               >
                 <CloseIcon sx={{ fontSize: 20 }} />
               </button>
@@ -531,7 +531,7 @@ export default function ModelHubPage() {
                     <LockIcon sx={{ fontSize: 40, color: '#d97706' }} />
                   </div>
                   <h3 className="text-xl font-bold mb-2">Expert Feature</h3>
-                  <p className="text-gray-600 mb-6 max-w-sm mx-auto">
+                  <p className="text-neutral-600 mb-6 max-w-sm mx-auto">
                     Model uploads are available for Expert members. Upgrade your account to share your models with the community.
                   </p>
                   <button
@@ -544,23 +544,23 @@ export default function ModelHubPage() {
               ) : (
                 <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">Model Title</label>
+                    <label className="block text-sm font-bold text-neutral-700 mb-2">Model Title</label>
                     <input
                       type="text"
                       value={uploadTitle}
                       onChange={(e) => setUploadTitle(e.target.value)}
                       placeholder="e.g., Advanced Portfolio Optimizer"
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                      className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                     />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">Category</label>
+                      <label className="block text-sm font-bold text-neutral-700 mb-2">Category</label>
                       <select
                         value={uploadCategory}
                         onChange={(e) => setUploadCategory(e.target.value as ModelCategory)}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                        className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                       >
                         <option value="">Select category</option>
                         <option>Valuation</option>
@@ -572,11 +572,11 @@ export default function ModelHubPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-bold text-gray-700 mb-2">Difficulty</label>
+                      <label className="block text-sm font-bold text-neutral-700 mb-2">Difficulty</label>
                       <select
                         value={uploadDifficulty}
                         onChange={(e) => setUploadDifficulty(e.target.value as ModelDifficulty)}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                        className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                       >
                         <option value="">Select difficulty</option>
                         <option>Beginner</option>
@@ -588,11 +588,11 @@ export default function ModelHubPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">File Type</label>
+                    <label className="block text-sm font-bold text-neutral-700 mb-2">File Type</label>
                     <select
                       value={uploadFileType}
                       onChange={(e) => setUploadFileType(e.target.value as ModelFileType)}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                      className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                     >
                       <option value="">Select file type</option>
                       <option>Excel</option>
@@ -604,29 +604,29 @@ export default function ModelHubPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">Description</label>
+                    <label className="block text-sm font-bold text-neutral-700 mb-2">Description</label>
                     <textarea
                       rows={3}
                       value={uploadDescription}
                       onChange={(e) => setUploadDescription(e.target.value)}
                       placeholder="Describe what your model does and who it's for..."
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand resize-none"
+                      className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand resize-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">What users will learn (one per line)</label>
+                    <label className="block text-sm font-bold text-neutral-700 mb-2">What users will learn (one per line)</label>
                     <textarea
                       rows={3}
                       value={uploadLearnings}
                       onChange={(e) => setUploadLearnings(e.target.value)}
                       placeholder="e.g., Build valuation models&#10;Calculate intrinsic value&#10;Compare to market price"
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand resize-none"
+                      className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand resize-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">Upload File</label>
+                    <label className="block text-sm font-bold text-neutral-700 mb-2">Upload File</label>
                     <input
                       type="file"
                       id="model-file-input"
@@ -636,13 +636,13 @@ export default function ModelHubPage() {
                     />
                     <label
                       htmlFor="model-file-input"
-                      className="block border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors cursor-pointer"
+                      className="block border-2 border-dashed border-neutral-300 rounded-lg p-8 text-center hover:border-neutral-400 transition-colors cursor-pointer"
                     >
                       <UploadIcon sx={{ fontSize: 48, color: 'var(--icon-muted)' }} />
-                      <p className="text-sm text-gray-600 mt-2">
+                      <p className="text-sm text-neutral-600 mt-2">
                         {uploadFile ? `Selected: ${uploadFile.name}` : 'Click to upload or drag and drop'}
                       </p>
-                      <p className="text-xs text-gray-500 mt-1">Excel, CSV, Python, PDF (max 25MB)</p>
+                      <p className="text-xs text-neutral-500 mt-1">Excel, CSV, Python, PDF (max 25MB)</p>
                     </label>
                     {uploadError && <p className="text-sm text-red-500 mt-2">{uploadError}</p>}
                   </div>
@@ -650,12 +650,12 @@ export default function ModelHubPage() {
                   <button
                     onClick={handlePublishModel}
                     disabled={!uploadTitle.trim() || !uploadCategory || !uploadDifficulty || !uploadFileType || !uploadFile || uploadSubmitting}
-                    className="w-full py-4 bg-black text-white font-bold rounded-full hover:bg-black/80 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    className="w-full py-4 bg-black text-white font-bold rounded-full hover:bg-black/80 transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed"
                   >
                     {uploadSubmitting ? 'Publishing…' : 'Publish Model'}
                   </button>
 
-                  <p className="text-xs text-center text-gray-500">
+                  <p className="text-xs text-center text-neutral-500">
                     By publishing, you agree to share this model under the Gazua Community License.
                   </p>
                 </div>
@@ -676,14 +676,14 @@ export default function ModelHubPage() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-8 py-6 flex items-center justify-between">
+            <div className="sticky top-0 bg-white border-b border-neutral-200 px-8 py-6 flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-bold mb-1">{selectedModel.title}</h2>
-                <p className="text-sm text-gray-600">by {selectedModel.creator}</p>
+                <p className="text-sm text-neutral-600">by {selectedModel.creator}</p>
               </div>
               <button
                 onClick={() => setShowPreviewModal(false)}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 hover:bg-neutral-100 rounded-full transition-colors"
               >
                 <CloseIcon sx={{ fontSize: 20 }} />
               </button>
@@ -696,7 +696,7 @@ export default function ModelHubPage() {
                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${getDifficultyColor(selectedModel.difficulty)}`}>
                   {selectedModel.difficulty}
                 </span>
-                <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium flex items-center gap-1">
+                <span className="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-xs font-medium flex items-center gap-1">
                   <span>{getFileTypeIcon(selectedModel.fileType)}</span>
                   {selectedModel.fileType}
                 </span>
@@ -708,7 +708,7 @@ export default function ModelHubPage() {
               {/* Description */}
               <div className="mb-6">
                 <h3 className="font-bold mb-2">About this model</h3>
-                <p className="text-gray-700">{selectedModel.description}</p>
+                <p className="text-neutral-700">{selectedModel.description}</p>
               </div>
 
               {/* What You'll Learn */}
@@ -718,20 +718,20 @@ export default function ModelHubPage() {
                   {selectedModel.learnings.map((learning, idx) => (
                     <li key={idx} className="flex items-start gap-3">
                       <CheckCircleIcon sx={{ fontSize: 20, color: 'var(--brand)', marginTop: '2px' }} />
-                      <span className="text-gray-700">{learning}</span>
+                      <span className="text-neutral-700">{learning}</span>
                     </li>
                   ))}
                 </ul>
               </div>
 
               {/* Preview Placeholder */}
-              <div className="mb-6 bg-gray-50 rounded-xl p-12 text-center border-2 border-dashed border-gray-300">
+              <div className="mb-6 bg-neutral-50 rounded-xl p-12 text-center border-2 border-dashed border-neutral-300">
                 <div className="text-6xl mb-4">{getFileTypeIcon(selectedModel.fileType)}</div>
                 <h3 className="font-bold mb-2">Model Preview</h3>
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="text-sm text-neutral-600 mb-4">
                   Download the model to view the complete file and start using it in your workflow.
                 </p>
-                <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
+                <div className="flex items-center justify-center gap-4 text-xs text-neutral-500">
                   <span>{selectedModel.downloads.toLocaleString()} downloads</span>
                   <span>•</span>
                   <span>{selectedModel.remixes} remixes</span>
