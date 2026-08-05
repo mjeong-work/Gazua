@@ -180,6 +180,15 @@ export default function AppHeader() {
             <button onClick={() => navigate('/creators')} className={cls(['/creators', '/profile'])}>
               Creators
             </button>
+            <button
+              onClick={() => setShowCreateSheet(true)}
+              className={`flex items-center gap-1.5 hover:opacity-70 transition-opacity ${showCreateSheet || activeCreateModal ? 'text-brand' : ''}`}
+            >
+              {showCreateSheet || activeCreateModal
+                ? <AddCircleIcon sx={{ fontSize: 18 }} />
+                : <AddCircleOutlineIcon sx={{ fontSize: 18 }} />}
+              Create
+            </button>
             <button onClick={() => navigate('/my-profile')} className={cls(['/my-profile'])}>
               My Profile
             </button>
