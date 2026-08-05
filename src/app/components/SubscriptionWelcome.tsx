@@ -109,10 +109,10 @@ export default function SubscriptionWelcome() {
         <p className="text-xs text-gray-400">
           Manage billing in{' '}
           <button
-            onClick={() => navigate('/account')}
+            onClick={() => navigate('/my-profile/settings')}
             className="underline underline-offset-2 hover:text-gray-600 transition-colors"
           >
-            your account
+            your profile settings
           </button>
         </p>
       </div>

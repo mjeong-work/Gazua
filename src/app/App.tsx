@@ -39,7 +39,7 @@ import PickInterests from './components/onboarding/PickInterests';
 import PickRisk from './components/onboarding/PickRisk';
 import Complete from './components/onboarding/Complete';
 import NotificationsPage from './components/NotificationsPage';
-import AccountPage from './components/AccountPage';
+import ProfileSettingsPage from './components/ProfileSettingsPage';
 import CreatePage from './components/CreatePage';
 import MessagesPage from './components/MessagesPage';
 import ModelHubPage from './components/ModelHubPage';
@@ -105,8 +105,8 @@ export default function App() {
                   <Route path="/insights"              element={<InvestmentProfilePage />} />
                   <Route path="/notifications"         element={<NotificationsPage />} />
                   <Route path="/messages"              element={<MessagesPage />} />
-                  <Route path="/account"               element={<AccountPage />} />
                   <Route path="/my-profile"            element={<MyProfilePage />} />
+                  <Route path="/my-profile/settings"   element={<ProfileSettingsPage />} />
                   <Route path="/subscription/welcome" element={<SubscriptionWelcome />} />
                   <Route path="/legal/:slug"         element={<LegalPage />} />
                   <Route path="/terms"               element={<Navigate to="/legal/terms" replace />} />
@@ -134,6 +134,7 @@ export default function App() {
                   <Route path="/profile/investment"    element={<Navigate to="/profile/alex-rodriguez/investment" replace />} />
                   <Route path="/profile/videos"        element={<Navigate to="/profile/alex-rodriguez/videos" replace />} />
                   <Route path="/profile/models"        element={<Navigate to="/profile/alex-rodriguez/videos" replace />} />
+                  <Route path="/account"               element={<Navigate to="/my-profile/settings" replace />} />
                   <Route path="/create"                element={<CreatePage />} />
                   <Route path="/rewards"               element={<Navigate to="/main" replace />} />
                   <Route path="/investing"             element={<Navigate to="/main" replace />} />

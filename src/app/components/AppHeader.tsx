@@ -8,8 +8,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
 import PersonIcon from '@mui/icons-material/Person';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-import SettingsIcon from '@mui/icons-material/Settings';
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import AddIcon from '@mui/icons-material/Add';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import NotificationsIcon from '@mui/icons-material/Notifications';
@@ -173,7 +172,7 @@ export default function AppHeader() {
                 <span className="absolute -top-1 -right-2.5 w-2 h-2 bg-brand rounded-full" />
               )}
             </button>
-            <button onClick={() => navigate('/account')} className={cls(['/account'])}>
+            <button onClick={() => navigate('/my-profile/settings')} className={cls(['/my-profile/settings'])}>
               Account
             </button>
             {profile?.role === 'admin' && (
@@ -199,7 +198,9 @@ export default function AppHeader() {
 
       <RiskBanner />
 
-      {/* Mobile bottom nav */}
+      {/* Mobile bottom nav — Home, Creators, [+ Create], Messages, Profile. Account no longer
+          lives here; its content moved to My Profile > Settings (gear icon), reached the same
+          way as before but nested under Profile instead of being its own tab. */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30">
         <div className="flex items-center justify-around h-16">
           <button
@@ -220,15 +221,19 @@ export default function AppHeader() {
               : <PeopleOutlinedIcon sx={{ fontSize: 24 }} />}
             <span className="text-[10px] font-medium">Creators</span>
           </button>
+
+          {/* Create — deliberately not styled like the other tabs (no icon/label pair, no
+              text-brand active state): a raised, filled circular button, same treatment as
+              this app's other floating create buttons, so it reads as an action, not a
+              destination. Always goes to /create regardless of current tab. */}
           <button
-            onClick={() => navigate('/my-profile')}
-            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/my-profile']) ? 'text-brand' : 'text-gray-500'}`}
+            onClick={() => navigate('/create')}
+            aria-label="Create"
+            className="flex items-center justify-center w-12 h-12 -mt-5 bg-mint text-black rounded-full shadow-lg hover:bg-mint-hover active:scale-95 transition-all"
           >
-            {active(['/my-profile'])
-              ? <PersonIcon sx={{ fontSize: 24 }} />
-              : <PersonOutlineIcon sx={{ fontSize: 24 }} />}
-            <span className="text-[10px] font-medium">Profile</span>
+            <AddIcon sx={{ fontSize: 28 }} />
           </button>
+
           <button
             onClick={() => navigate('/messages')}
             className={`relative flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/messages']) ? 'text-brand' : 'text-gray-500'}`}
@@ -242,13 +247,13 @@ export default function AppHeader() {
             <span className="text-[10px] font-medium">Messages</span>
           </button>
           <button
-            onClick={() => navigate('/account')}
-            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/account']) ? 'text-brand' : 'text-gray-500'}`}
+            onClick={() => navigate('/my-profile')}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/my-profile']) ? 'text-brand' : 'text-gray-500'}`}
           >
-            {active(['/account'])
-              ? <SettingsIcon sx={{ fontSize: 24 }} />
-              : <SettingsOutlinedIcon sx={{ fontSize: 24 }} />}
-            <span className="text-[10px] font-medium">Account</span>
+            {active(['/my-profile'])
+              ? <PersonIcon sx={{ fontSize: 24 }} />
+              : <PersonOutlineIcon sx={{ fontSize: 24 }} />}
+            <span className="text-[10px] font-medium">Profile</span>
           </button>
         </div>
       </nav>

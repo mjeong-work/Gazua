@@ -555,7 +555,7 @@ export default function MyProfilePage() {
                       {shareCopied ? <CheckIcon sx={{ fontSize: 15 }} /> : <ShareIcon sx={{ fontSize: 15 }} />}
                       {shareCopied ? 'Copied!' : 'Share'}
                     </button>
-                    <button onClick={() => navigate('/account')} className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0" title="Settings">
+                    <button onClick={() => navigate('/my-profile/settings')} className="p-2 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0" title="Settings">
                       <SettingsIcon sx={{ fontSize: 20, color: '#6b7280' }} />
                     </button>
                   </div>

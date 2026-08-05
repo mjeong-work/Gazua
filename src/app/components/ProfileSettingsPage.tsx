@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { toast } from 'sonner';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AppHeader from './AppHeader';
 import { signOut } from '../../lib/auth.service';
 import { useAuth } from '../contexts/AuthContext';
@@ -53,7 +54,9 @@ const RISK_LABELS: Record<string, string> = {
   speculative: 'Speculative',
 };
 
-export default function AccountPage() {
+// Reached via the gear icon on My Profile (Profile > Settings) — was previously its own
+// top-level "Account" destination; see /account's legacy redirect in App.tsx.
+export default function ProfileSettingsPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -146,7 +149,16 @@ export default function AccountPage() {
       <AppHeader />
 
       <div className="flex-1 px-4 py-8 w-full max-w-lg mx-auto space-y-4">
-        <h1 className="text-2xl font-bold text-gray-900">Account</h1>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigate('/my-profile')}
+            className="p-1.5 -ml-1.5 hover:bg-gray-100 rounded-full transition-colors"
+            aria-label="Back to profile"
+          >
+            <ArrowBackIcon sx={{ fontSize: 20 }} />
+          </button>
+          <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+        </div>
 
         {/* ── 1. Profile ─────────────────────────────────────────── */}
         <section className="border border-gray-200 rounded-2xl p-6">
