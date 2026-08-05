@@ -447,9 +447,11 @@ export default function MyProfilePage() {
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
                       <h1 className="text-2xl font-bold tracking-tight break-words">{displayName}</h1>
-                      <svg className="w-5 h-5 text-brand flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
+                      {profile?.credibility_level === 'verified_pro' && (
+                        <svg className="w-5 h-5 text-brand flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      )}
                     </div>
                     <p className="text-gray-500 text-sm mb-3">{displayHandle}</p>
                     <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm">
