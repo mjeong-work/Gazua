@@ -207,23 +207,23 @@ export default function CreatorProfileVideos() {
         <AppHeader />
         <div className="flex-1 overflow-y-auto">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8 animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-16 mb-8" />
+            <div className="h-4 bg-neutral-200 rounded w-16 mb-8" />
             <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 mb-8">
-              <div className="w-20 h-20 sm:w-32 sm:h-32 rounded-full bg-gray-200 flex-shrink-0" />
+              <div className="w-20 h-20 sm:w-32 sm:h-32 rounded-full bg-neutral-200 flex-shrink-0" />
               <div className="flex-1 space-y-3 pt-2">
-                <div className="h-7 bg-gray-200 rounded w-48" />
-                <div className="h-4 bg-gray-200 rounded w-28" />
+                <div className="h-7 bg-neutral-200 rounded w-48" />
+                <div className="h-4 bg-neutral-200 rounded w-28" />
                 <div className="flex gap-6 mt-2">
-                  <div className="h-4 bg-gray-200 rounded w-20" />
-                  <div className="h-4 bg-gray-200 rounded w-20" />
-                  <div className="h-4 bg-gray-200 rounded w-20" />
+                  <div className="h-4 bg-neutral-200 rounded w-20" />
+                  <div className="h-4 bg-neutral-200 rounded w-20" />
+                  <div className="h-4 bg-neutral-200 rounded w-20" />
                 </div>
-                <div className="h-4 bg-gray-200 rounded w-full max-w-lg mt-2" />
-                <div className="h-4 bg-gray-200 rounded w-4/5 max-w-md" />
+                <div className="h-4 bg-neutral-200 rounded w-full max-w-lg mt-2" />
+                <div className="h-4 bg-neutral-200 rounded w-4/5 max-w-md" />
                 <div className="flex gap-3 mt-4">
-                  <div className="h-10 bg-gray-200 rounded-full w-24" />
-                  <div className="h-10 bg-gray-200 rounded-full w-24" />
-                  <div className="h-10 bg-gray-200 rounded-full w-24" />
+                  <div className="h-10 bg-neutral-200 rounded-full w-24" />
+                  <div className="h-10 bg-neutral-200 rounded-full w-24" />
+                  <div className="h-10 bg-neutral-200 rounded-full w-24" />
                 </div>
               </div>
             </div>
@@ -241,7 +241,7 @@ export default function CreatorProfileVideos() {
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-2">Creator not found</h2>
-            <p className="text-gray-600 mb-4">This creator profile doesn't exist yet.</p>
+            <p className="text-neutral-600 mb-4">This creator profile doesn't exist yet.</p>
             <button onClick={() => navigate('/creators')} className="px-6 py-3 bg-black text-white rounded-full hover:bg-black/80">
               Browse Creators
             </button>
@@ -258,7 +258,7 @@ export default function CreatorProfileVideos() {
 
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-5xl mx-auto px-6 pt-6">
-          <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-gray-600 hover:text-black">
+          <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-neutral-600 hover:text-black">
             <ArrowBackIcon sx={{ fontSize: 16 }} />
             Back
           </button>
@@ -268,7 +268,7 @@ export default function CreatorProfileVideos() {
 
           {/* ── Profile Header ── */}
           <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 mb-6 sm:mb-8">
-            <div className="w-20 h-20 sm:w-32 sm:h-32 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-4xl sm:text-5xl flex-shrink-0">
+            <div className="w-20 h-20 sm:w-32 sm:h-32 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-4xl sm:text-5xl flex-shrink-0">
               {creator.avatar}
             </div>
 
@@ -285,25 +285,25 @@ export default function CreatorProfileVideos() {
                       </span>
                     )}
                   </div>
-                  <p className="text-gray-600 mb-3">{creator.handle}</p>
+                  <p className="text-neutral-600 mb-3">{creator.handle}</p>
                   <div className="flex items-center flex-wrap gap-3 sm:gap-6 text-sm mb-4">
                     <div>
                       <span className="font-bold text-lg">
                         {followerCount !== null ? followerCount.toLocaleString() : creator.followers}
                       </span>
-                      <span className="text-gray-600 ml-1">followers</span>
+                      <span className="text-neutral-600 ml-1">followers</span>
                     </div>
                     <div>
                       <span className="font-bold text-lg">
                         {followingCount !== null ? followingCount.toLocaleString() : creator.following}
                       </span>
-                      <span className="text-gray-600 ml-1">following</span>
+                      <span className="text-neutral-600 ml-1">following</span>
                     </div>
                     <div>
                       <span className="font-bold text-lg">
                         {postCount !== null ? postCount.toLocaleString() : creator.posts}
                       </span>
-                      <span className="text-gray-600 ml-1">posts</span>
+                      <span className="text-neutral-600 ml-1">posts</span>
                     </div>
                   </div>
                 </div>
@@ -317,7 +317,7 @@ export default function CreatorProfileVideos() {
                       try { localStorage.setItem(`gazua:notif:${creatorId}`, String(next)); } catch {}
                       triggerToast(next ? 'Notifications enabled for this creator' : 'Notifications turned off');
                     }}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    className="p-2 hover:bg-neutral-100 rounded-full transition-colors"
                     title="Toggle notifications"
                   >
                     {notificationsOn
@@ -325,17 +325,17 @@ export default function CreatorProfileVideos() {
                       : <NotificationsIcon sx={{ fontSize: 20 }} />
                     }
                   </button>
-                  <button onClick={handleShare} className="p-2 hover:bg-gray-100 rounded-full transition-colors" title="Share profile">
+                  <button onClick={handleShare} className="p-2 hover:bg-neutral-100 rounded-full transition-colors" title="Share profile">
                     <ShareIcon sx={{ fontSize: 20 }} />
                   </button>
                   <div className="relative">
-                    <button onClick={() => setShowMoreMenu(v => !v)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                    <button onClick={() => setShowMoreMenu(v => !v)} className="p-2 hover:bg-neutral-100 rounded-full transition-colors">
                       <MoreHorizIcon sx={{ fontSize: 20 }} />
                     </button>
                     {showMoreMenu && (
-                      <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg py-2 w-44 z-10" onMouseLeave={() => setShowMoreMenu(false)}>
-                        <button className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50" onClick={() => { triggerToast('Report submitted'); setShowMoreMenu(false); }}>Report creator</button>
-                        <button className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50" onClick={() => { triggerToast('Creator muted'); setShowMoreMenu(false); }}>Mute creator</button>
+                      <div className="absolute right-0 top-full mt-1 bg-white border border-neutral-200 rounded-xl shadow-lg py-2 w-44 z-10" onMouseLeave={() => setShowMoreMenu(false)}>
+                        <button className="w-full text-left px-4 py-2 text-sm hover:bg-neutral-50" onClick={() => { triggerToast('Report submitted'); setShowMoreMenu(false); }}>Report creator</button>
+                        <button className="w-full text-left px-4 py-2 text-sm hover:bg-neutral-50" onClick={() => { triggerToast('Creator muted'); setShowMoreMenu(false); }}>Mute creator</button>
                       </div>
                     )}
                   </div>
@@ -347,7 +347,7 @@ export default function CreatorProfileVideos() {
               <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                 <button
                   onClick={handleFollowToggle}
-                  className={`px-6 sm:px-8 py-2.5 font-medium text-sm rounded-full transition-colors ${isFollowingCreator ? 'bg-gray-200 text-black hover:bg-gray-300' : 'bg-black text-white hover:bg-black/80'}`}
+                  className={`px-6 sm:px-8 py-2.5 font-medium text-sm rounded-full transition-colors ${isFollowingCreator ? 'bg-neutral-200 text-black hover:bg-neutral-300' : 'bg-black text-white hover:bg-black/80'}`}
                 >
                   {isFollowingCreator ? 'Following' : 'Follow'}
                 </button>
@@ -362,7 +362,7 @@ export default function CreatorProfileVideos() {
                 {dbProfile && (
                   <button
                     onClick={() => setShowChat(true)}
-                    className="px-5 sm:px-6 py-2.5 bg-gray-100 text-black font-medium text-sm rounded-full hover:bg-gray-200 transition-colors"
+                    className="px-5 sm:px-6 py-2.5 bg-neutral-100 text-black font-medium text-sm rounded-full hover:bg-neutral-200 transition-colors"
                   >
                     Message
                   </button>
@@ -372,7 +372,7 @@ export default function CreatorProfileVideos() {
           </div>
 
           {/* ── Tabs ── */}
-          <div className="border-b border-gray-200 mb-6 sm:mb-8">
+          <div className="border-b border-neutral-200 mb-6 sm:mb-8">
             <div className="flex gap-4 sm:gap-8 overflow-x-auto">
               {(['investment', 'videos', 'posts', 'about'] as const).map(tab => (
                 <button
@@ -381,7 +381,7 @@ export default function CreatorProfileVideos() {
                     setActiveTab(tab);
                     if (tab === 'investment') navigate(`/profile/${creatorId}/investment`);
                   }}
-                  className={`pb-4 px-1 font-medium text-sm border-b-2 capitalize transition-colors whitespace-nowrap flex-shrink-0 ${activeTab === tab ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                  className={`pb-4 px-1 font-medium text-sm border-b-2 capitalize transition-colors whitespace-nowrap flex-shrink-0 ${activeTab === tab ? 'border-black text-black' : 'border-transparent text-neutral-500 hover:text-neutral-700'}`}
                 >
                   {tab}
                 </button>
@@ -394,11 +394,11 @@ export default function CreatorProfileVideos() {
             <>
               {videos.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-24 text-center">
-                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+                  <div className="w-20 h-20 bg-neutral-100 rounded-full flex items-center justify-center mb-6">
                     <VideoLibraryIcon sx={{ fontSize: 40, color: '#d1d5db' }} />
                   </div>
                   <h3 className="text-xl font-bold mb-2">No videos yet</h3>
-                  <p className="text-gray-500 text-sm max-w-xs">
+                  <p className="text-neutral-500 text-sm max-w-xs">
                     {creator.name} hasn't published any videos yet. Check back later.
                   </p>
                 </div>
@@ -422,7 +422,7 @@ export default function CreatorProfileVideos() {
                       </div>
                     </div>
                     <h3 className="font-medium text-sm mb-1 group-hover:text-brand transition-colors line-clamp-2">{video.title}</h3>
-                    <p className="text-xs text-gray-600">{video.views} views • {video.uploaded_at}</p>
+                    <p className="text-xs text-neutral-600">{video.views} views • {video.uploaded_at}</p>
                   </div>
                 ))}
               </div>
@@ -434,18 +434,18 @@ export default function CreatorProfileVideos() {
             <>
               {posts.length === 0 && (
                 <div className="flex flex-col items-center justify-center py-24 text-center">
-                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
+                  <div className="w-20 h-20 bg-neutral-100 rounded-full flex items-center justify-center mb-6">
                     <VideoLibraryIcon sx={{ fontSize: 40, color: '#d1d5db' }} />
                   </div>
                   <h3 className="text-xl font-bold mb-2">No posts yet</h3>
-                  <p className="text-gray-500 text-sm max-w-xs">
+                  <p className="text-neutral-500 text-sm max-w-xs">
                     {creator.name} hasn't shared any posts yet. Check back later.
                   </p>
                 </div>
               )}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {posts.map((post) => (
-                  <div key={post.id} className="p-4 bg-white border border-gray-200 rounded-xl hover:border-gray-300 transition-colors flex flex-col">
+                  <div key={post.id} className="p-4 bg-white border border-neutral-200 rounded-xl hover:border-neutral-300 transition-colors flex flex-col">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
                         {creator.avatar}
@@ -459,14 +459,14 @@ export default function CreatorProfileVideos() {
                             </svg>
                           )}
                         </div>
-                        <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                        <div className="flex items-center gap-1.5 text-xs text-neutral-400">
                           <span>{creator.handle}</span><span>·</span><span>{post.time}</span>
                         </div>
                       </div>
-                      <span className="text-xs font-medium px-2 py-1 bg-gray-100 rounded-full text-gray-500 flex-shrink-0">{post.tag}</span>
+                      <span className="text-xs font-medium px-2 py-1 bg-neutral-100 rounded-full text-neutral-500 flex-shrink-0">{post.tag}</span>
                     </div>
-                    <p className="text-sm text-gray-800 leading-relaxed flex-1 mb-3">{post.content}</p>
-                    <div className="flex items-center gap-5 text-xs text-gray-400 pt-3 border-t border-gray-100 mt-auto">
+                    <p className="text-sm text-neutral-800 leading-relaxed flex-1 mb-3">{post.content}</p>
+                    <div className="flex items-center gap-5 text-xs text-neutral-400 pt-3 border-t border-neutral-100 mt-auto">
                       <button className="flex items-center gap-1.5 hover:text-brand transition-colors text-[14px]">
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
                         {post.likes.toLocaleString()}
@@ -479,7 +479,7 @@ export default function CreatorProfileVideos() {
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                         {post.reposts.toLocaleString()}
                       </button>
-                      <button className="flex items-center gap-1.5 hover:text-gray-600 transition-colors ml-auto">
+                      <button className="flex items-center gap-1.5 hover:text-neutral-600 transition-colors ml-auto">
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
                       </button>
                     </div>
@@ -494,9 +494,9 @@ export default function CreatorProfileVideos() {
           {activeTab === 'about' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-5">
-                <div className="p-5 bg-white border border-gray-200 rounded-xl">
+                <div className="p-5 bg-white border border-neutral-200 rounded-xl">
                   <h2 className="text-base font-semibold mb-3">About {creator.name}</h2>
-                  <p className="text-sm text-gray-700 leading-relaxed">{creator.bio}</p>
+                  <p className="text-sm text-neutral-700 leading-relaxed">{creator.bio}</p>
                 </div>
                 <div className="p-4 border border-amber-200 bg-amber-50 rounded-xl">
                   <p className="text-xs text-amber-800 leading-relaxed">
@@ -506,16 +506,16 @@ export default function CreatorProfileVideos() {
               </div>
               <div className="space-y-4">
                 {(dbProfile?.tags?.length || creator.focus) && (
-                  <div className="p-5 bg-white border border-gray-200 rounded-xl">
+                  <div className="p-5 bg-white border border-neutral-200 rounded-xl">
                     <h3 className="text-base font-semibold mb-3">Focus Areas</h3>
                     <div className="flex flex-wrap gap-2">
                       {(dbProfile?.tags?.length ? dbProfile.tags : [creator.focus]).map(tag => (
-                        <span key={tag} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">{tag}</span>
+                        <span key={tag} className="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-xs font-medium">{tag}</span>
                       ))}
                     </div>
                   </div>
                 )}
-                <div className="p-5 bg-white border border-gray-200 rounded-xl space-y-3">
+                <div className="p-5 bg-white border border-neutral-200 rounded-xl space-y-3">
                   <h3 className="text-base font-semibold">By the numbers</h3>
                   {[
                     { label: 'Followers', value: followerCount !== null ? followerCount.toLocaleString() : creator.followers },
@@ -523,7 +523,7 @@ export default function CreatorProfileVideos() {
                     { label: 'Joined', value: dbProfile ? new Date(dbProfile.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '—' },
                   ].map(stat => (
                     <div key={stat.label} className="flex items-center justify-between text-sm">
-                      <span className="text-gray-500">{stat.label}</span>
+                      <span className="text-neutral-500">{stat.label}</span>
                       <span className="font-semibold">{stat.value}</span>
                     </div>
                   ))}
@@ -557,8 +557,8 @@ export default function CreatorProfileVideos() {
             </div>
             <div className="p-6">
               <h3 className="text-xl font-bold mb-2">{previewVideo.title}</h3>
-              <p className="text-sm text-gray-600 mb-4">{creator.name} • {previewVideo.views} views • {previewVideo.uploaded_at}</p>
-              <div className="p-4 bg-gray-50 rounded-lg text-center text-sm text-gray-600">
+              <p className="text-sm text-neutral-600 mb-4">{creator.name} • {previewVideo.views} views • {previewVideo.uploaded_at}</p>
+              <div className="p-4 bg-neutral-50 rounded-lg text-center text-sm text-neutral-600">
                 🎬 Full video playback coming soon.
               </div>
             </div>

@@ -562,7 +562,7 @@ export default function CreatorsPage() {
     const hasProfile = dbProfiles !== null ? true : !!getCreator(creatorSlug);
 
     return (
-      <div key={creator.id} className={`${opts.fullWidth ? 'w-full' : 'flex-shrink-0 w-[min(78vw,300px)] sm:w-80'} border border-gray-200 rounded-xl p-6 hover:border-gray-300 transition-colors bg-white`}>
+      <div key={creator.id} className={`${opts.fullWidth ? 'w-full' : 'flex-shrink-0 w-[min(78vw,300px)] sm:w-80'} border border-neutral-200 rounded-xl p-6 hover:border-neutral-300 transition-colors bg-white`}>
         <div className="flex items-start gap-4 mb-4">
           <div
             onClick={hasProfile ? () => navigate(`/profile/${creatorSlug}/investment`) : undefined}
@@ -584,8 +584,8 @@ export default function CreatorsPage() {
                 </svg>
               )}
             </div>
-            <p className="text-sm text-gray-600 mb-2 line-clamp-2">{creator.tagline}</p>
-            <div className="flex items-center gap-2 text-xs text-gray-500">
+            <p className="text-sm text-neutral-600 mb-2 line-clamp-2">{creator.tagline}</p>
+            <div className="flex items-center gap-2 text-xs text-neutral-500">
               <span className="font-medium text-black">{creator.followers}</span>
               <span>followers</span>
             </div>
@@ -594,7 +594,7 @@ export default function CreatorsPage() {
 
         <div className="flex items-center gap-2 mb-4 flex-wrap">
           {creator.tags.slice(0, 3).map((tag) => (
-            <span key={tag} className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium">
+            <span key={tag} className="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-xs font-medium">
               {tag}
             </span>
           ))}
@@ -605,7 +605,7 @@ export default function CreatorsPage() {
             onClick={() => toggleFollow(followId)}
             className={`${hasProfile ? 'flex-1' : 'w-full'} px-4 py-2 rounded-full text-sm font-medium transition-colors ${
               isFollowing
-                ? 'bg-gray-200 text-black hover:bg-gray-300'
+                ? 'bg-neutral-200 text-black hover:bg-neutral-300'
                 : 'bg-black text-white hover:bg-black/80'
             }`}
           >
@@ -614,7 +614,7 @@ export default function CreatorsPage() {
           {hasProfile && (
             <button
               onClick={() => navigate(`/profile/${creatorSlug}/investment`)}
-              className="flex-1 px-4 py-2 border border-gray-200 rounded-full text-sm font-medium hover:bg-gray-50 transition-colors"
+              className="flex-1 px-4 py-2 border border-neutral-200 rounded-full text-sm font-medium hover:bg-neutral-50 transition-colors"
             >
               View
             </button>
@@ -666,7 +666,7 @@ export default function CreatorsPage() {
         </h3>
         <p
           onClick={contentHasProfile ? (e) => { e.stopPropagation(); navigate(`/profile/${contentCreatorSlug}/investment`); } : undefined}
-          className={`text-xs text-gray-600 ${contentHasProfile ? 'cursor-pointer hover:underline hover:text-black' : ''}`}
+          className={`text-xs text-neutral-600 ${contentHasProfile ? 'cursor-pointer hover:underline hover:text-black' : ''}`}
         >
           {item.creator}
         </p>
@@ -706,17 +706,17 @@ export default function CreatorsPage() {
             <div className="flex items-center gap-1 mb-0.5">
               <p
                 onClick={video.hasProfile ? (e) => { e.stopPropagation(); navigate(`/profile/${video.creatorRouteSlug}/videos`); } : undefined}
-                className={`text-xs text-gray-600 ${video.hasProfile ? 'cursor-pointer hover:underline hover:text-black' : ''}`}
+                className={`text-xs text-neutral-600 ${video.hasProfile ? 'cursor-pointer hover:underline hover:text-black' : ''}`}
               >
                 {video.creator}
               </p>
               {video.creatorVerified && (
-                <svg className="w-3 h-3 text-gray-600" viewBox="0 0 24 24" fill="currentColor">
+                <svg className="w-3 h-3 text-neutral-600" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               )}
             </div>
-            <p className="text-xs text-gray-600">
+            <p className="text-xs text-neutral-600">
               {video.views} views • {video.uploadedAt}
             </p>
           </div>
@@ -739,7 +739,7 @@ export default function CreatorsPage() {
 
           {/* ── Mobile (< lg): tab-and-swipe browsing ── */}
           <div className="lg:hidden h-full flex flex-col">
-            <div className="flex items-center border-b border-gray-200 flex-shrink-0">
+            <div className="flex items-center border-b border-neutral-200 flex-shrink-0">
               <div
                 role="tablist"
                 aria-label="Content type"
@@ -757,7 +757,7 @@ export default function CreatorsPage() {
                     tabIndex={mobileTab === key ? 0 : -1}
                     onClick={() => handleTabClick(key)}
                     className={`flex-1 py-3.5 text-sm text-center border-b-2 transition-colors ${
-                      mobileTab === key ? 'border-black text-black font-semibold' : 'border-transparent text-gray-500 font-medium'
+                      mobileTab === key ? 'border-black text-black font-semibold' : 'border-transparent text-neutral-500 font-medium'
                     }`}
                   >
                     {label}
@@ -769,7 +769,7 @@ export default function CreatorsPage() {
                 aria-haspopup="dialog"
                 aria-expanded={isFilterSheetOpen}
                 aria-label={`Filter by level${activeMobileFilterCount > 0 ? ` (${activeMobileFilterCount} active)` : ''}`}
-                className="relative shrink-0 px-4 py-3.5 text-gray-600 hover:text-black transition-colors"
+                className="relative shrink-0 px-4 py-3.5 text-neutral-600 hover:text-black transition-colors"
               >
                 <TuneIcon sx={{ fontSize: 20 }} />
                 {activeMobileFilterCount > 0 && (
@@ -779,7 +779,7 @@ export default function CreatorsPage() {
             </div>
 
             {isSearching && (
-              <p className="text-sm text-gray-500 px-4 py-3 flex-shrink-0 border-b border-gray-100">
+              <p className="text-sm text-neutral-500 px-4 py-3 flex-shrink-0 border-b border-neutral-100">
                 Results for <span className="font-medium text-black">"{debouncedSearchQuery}"</span>
                 {' · '}
                 <button onClick={clearSearch} className="text-brand hover:underline">Clear</button>
@@ -802,20 +802,20 @@ export default function CreatorsPage() {
                   {creatorsLoading ? (
                     <div className="flex flex-col gap-4">
                       {[1, 2, 3].map(n => (
-                        <div key={n} className="w-full border border-gray-200 rounded-xl p-6 animate-pulse">
+                        <div key={n} className="w-full border border-neutral-200 rounded-xl p-6 animate-pulse">
                           <div className="flex items-start gap-4 mb-4">
-                            <div className="w-16 h-16 rounded-full bg-gray-200 flex-shrink-0" />
+                            <div className="w-16 h-16 rounded-full bg-neutral-200 flex-shrink-0" />
                             <div className="flex-1 space-y-2 pt-1">
-                              <div className="h-4 bg-gray-200 rounded w-2/3" />
-                              <div className="h-3 bg-gray-200 rounded w-full" />
+                              <div className="h-4 bg-neutral-200 rounded w-2/3" />
+                              <div className="h-3 bg-neutral-200 rounded w-full" />
                             </div>
                           </div>
-                          <div className="h-9 bg-gray-200 rounded-full" />
+                          <div className="h-9 bg-neutral-200 rounded-full" />
                         </div>
                       ))}
                     </div>
                   ) : displayedCreators.length === 0 ? (
-                    <p className="text-center text-gray-500 text-sm py-12">{mobileEmptyMessage('creators')}</p>
+                    <p className="text-center text-neutral-500 text-sm py-12">{mobileEmptyMessage('creators')}</p>
                   ) : (
                     <div className="flex flex-col gap-4">
                       {displayedCreators.map((c) => renderCreatorCard(c, { fullWidth: true }))}
@@ -833,7 +833,7 @@ export default function CreatorsPage() {
               >
                 <div className="px-4 py-4 pb-28">
                   {mobileReelsItems.length === 0 ? (
-                    <p className="text-center text-gray-500 text-sm py-12">{mobileEmptyMessage('reels')}</p>
+                    <p className="text-center text-neutral-500 text-sm py-12">{mobileEmptyMessage('reels')}</p>
                   ) : (
                     <div className="grid grid-cols-2 gap-3">
                       {mobileReelsItems.map((item) => renderContentCard(item, { fullWidth: true }))}
@@ -851,7 +851,7 @@ export default function CreatorsPage() {
               >
                 <div className="px-4 py-4 pb-28">
                   {mobileVideoItems.length === 0 ? (
-                    <p className="text-center text-gray-500 text-sm py-12">{mobileEmptyMessage('videos')}</p>
+                    <p className="text-center text-neutral-500 text-sm py-12">{mobileEmptyMessage('videos')}</p>
                   ) : (
                     <div className="flex flex-col gap-5">
                       {mobileVideoItems.map((v) => renderVideoCard(v, { fullWidth: true }))}
@@ -867,7 +867,7 @@ export default function CreatorsPage() {
             {/* Hero */}
             <div className="text-center mb-8">
               <h1 className="text-5xl font-bold mb-4">Discover Finance Creators</h1>
-              <p className="text-xl text-gray-600 mb-8">
+              <p className="text-xl text-neutral-600 mb-8">
                 Learn from expert investors, traders, and educators sharing real strategies and market insights.
               </p>
 
@@ -880,7 +880,7 @@ export default function CreatorsPage() {
                     className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all shrink-0 ${
                       isDesktopFilterActive(filter)
                         ? 'bg-black text-white'
-                        : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300'
+                        : 'bg-white text-neutral-700 border border-neutral-200 hover:border-neutral-300'
                     }`}
                   >
                     {filter}
@@ -889,7 +889,7 @@ export default function CreatorsPage() {
               </div>
 
               {isSearching && (
-                <p className="text-sm text-gray-500 mt-4">
+                <p className="text-sm text-neutral-500 mt-4">
                   Showing results for <span className="font-medium text-black">"{debouncedSearchQuery}"</span>
                   {' · '}
                   <button onClick={clearSearch} className="text-brand hover:underline">Clear</button>
@@ -898,7 +898,7 @@ export default function CreatorsPage() {
             </div>
 
             {isSearching && !hasAnySearchResults ? (
-              <p className="text-center text-gray-500 text-sm py-12">
+              <p className="text-center text-neutral-500 text-sm py-12">
                 No results found for "{debouncedSearchQuery}"
               </p>
             ) : (
@@ -910,22 +910,22 @@ export default function CreatorsPage() {
                     {creatorsLoading ? (
                       <div className="max-w-[1328px] mx-auto flex gap-4 overflow-x-auto pb-2" style={{ justifyContent: 'safe center' }}>
                         {[1, 2, 3].map(n => (
-                          <div key={n} className="flex-shrink-0 w-[min(78vw,300px)] sm:w-80 border border-gray-200 rounded-xl p-6 animate-pulse">
+                          <div key={n} className="flex-shrink-0 w-[min(78vw,300px)] sm:w-80 border border-neutral-200 rounded-xl p-6 animate-pulse">
                             <div className="flex items-start gap-4 mb-4">
-                              <div className="w-16 h-16 rounded-full bg-gray-200 flex-shrink-0" />
+                              <div className="w-16 h-16 rounded-full bg-neutral-200 flex-shrink-0" />
                               <div className="flex-1 space-y-2 pt-1">
-                                <div className="h-4 bg-gray-200 rounded w-2/3" />
-                                <div className="h-3 bg-gray-200 rounded w-full" />
+                                <div className="h-4 bg-neutral-200 rounded w-2/3" />
+                                <div className="h-3 bg-neutral-200 rounded w-full" />
                               </div>
                             </div>
-                            <div className="h-9 bg-gray-200 rounded-full" />
+                            <div className="h-9 bg-neutral-200 rounded-full" />
                           </div>
                         ))}
                       </div>
                     ) : myFollowingOnly && !user && !isSearching ? (
-                      <p className="text-center text-gray-500 text-sm">Sign in to see your followed creators</p>
+                      <p className="text-center text-neutral-500 text-sm">Sign in to see your followed creators</p>
                     ) : myFollowingOnly && displayedCreators.length === 0 && !isSearching ? (
-                      <p className="text-center text-gray-500 text-sm">Follow creators to see them here</p>
+                      <p className="text-center text-neutral-500 text-sm">Follow creators to see them here</p>
                     ) : (
                       <div className="max-w-[1328px] mx-auto flex gap-4 overflow-x-auto pb-2" style={{ justifyContent: 'safe center' }}>
                         {displayedCreators.map((c) => renderCreatorCard(c))}
@@ -939,11 +939,11 @@ export default function CreatorsPage() {
                   <section className="mb-12">
                     <h2 className="text-2xl font-bold mb-6 text-center">Featured Content</h2>
                     {myFollowingOnly && !user && !isSearching ? (
-                      <p className="text-center text-gray-500 text-sm">Sign in to see your followed creators</p>
+                      <p className="text-center text-neutral-500 text-sm">Sign in to see your followed creators</p>
                     ) : myFollowingOnly && displayedContent.length === 0 && !isSearching ? (
-                      <p className="text-center text-gray-500 text-sm">Follow creators to see them here</p>
+                      <p className="text-center text-neutral-500 text-sm">Follow creators to see them here</p>
                     ) : displayedContent.length === 0 ? (
-                      <p className="text-center text-gray-500 text-sm">No reels yet. Check back soon!</p>
+                      <p className="text-center text-neutral-500 text-sm">No reels yet. Check back soon!</p>
                     ) : (
                       <div className="max-w-[1344px] mx-auto flex gap-4 overflow-x-auto pb-2" style={{ justifyContent: 'safe center' }}>
                         {displayedContent.map((item) => renderContentCard(item))}
@@ -957,7 +957,7 @@ export default function CreatorsPage() {
                   <section className="mb-12">
                     <h2 className="text-2xl font-bold mb-6 text-center">Videos</h2>
                     {videos.length === 0 ? (
-                      <p className="text-center text-gray-500 text-sm">No videos yet. Check back soon!</p>
+                      <p className="text-center text-neutral-500 text-sm">No videos yet. Check back soon!</p>
                     ) : (
                       <div className="max-w-[1328px] mx-auto flex gap-4 overflow-x-auto pb-2" style={{ justifyContent: 'safe center' }}>
                         {videos.map((v) => renderVideoCard(v))}
