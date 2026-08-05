@@ -106,7 +106,7 @@ export default function UploadVideoModal({ onClose, onSuccess }: UploadVideoModa
       >
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold">Upload Video</h2>
-          <button onClick={onClose} className="icon-tap-target p-1.5 hover:bg-gray-100 rounded-full transition-colors">
+          <button onClick={onClose} className="icon-tap-target p-1.5 hover:bg-neutral-100 rounded-full transition-colors">
             <CloseIcon sx={{ fontSize: 18 }} />
           </button>
         </div>
@@ -123,24 +123,24 @@ export default function UploadVideoModal({ onClose, onSuccess }: UploadVideoModa
           onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
           onDragLeave={() => setIsDragging(false)}
           onDrop={(e) => { e.preventDefault(); setIsDragging(false); handleFileSelected(e.dataTransfer.files?.[0]); }}
-          className={`border-2 border-dashed rounded-xl p-8 text-center mb-4 transition-colors cursor-pointer ${isDragging ? 'border-brand bg-green-50' : 'border-gray-200 hover:border-gray-300'}`}
+          className={`border-2 border-dashed rounded-xl p-8 text-center mb-4 transition-colors cursor-pointer ${isDragging ? 'border-brand bg-green-50' : 'border-neutral-200 hover:border-neutral-300'}`}
         >
           <div className="text-3xl mb-2">🎬</div>
-          <p className="text-sm font-medium text-gray-700 mb-1">
+          <p className="text-sm font-medium text-neutral-700 mb-1">
             {processing ? 'Processing video…' : fileName ? `Selected: ${fileName}` : 'Drop your video here or click to browse'}
           </p>
-          <p className="text-xs text-gray-400">MP4, MOV, or WEBM up to 4GB</p>
+          <p className="text-xs text-neutral-400">MP4, MOV, or WEBM up to 4GB</p>
         </div>
         {error && <p className="text-sm text-red-500 mb-4">{error}</p>}
 
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-gray-600 mb-1.5">Title <span className="text-red-400">*</span></label>
+            <label className="block text-xs font-medium text-neutral-600 mb-1.5">Title <span className="text-red-400">*</span></label>
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Give your video a title..."
-              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors"
+              className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors"
             />
           </div>
         </div>
@@ -153,7 +153,7 @@ export default function UploadVideoModal({ onClose, onSuccess }: UploadVideoModa
           >
             {uploading ? 'Uploading…' : 'Upload'}
           </button>
-          <button onClick={onClose} className="flex-1 py-2.5 border border-gray-200 text-sm font-medium rounded-full hover:bg-gray-50 transition-colors">
+          <button onClick={onClose} className="flex-1 py-2.5 border border-neutral-200 text-sm font-medium rounded-full hover:bg-neutral-50 transition-colors">
             Cancel
           </button>
         </div>

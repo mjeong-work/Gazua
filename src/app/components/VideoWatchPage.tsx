@@ -182,7 +182,7 @@ export default function VideoWatchPage() {
       <div className="min-h-screen flex flex-col bg-white">
         <AppHeader />
         <div className="flex-1 flex items-center justify-center">
-          <div className="w-10 h-10 border-2 border-gray-200 border-t-black rounded-full animate-spin" />
+          <div className="w-10 h-10 border-2 border-neutral-200 border-t-black rounded-full animate-spin" />
         </div>
       </div>
     );
@@ -195,7 +195,7 @@ export default function VideoWatchPage() {
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-2">Video not found</h2>
-            <p className="text-gray-600 mb-4">This video doesn't exist or may have been removed.</p>
+            <p className="text-neutral-600 mb-4">This video doesn't exist or may have been removed.</p>
             <button onClick={() => navigate('/creators')} className="px-6 py-3 bg-black text-white rounded-full hover:bg-black/80">
               Browse Creators
             </button>
@@ -214,7 +214,7 @@ export default function VideoWatchPage() {
       <div className="flex-1 overflow-y-auto">
         <div className={`mx-auto px-4 sm:px-6 py-6 pb-24 lg:pb-8 transition-[max-width] duration-200 ${isCommentsOpen ? 'max-w-6xl' : 'max-w-4xl'} lg:flex lg:items-start lg:gap-6`}>
         <div className="min-w-0 flex-1">
-          <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-gray-600 hover:text-black mb-4">
+          <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-sm text-neutral-600 hover:text-black mb-4">
             <ArrowBackIcon sx={{ fontSize: 16 }} />
             Back
           </button>
@@ -256,19 +256,19 @@ export default function VideoWatchPage() {
 
           {/* ── Title & stats ── */}
           <h1 className="text-xl font-bold mb-1">{video.title}</h1>
-          <div className="flex flex-wrap items-center gap-x-1.5 text-sm text-gray-500 mb-4">
+          <div className="flex flex-wrap items-center gap-x-1.5 text-sm text-neutral-500 mb-4">
             <ReelMetadata viewCount={video.views} likeCount={likeCount} />
             <span aria-hidden="true">·</span>
             <span>{video.uploadedAt}</span>
           </div>
 
           {/* ── Creator bar ── */}
-          <div className="flex items-center justify-between border-t border-gray-200 pt-4 mb-4">
+          <div className="flex items-center justify-between border-t border-neutral-200 pt-4 mb-4">
             <button
               onClick={() => navigate(`/profile/${video.creatorRouteSlug}/videos`)}
               className="flex items-center gap-3 text-left hover:opacity-80 transition-opacity"
             >
-              <div className="w-11 h-11 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-xl flex-shrink-0">
+              <div className="w-11 h-11 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-xl flex-shrink-0">
                 {video.creatorAvatar}
               </div>
               <div>
@@ -280,14 +280,14 @@ export default function VideoWatchPage() {
                     </svg>
                   )}
                 </div>
-                {video.creatorFollowers && <p className="text-xs text-gray-500">{video.creatorFollowers} followers</p>}
+                {video.creatorFollowers && <p className="text-xs text-neutral-500">{video.creatorFollowers} followers</p>}
               </div>
             </button>
 
             <button
               onClick={() => toggleFollow(video.creatorFollowId)}
               className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
-                isFollowingCreator ? 'bg-gray-200 text-black hover:bg-gray-300' : 'bg-black text-white hover:bg-black/80'
+                isFollowingCreator ? 'bg-neutral-200 text-black hover:bg-neutral-300' : 'bg-black text-white hover:bg-black/80'
               }`}
             >
               {isFollowingCreator ? 'Following' : 'Follow'}
@@ -306,7 +306,7 @@ export default function VideoWatchPage() {
             shareUrl={window.location.href}
             shareTitle={video.title}
             onToast={(msg, subtitle) => toast(msg, subtitle ? { description: subtitle } : undefined)}
-            className="border-y border-gray-200 py-4 mb-8"
+            className="border-y border-neutral-200 py-4 mb-8"
             commentsPortalTarget={commentsPortalEl}
             onCommentPanelOpenChange={setIsCommentsOpen}
             savedItem={savedItem!}
@@ -331,7 +331,7 @@ export default function VideoWatchPage() {
                       </div>
                     </div>
                     <h3 className="font-medium text-sm mb-1 line-clamp-2 group-hover:text-brand transition-colors">{v.title}</h3>
-                    <p className="text-xs text-gray-400">{v.views} views · {v.uploadedAt}</p>
+                    <p className="text-xs text-neutral-400">{v.views} views · {v.uploadedAt}</p>
                   </div>
                 ))}
               </div>
