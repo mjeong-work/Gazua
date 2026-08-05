@@ -190,20 +190,28 @@ export default function MyProfilePage() {
               </div>
             </div>
 
-            {activeTab === 'investment' && <InvestmentTab />}
-            {activeTab === 'videos' && <VideosTab videos={videos} setVideos={setVideos} refreshVideos={refreshVideos} />}
-            {activeTab === 'posts' && <PostsTab posts={posts} setPosts={setPosts} displayName={displayName} displayHandle={displayHandle} initials={initials} />}
-            {activeTab === 'saved' && <SavedTab />}
-            {activeTab === 'watching' && <WatchingTab />}
-            {activeTab === 'about' && (
+            {/* Every tab stays mounted (hidden via CSS, not unmounted via && ) once visited —
+                each *Tab.tsx owns in-progress state (an open editor, an unsaved form draft,
+                a scroll position) that would otherwise reset the instant you switched away and
+                back, since a conditionally-rendered subtree unmounts and remounts fresh. */}
+            <div className={activeTab === 'investment' ? '' : 'hidden'}><InvestmentTab /></div>
+            <div className={activeTab === 'videos' ? '' : 'hidden'}>
+              <VideosTab videos={videos} setVideos={setVideos} refreshVideos={refreshVideos} />
+            </div>
+            <div className={activeTab === 'posts' ? '' : 'hidden'}>
+              <PostsTab posts={posts} setPosts={setPosts} displayName={displayName} displayHandle={displayHandle} initials={initials} />
+            </div>
+            <div className={activeTab === 'saved' ? '' : 'hidden'}><SavedTab /></div>
+            <div className={activeTab === 'watching' ? '' : 'hidden'}><WatchingTab /></div>
+            <div className={activeTab === 'about' ? '' : 'hidden'}>
               <AboutTab
                 bioText={bioText}
                 onEditProfile={() => setShowEditProfile(true)}
                 videosCount={videos.length}
                 postsCount={posts.filter(p => !p.draft).length}
               />
-            )}
-            {activeTab === 'analytics' && <AnalyticsTab />}
+            </div>
+            <div className={activeTab === 'analytics' ? '' : 'hidden'}><AnalyticsTab /></div>
 
           </div>
         </div>
