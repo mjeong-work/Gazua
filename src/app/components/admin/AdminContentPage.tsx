@@ -67,18 +67,18 @@ export default function AdminContentPage() {
     {
       key: 'preview',
       label: 'Content',
-      render: item => <p className="text-sm text-gray-700 line-clamp-2 max-w-md">{item.preview}</p>,
+      render: item => <p className="text-sm text-neutral-700 line-clamp-2 max-w-md">{item.preview}</p>,
     },
     {
       key: 'creator',
       label: 'Creator',
-      render: item => <span className="text-gray-600">{item.creatorName ?? item.creatorUsername ?? '—'}</span>,
+      render: item => <span className="text-neutral-600">{item.creatorName ?? item.creatorUsername ?? '—'}</span>,
     },
     { key: 'status', label: 'Status', render: item => <AdminStatusBadge status={item.moderationStatus} /> },
     {
       key: 'created_at',
       label: 'Created',
-      render: item => <span className="text-gray-500">{new Date(item.createdAt).toLocaleDateString()}</span>,
+      render: item => <span className="text-neutral-500">{new Date(item.createdAt).toLocaleDateString()}</span>,
     },
     {
       key: 'actions',
@@ -94,7 +94,7 @@ export default function AdminContentPage() {
         ) : (
           <button
             onClick={() => setConfirm({ item, status: 'visible' })}
-            className="px-3 py-1.5 text-xs font-medium rounded-full border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
+            className="px-3 py-1.5 text-xs font-medium rounded-full border border-neutral-200 text-neutral-700 hover:bg-neutral-50 transition-colors"
           >
             Restore
           </button>
@@ -107,7 +107,7 @@ export default function AdminContentPage() {
     <div className="space-y-4">
       <div>
         <h1 className="text-2xl font-bold">Content</h1>
-        <p className="text-sm text-gray-500 mt-1">Browse and moderate posts, Reels, videos, and comments.</p>
+        <p className="text-sm text-neutral-500 mt-1">Browse and moderate posts, Reels, videos, and comments.</p>
       </div>
 
       <div className="flex gap-2">
@@ -116,7 +116,7 @@ export default function AdminContentPage() {
             key={t}
             onClick={() => setTab(t)}
             className={`px-4 py-2 text-xs font-medium rounded-full border transition-colors capitalize ${
-              tab === t ? 'bg-black text-white border-black' : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+              tab === t ? 'bg-black text-white border-black' : 'border-neutral-200 text-neutral-700 hover:bg-neutral-50'
             }`}
           >
             {t}s

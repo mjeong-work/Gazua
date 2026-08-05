@@ -39,13 +39,13 @@ export default function AdminConfirmDialog({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={onClose}>
       <div
         onClick={e => e.stopPropagation()}
-        className="w-full max-w-sm bg-white rounded-2xl border border-gray-200 shadow-xl p-6"
+        className="w-full max-w-sm bg-white rounded-2xl border border-neutral-200 shadow-xl p-6"
         role="alertdialog"
         aria-modal="true"
         aria-label={title}
       >
         <h2 className="text-base font-bold mb-1">{title}</h2>
-        {body && <p className="text-sm text-gray-500 mb-4">{body}</p>}
+        {body && <p className="text-sm text-neutral-500 mb-4">{body}</p>}
 
         {withNotes && (
           <textarea
@@ -54,7 +54,7 @@ export default function AdminConfirmDialog({
             onChange={e => setNotes(e.target.value)}
             placeholder={notesPlaceholder}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none focus:outline-none focus:border-gray-400 mb-4"
+            className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm resize-none focus:outline-none focus:border-neutral-400 mb-4"
           />
         )}
 
@@ -62,7 +62,7 @@ export default function AdminConfirmDialog({
           <button
             onClick={onClose}
             disabled={submitting}
-            className="px-4 py-2 text-xs font-medium rounded-full border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+            className="px-4 py-2 text-xs font-medium rounded-full border border-neutral-200 text-neutral-700 hover:bg-neutral-50 transition-colors disabled:opacity-50"
           >
             {cancelLabel}
           </button>
