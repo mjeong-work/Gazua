@@ -66,7 +66,7 @@ export default function AdminUsersPage() {
       render: u => (
         <div>
           <p className="font-medium text-sm">{u.full_name}</p>
-          <p className="text-xs text-gray-400">@{u.username}</p>
+          <p className="text-xs text-neutral-400">@{u.username}</p>
         </div>
       ),
     },
@@ -77,7 +77,7 @@ export default function AdminUsersPage() {
       key: 'created_at',
       label: 'Joined',
       sortable: true,
-      render: u => <span className="text-gray-500">{new Date(u.created_at).toLocaleDateString()}</span>,
+      render: u => <span className="text-neutral-500">{new Date(u.created_at).toLocaleDateString()}</span>,
     },
   ];
 
@@ -85,7 +85,7 @@ export default function AdminUsersPage() {
     <div className="space-y-4">
       <div>
         <h1 className="text-2xl font-bold">Users</h1>
-        <p className="text-sm text-gray-500 mt-1">{total.toLocaleString()} total.</p>
+        <p className="text-sm text-neutral-500 mt-1">{total.toLocaleString()} total.</p>
       </div>
 
       <AdminSearchFilterBar

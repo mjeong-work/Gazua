@@ -87,12 +87,12 @@ export default function AdminUserDetailPage() {
 
   return (
     <div className="space-y-6">
-      <button onClick={() => navigate('/admin/users')} className="flex items-center gap-2 text-sm text-gray-600 hover:text-black transition-colors">
+      <button onClick={() => navigate('/admin/users')} className="flex items-center gap-2 text-sm text-neutral-600 hover:text-black transition-colors">
         <ArrowBackIcon sx={{ fontSize: 16 }} />
         Back to Users
       </button>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-5">
+      <div className="bg-white border border-neutral-200 rounded-xl p-5">
         <div className="flex items-start justify-between flex-wrap gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
@@ -100,20 +100,20 @@ export default function AdminUserDetailPage() {
               <AdminStatusBadge status={detail.role} />
               <AdminStatusBadge status={detail.status} />
             </div>
-            <p className="text-sm text-gray-500">@{detail.username}{detail.handle ? ` · ${detail.handle}` : ''}</p>
+            <p className="text-sm text-neutral-500">@{detail.username}{detail.handle ? ` · ${detail.handle}` : ''}</p>
             <div className="flex items-center gap-2 mt-2">
-              <label className="text-xs font-medium text-gray-500">Credibility level</label>
+              <label className="text-xs font-medium text-neutral-500">Credibility level</label>
               <select
                 value={detail.credibility_level}
                 onChange={(e) => handleChangeCredibilityLevel(e.target.value as CredibilityLevel)}
-                className="text-xs border border-gray-200 rounded-full px-2.5 py-1 focus:outline-none focus:border-black transition-colors"
+                className="text-xs border border-neutral-200 rounded-full px-2.5 py-1 focus:outline-none focus:border-black transition-colors"
               >
                 {CREDIBILITY_LEVELS.map((level) => (
                   <option key={level} value={level}>{level}</option>
                 ))}
               </select>
             </div>
-            {detail.bio && <p className="text-sm text-gray-600 mt-2 max-w-lg">{detail.bio}</p>}
+            {detail.bio && <p className="text-sm text-neutral-600 mt-2 max-w-lg">{detail.bio}</p>}
             {detail.status === 'suspended' && detail.suspended_reason && (
               <p className="text-xs text-red-600 mt-2">Suspended: {detail.suspended_reason}</p>
             )}
@@ -123,7 +123,7 @@ export default function AdminUserDetailPage() {
             {detail.status !== 'suspended' && (
               <button
                 onClick={() => setPendingAction('warning_sent')}
-                className="px-4 py-2 text-xs font-medium rounded-full border border-gray-800 text-gray-900 hover:bg-gray-100 transition-colors"
+                className="px-4 py-2 text-xs font-medium rounded-full border border-neutral-800 text-neutral-900 hover:bg-neutral-100 transition-colors"
               >
                 Warn
               </button>
@@ -138,7 +138,7 @@ export default function AdminUserDetailPage() {
             ) : (
               <button
                 onClick={() => setPendingAction('user_reinstated')}
-                className="px-4 py-2 text-xs font-medium rounded-full border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 text-xs font-medium rounded-full border border-neutral-200 text-neutral-700 hover:bg-neutral-50 transition-colors"
               >
                 Reinstate
               </button>
@@ -146,7 +146,7 @@ export default function AdminUserDetailPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mt-5 pt-5 border-t border-gray-100">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mt-5 pt-5 border-t border-neutral-100">
           <Stat label="Posts" value={detail.postCount} />
           <Stat label="Reels" value={detail.reelCount} />
           <Stat label="Videos" value={detail.videoCount} />
@@ -157,7 +157,7 @@ export default function AdminUserDetailPage() {
 
       <Section title="Content History">
         {!content || (content.posts.length + content.reels.length + content.videos.length === 0) ? (
-          <p className="text-sm text-gray-400 py-4 text-center">No content.</p>
+          <p className="text-sm text-neutral-400 py-4 text-center">No content.</p>
         ) : (
           <div className="space-y-2">
             {content.posts.map(p => <ContentRow key={`post-${(p as { id: string }).id}`} type="post" item={p as Record<string, unknown>} previewKey="content" />)}
@@ -168,27 +168,27 @@ export default function AdminUserDetailPage() {
       </Section>
 
       <Section title="Reports Filed">
-        {reportsFiled.length === 0 ? <p className="text-sm text-gray-400 py-4 text-center">None.</p> : (
+        {reportsFiled.length === 0 ? <p className="text-sm text-neutral-400 py-4 text-center">None.</p> : (
           <ReportRows reports={reportsFiled} />
         )}
       </Section>
 
       <Section title="Reports Against">
-        {reportsAgainst.length === 0 ? <p className="text-sm text-gray-400 py-4 text-center">None.</p> : (
+        {reportsAgainst.length === 0 ? <p className="text-sm text-neutral-400 py-4 text-center">None.</p> : (
           <ReportRows reports={reportsAgainst} />
         )}
       </Section>
 
       <Section title="Moderation History">
-        {modHistory.length === 0 ? <p className="text-sm text-gray-400 py-4 text-center">No warnings, suspensions, or reinstatements.</p> : (
+        {modHistory.length === 0 ? <p className="text-sm text-neutral-400 py-4 text-center">No warnings, suspensions, or reinstatements.</p> : (
           <div className="space-y-2">
             {modHistory.map(m => (
-              <div key={m.id} className="flex items-center justify-between gap-3 p-3 bg-gray-50 rounded-lg">
+              <div key={m.id} className="flex items-center justify-between gap-3 p-3 bg-neutral-50 rounded-lg">
                 <div>
                   <p className="text-sm font-medium capitalize">{m.action.replace(/_/g, ' ')}</p>
-                  {m.notes && <p className="text-xs text-gray-500 mt-0.5">{m.notes}</p>}
+                  {m.notes && <p className="text-xs text-neutral-500 mt-0.5">{m.notes}</p>}
                 </div>
-                <span className="text-xs text-gray-400">{new Date(m.created_at).toLocaleString()}</span>
+                <span className="text-xs text-neutral-400">{new Date(m.created_at).toLocaleString()}</span>
               </div>
             ))}
           </div>
@@ -221,7 +221,7 @@ export default function AdminUserDetailPage() {
 function Stat({ label, value }: { label: string; value: number }) {
   return (
     <div>
-      <p className="text-xs text-gray-400">{label}</p>
+      <p className="text-xs text-neutral-400">{label}</p>
       <p className="text-lg font-bold">{value}</p>
     </div>
   );
@@ -229,7 +229,7 @@ function Stat({ label, value }: { label: string; value: number }) {
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4">
+    <div className="bg-white border border-neutral-200 rounded-xl p-4">
       <h2 className="text-base font-semibold mb-3">{title}</h2>
       {children}
     </div>
@@ -239,15 +239,15 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 function ContentRow({ type, item, previewKey }: { type: string; item: Record<string, unknown>; previewKey: string }) {
   const preview = String(item[previewKey] ?? '');
   return (
-    <div className="flex items-center justify-between gap-3 p-3 bg-gray-50 rounded-lg">
+    <div className="flex items-center justify-between gap-3 p-3 bg-neutral-50 rounded-lg">
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 mb-0.5">
-          <span className="text-xs font-bold uppercase tracking-widest text-gray-400">{type}</span>
+          <span className="text-xs font-bold uppercase tracking-widest text-neutral-400">{type}</span>
           <AdminStatusBadge status={String(item.moderation_status)} />
         </div>
-        <p className="text-sm text-gray-700 truncate">{preview}</p>
+        <p className="text-sm text-neutral-700 truncate">{preview}</p>
       </div>
-      <span className="text-xs text-gray-400 flex-shrink-0">{new Date(String(item.created_at)).toLocaleDateString()}</span>
+      <span className="text-xs text-neutral-400 flex-shrink-0">{new Date(String(item.created_at)).toLocaleDateString()}</span>
     </div>
   );
 }
@@ -256,13 +256,13 @@ function ReportRows({ reports }: { reports: AdminReportListItem[] }) {
   return (
     <div className="space-y-2">
       {reports.map(r => (
-        <div key={r.id} className="flex items-center justify-between gap-3 p-3 bg-gray-50 rounded-lg">
+        <div key={r.id} className="flex items-center justify-between gap-3 p-3 bg-neutral-50 rounded-lg">
           <div className="min-w-0">
             <div className="flex items-center gap-2 mb-0.5">
-              <span className="text-xs font-bold uppercase tracking-widest text-gray-400">{r.content_type}</span>
+              <span className="text-xs font-bold uppercase tracking-widest text-neutral-400">{r.content_type}</span>
               <span className="text-xs px-2 py-0.5 bg-red-50 text-red-700 rounded-full font-medium capitalize">{r.reason.replace(/_/g, ' ')}</span>
             </div>
-            <p className="text-xs text-gray-400 truncate font-mono">{r.content_id}</p>
+            <p className="text-xs text-neutral-400 truncate font-mono">{r.content_id}</p>
           </div>
           <AdminStatusBadge status={r.status} />
         </div>
