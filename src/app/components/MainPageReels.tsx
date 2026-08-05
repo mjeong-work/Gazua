@@ -332,7 +332,7 @@ export default function MainPageReels() {
           <div
             className={[
               'absolute inset-y-0 left-0 w-[85vw] z-20 bg-white overflow-y-auto',
-              'border-r border-gray-200 px-6 pt-4 pb-20',
+              'border-r border-neutral-200 px-6 pt-4 pb-20',
               'transition-transform duration-300 ease-in-out',
               isPanelOpen ? 'translate-x-0' : '-translate-x-full',
               'lg:static lg:inset-auto lg:z-auto lg:flex-1 lg:translate-x-0 lg:pb-6',
@@ -343,11 +343,11 @@ export default function MainPageReels() {
                 <h2 className="text-3xl font-bold">
                   {tickerInfo?.price ?? '—'}
                 </h2>
-                <span className={`text-sm font-medium ${tickerInfo ? (tickerInfo.positive ? 'text-brand' : 'text-red-500') : 'text-gray-400'}`}>
+                <span className={`text-sm font-medium ${tickerInfo ? (tickerInfo.positive ? 'text-brand' : 'text-red-500') : 'text-neutral-400'}`}>
                   {tickerInfo ? `${tickerInfo.changeAmt} (${tickerInfo.change})` : ''}
                 </span>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-neutral-600">
                 {ticker ? `$${ticker}` : 'S&P 500'}
               </p>
             </div>
@@ -378,7 +378,7 @@ export default function MainPageReels() {
                     className={`px-3 py-1 rounded transition-colors ${
                       activeTimeRange === range
                         ? 'bg-black text-white'
-                        : 'hover:bg-gray-100 text-gray-600'
+                        : 'hover:bg-neutral-100 text-neutral-600'
                     }`}
                   >
                     {range}
@@ -391,18 +391,18 @@ export default function MainPageReels() {
             <div className="space-y-3">
               {indicesLoading
                 ? [1, 2, 3, 4].map(n => (
-                    <div key={n} className="p-4 bg-gray-50 rounded-lg animate-pulse">
+                    <div key={n} className="p-4 bg-neutral-50 rounded-lg animate-pulse">
                       <div className="flex items-center justify-between mb-2">
-                        <div className="h-3 bg-gray-200 rounded w-20" />
-                        <div className="h-3 bg-gray-200 rounded w-12" />
+                        <div className="h-3 bg-neutral-200 rounded w-20" />
+                        <div className="h-3 bg-neutral-200 rounded w-12" />
                       </div>
-                      <div className="h-5 bg-gray-200 rounded w-24" />
+                      <div className="h-5 bg-neutral-200 rounded w-24" />
                     </div>
                   ))
                 : liveIndices.map(index => (
-                    <div key={index.id} className="p-4 bg-gray-50 rounded-lg">
+                    <div key={index.id} className="p-4 bg-neutral-50 rounded-lg">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">{index.name}</span>
+                        <span className="text-sm text-neutral-600">{index.name}</span>
                         <span className={`text-xs font-medium ${index.positive ? 'text-brand' : 'text-red-500'}`}>{index.change}</span>
                       </div>
                       <p className="text-xl font-bold mt-1">{index.value}</p>

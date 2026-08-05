@@ -21,7 +21,7 @@ function Avatar({ name, avatarUrl, size = 'w-10 h-10' }: { name: string; avatarU
     return <img src={avatarUrl} alt={name} className={`${size} rounded-full object-cover flex-shrink-0`} />;
   }
   return (
-    <div className={`${size} rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-sm font-semibold text-gray-600 flex-shrink-0`}>
+    <div className={`${size} rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-sm font-semibold text-neutral-600 flex-shrink-0`}>
       {(name[0] ?? '?').toUpperCase()}
     </div>
   );
@@ -48,16 +48,16 @@ export default function MessagesPage() {
     <div className="h-screen flex flex-col bg-white">
       <AppHeader />
 
-      <div className="flex flex-1 min-h-0 items-stretch lg:max-w-5xl lg:w-full lg:mx-auto lg:border-x border-gray-200">
+      <div className="flex flex-1 min-h-0 items-stretch lg:max-w-5xl lg:w-full lg:mx-auto lg:border-x border-neutral-200">
         {/* Conversation list — full-width on mobile when nothing's selected, hidden once a thread is open; always visible alongside the thread on desktop */}
-        <div className={`${activeThread ? 'hidden' : 'flex'} lg:flex flex-col w-full lg:w-72 lg:flex-shrink-0 border-r border-gray-200 overflow-y-auto`}>
-          <div className="px-4 py-4 border-b border-gray-200 flex-shrink-0">
+        <div className={`${activeThread ? 'hidden' : 'flex'} lg:flex flex-col w-full lg:w-72 lg:flex-shrink-0 border-r border-neutral-200 overflow-y-auto`}>
+          <div className="px-4 py-4 border-b border-neutral-200 flex-shrink-0">
             <h1 className="text-lg font-bold">Messages</h1>
           </div>
           {isLoadingConversations ? (
-            <p className="p-4 text-sm text-gray-500">Loading…</p>
+            <p className="p-4 text-sm text-neutral-500">Loading…</p>
           ) : conversations.length === 0 ? (
-            <p className="p-4 text-sm text-gray-500">No messages yet. Message a creator from their profile to start a conversation.</p>
+            <p className="p-4 text-sm text-neutral-500">No messages yet. Message a creator from their profile to start a conversation.</p>
           ) : (
             <div className="p-2 space-y-1 pb-16 lg:pb-2">
               {conversations.map(conv => {
@@ -67,15 +67,15 @@ export default function MessagesPage() {
                   <button
                     key={conv.partnerId}
                     onClick={() => handleSelect({ id: conv.partnerId, name: conv.partnerName, avatarUrl: conv.partnerAvatarUrl })}
-                    className={`w-full flex items-center gap-3 p-2.5 rounded-lg text-left transition-colors ${isSelected ? 'bg-gray-100' : 'hover:bg-gray-50'}`}
+                    className={`w-full flex items-center gap-3 p-2.5 rounded-lg text-left transition-colors ${isSelected ? 'bg-neutral-100' : 'hover:bg-neutral-50'}`}
                   >
                     <Avatar name={conv.partnerName} avatarUrl={conv.partnerAvatarUrl} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-baseline justify-between gap-2">
                         <p className={`text-sm truncate ${isUnread ? 'font-bold' : 'font-semibold'}`}>{conv.partnerName}</p>
-                        <span className="text-xs text-gray-400 flex-shrink-0">{formatRelative(conv.lastMessage.created_at)}</span>
+                        <span className="text-xs text-neutral-400 flex-shrink-0">{formatRelative(conv.lastMessage.created_at)}</span>
                       </div>
-                      <p className={`text-xs truncate ${isUnread ? 'text-black font-medium' : 'text-gray-500'}`}>{conv.lastMessage.content}</p>
+                      <p className={`text-xs truncate ${isUnread ? 'text-black font-medium' : 'text-neutral-500'}`}>{conv.lastMessage.content}</p>
                     </div>
                     {isUnread && <span className="w-2 h-2 rounded-full bg-brand flex-shrink-0" />}
                   </button>
@@ -89,12 +89,12 @@ export default function MessagesPage() {
         <div className={`${activeThread ? 'flex' : 'hidden'} lg:flex flex-1 min-w-0 flex-col`}>
           {!activeThread ? (
             <div className="flex-1 flex items-center justify-center">
-              <p className="text-sm text-gray-500">Select a conversation to view messages.</p>
+              <p className="text-sm text-neutral-500">Select a conversation to view messages.</p>
             </div>
           ) : (
             <>
-              <div className="flex items-center gap-3 px-4 lg:px-5 py-4 border-b border-gray-200 flex-shrink-0">
-                <button onClick={closeThread} className="lg:hidden p-1 -ml-1 hover:bg-gray-100 rounded-full transition-colors flex-shrink-0" aria-label="Back to conversations">
+              <div className="flex items-center gap-3 px-4 lg:px-5 py-4 border-b border-neutral-200 flex-shrink-0">
+                <button onClick={closeThread} className="lg:hidden p-1 -ml-1 hover:bg-neutral-100 rounded-full transition-colors flex-shrink-0" aria-label="Back to conversations">
                   <ArrowBackIcon sx={{ fontSize: 20 }} />
                 </button>
                 <Avatar name={activeThread.partner.name} avatarUrl={activeThread.partner.avatarUrl} size="w-9 h-9" />
@@ -105,17 +105,17 @@ export default function MessagesPage() {
 
               <div className="flex-1 overflow-y-auto px-4 lg:px-5 py-4 space-y-3">
                 {activeThread.isLoading ? (
-                  <p className="text-sm text-gray-500">Loading…</p>
+                  <p className="text-sm text-neutral-500">Loading…</p>
                 ) : activeThread.messages.length === 0 ? (
-                  <p className="text-sm text-gray-500">No messages yet — say hello!</p>
+                  <p className="text-sm text-neutral-500">No messages yet — say hello!</p>
                 ) : (
                   activeThread.messages.map(m => {
                     const isMine = m.sender_id === user?.id;
                     return (
                       <div key={m.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[80%] lg:max-w-[60%] px-3.5 py-2 rounded-2xl text-sm ${isMine ? 'bg-black text-white' : 'bg-gray-100 text-gray-800'}`}>
+                        <div className={`max-w-[80%] lg:max-w-[60%] px-3.5 py-2 rounded-2xl text-sm ${isMine ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-800'}`}>
                           {m.content}
-                          <div className={`text-[10px] mt-1 ${isMine ? 'text-white/60' : 'text-gray-400'}`}>{formatRelative(m.created_at)}</div>
+                          <div className={`text-[10px] mt-1 ${isMine ? 'text-white/60' : 'text-neutral-400'}`}>{formatRelative(m.created_at)}</div>
                         </div>
                       </div>
                     );
@@ -123,13 +123,13 @@ export default function MessagesPage() {
                 )}
               </div>
 
-              <div className="flex items-center gap-2 px-4 py-3 border-t border-gray-200 flex-shrink-0 mb-16 lg:mb-0">
+              <div className="flex items-center gap-2 px-4 py-3 border-t border-neutral-200 flex-shrink-0 mb-16 lg:mb-0">
                 <input
                   value={inputValue}
                   onChange={e => setInputValue(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') handleSend(); }}
                   placeholder="Type a message..."
-                  className="flex-1 px-4 py-2 border border-gray-200 rounded-full text-sm focus:outline-none focus:border-black transition-colors"
+                  className="flex-1 px-4 py-2 border border-neutral-200 rounded-full text-sm focus:outline-none focus:border-black transition-colors"
                 />
                 <button
                   onClick={handleSend}
