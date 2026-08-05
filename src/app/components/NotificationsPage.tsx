@@ -7,6 +7,7 @@ import AppHeader from './AppHeader';
 import { useAuth } from '../contexts/AuthContext';
 import { getNotifications, markAsRead, markAllAsRead } from '../../lib/services/notifications.service';
 import type { Notification, NotificationType } from '../../types/database';
+import { useServiceQuery } from '../hooks/useServiceQuery';
 
 function formatRelativeTime(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
@@ -32,22 +33,13 @@ function typeIcon(type: NotificationType) {
 export default function NotificationsPage() {
   const { user } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-    let cancelled = false;
-    setLoading(true);
-    getNotifications(user.id).then(({ data }) => {
-      if (cancelled) return;
-      setLoading(false);
-      setNotifications(data ?? []);
-    });
-    return () => { cancelled = true; };
-  }, [user]);
+  const { data: notificationsData, loading } = useServiceQuery(
+    () => getNotifications(user!.id),
+    [user?.id],
+    { enabled: !!user, label: 'notifications' },
+  );
+  useEffect(() => { if (notificationsData) setNotifications(notificationsData); }, [notificationsData]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 

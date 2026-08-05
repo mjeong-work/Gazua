@@ -19,6 +19,7 @@ import { getVideosByCreator as getDbVideos } from '../../lib/services/reels.serv
 import { getPostCountByCreator, getPostsByCreator } from '../../lib/services/posts.service';
 import { getCommentCount } from '../../lib/services/comments.service';
 import { getFollowingCount } from '../../lib/services/follows.service';
+import { reportServiceError } from '../hooks/useServiceQuery';
 import type { Profile, VideoWithCreator, PostWithCreator } from '../../types/database';
 import { useFollow } from '../contexts/FollowContext';
 import { SUBSCRIBE_ENABLED } from '../featureFlags';
@@ -103,6 +104,7 @@ export default function CreatorProfileVideos() {
   // ── Remote data ────────────────────────────────────────────────────
   const [dbProfile, setDbProfile] = useState<Profile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
+  const [profileRefreshKey, setProfileRefreshKey] = useState(0);
   const [dbVideos, setDbVideos] = useState<Video[] | null>(null);
   const [dbPosts, setDbPosts] = useState<DisplayPost[] | null>(null);
   const [followerCount, setFollowerCount] = useState<number | null>(null);
@@ -124,24 +126,35 @@ export default function CreatorProfileVideos() {
   // ── Effects ────────────────────────────────────────────────────────
   useEffect(() => {
     setProfileLoading(true);
-    getCreatorByUsername(creatorId).then(({ data }) => {
+    getCreatorByUsername(creatorId).then(({ data, error }) => {
       setDbProfile(data);
       setProfileLoading(false);
+      if (error) {
+        reportServiceError(error, { label: 'this creator profile', retry: () => setProfileRefreshKey(k => k + 1) });
+      }
       if (data) {
         // Videos and follower count load eagerly
-        getDbVideos(data.id).then(({ data: vids }) => {
+        getDbVideos(data.id).then(({ data: vids, error: vidsError }) => {
+          if (vidsError) {
+            reportServiceError(vidsError, { label: `${data.full_name}'s videos` });
+            return;
+          }
           if (vids && vids.length > 0) setDbVideos(vids.map(normalizeDbVideo));
         });
         getFollowerCount(data.id).then(({ data: n }) => { if (n !== null) setFollowerCount(n); });
         getFollowingCount(data.id).then(({ data: n }) => { if (n !== null) setFollowingCount(n); });
         getPostCountByCreator(data.id).then(({ data: n }) => { if (n !== null) setPostCount(n); });
-        getPostsByCreator(data.id).then(({ data: posts, error }) => {
-          if (error || !posts) return;
+        getPostsByCreator(data.id).then(({ data: posts, error: postsError }) => {
+          if (postsError) {
+            reportServiceError(postsError, { label: `${data.full_name}'s posts` });
+            return;
+          }
+          if (!posts) return;
           Promise.all(posts.map(normalizeDbPost)).then(setDbPosts);
         });
       }
     });
-  }, [creatorId]);
+  }, [creatorId, profileRefreshKey]);
 
   // ── Derived data ───────────────────────────────────────────────────
   const creator = useMemo((): MockCreator | null => {

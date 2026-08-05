@@ -16,6 +16,7 @@ import { getCreatorByUsername, getFollowerCount } from '../../lib/services/profi
 import { getPostCountByCreator, getPostsByCreator } from '../../lib/services/posts.service';
 import { getCommentCount } from '../../lib/services/comments.service';
 import { getFollowingCount } from '../../lib/services/follows.service';
+import { reportServiceError } from '../hooks/useServiceQuery';
 import type { Profile, PostWithCreator } from '../../types/database';
 import { useFollow } from '../contexts/FollowContext';
 import { SUBSCRIBE_ENABLED, ACTUAL_PORTFOLIO_ENABLED } from '../featureFlags';
@@ -81,6 +82,7 @@ export default function CreatorProfileInvestment() {
   // ── Remote data ────────────────────────────────────────────────────
   const [dbProfile, setDbProfile] = useState<Profile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
+  const [profileRefreshKey, setProfileRefreshKey] = useState(0);
   const [followerCount, setFollowerCount] = useState<number | null>(null);
   const [followingCount, setFollowingCount] = useState<number | null>(null);
   const [postCount, setPostCount] = useState<number | null>(null);
@@ -151,20 +153,30 @@ export default function CreatorProfileInvestment() {
   // ── Effects ────────────────────────────────────────────────────────
   useEffect(() => {
     setProfileLoading(true);
-    getCreatorByUsername(creatorId).then(({ data }) => {
+    getCreatorByUsername(creatorId).then(({ data, error }) => {
       setDbProfile(data);
       setProfileLoading(false);
+      if (error) {
+        // Doesn't distinguish "genuinely no such creator" from a failed request (getCreatorByUsername
+        // returns the same shape either way), so this can retry-and-still-404 — that's fine, the
+        // "Creator not found" fallback below covers it either way.
+        reportServiceError(error, { label: 'this creator profile', retry: () => setProfileRefreshKey(k => k + 1) });
+      }
       if (data) {
         getFollowerCount(data.id).then(({ data: n }) => { if (n !== null) setFollowerCount(n); });
         getFollowingCount(data.id).then(({ data: n }) => { if (n !== null) setFollowingCount(n); });
         getPostCountByCreator(data.id).then(({ data: n }) => { if (n !== null) setPostCount(n); });
-        getPostsByCreator(data.id).then(({ data: posts, error }) => {
-          if (error || !posts) return;
+        getPostsByCreator(data.id).then(({ data: posts, error: postsError }) => {
+          if (postsError) {
+            reportServiceError(postsError, { label: `${data.full_name}'s posts` });
+            return;
+          }
+          if (!posts) return;
           Promise.all(posts.map(normalizeDbPost)).then(setDbPosts);
         });
       }
     });
-  }, [creatorId]);
+  }, [creatorId, profileRefreshKey]);
 
   const posts = dbProfile ? (dbPosts ?? []) : MOCK_POSTS_FALLBACK;
 

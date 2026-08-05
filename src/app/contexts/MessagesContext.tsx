@@ -10,6 +10,7 @@ import {
   type ConversationSummary,
 } from '../../lib/services/messages.service';
 import type { Message } from '../../types/database';
+import { reportServiceError } from '../hooks/useServiceQuery';
 
 export type { ConversationSummary };
 
@@ -55,10 +56,17 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
     if (!uid) return;
 
     setIsLoadingConversations(true);
-    getConversations(uid).then(({ data }) => {
-      setIsLoadingConversations(false);
-      if (data) setConversations(data);
-    });
+    const loadConversations = () => {
+      getConversations(uid).then(({ data, error }) => {
+        setIsLoadingConversations(false);
+        if (error) {
+          reportServiceError(error, { label: 'your conversations', retry: loadConversations });
+          return;
+        }
+        if (data) setConversations(data);
+      });
+    };
+    loadConversations();
 
     const channel = subscribeToMessages(uid, (message) => {
       const partnerId = message.sender_id === uid ? message.recipient_id : message.sender_id;
@@ -70,7 +78,10 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
           // A new counterpart we have no profile snippet for yet (they only just
           // messaged us for the first time) — re-fetch the full list to pick up
           // their profile info rather than fabricating a partial entry.
-          getConversations(uid).then(({ data }) => { if (data) setConversations(data); });
+          getConversations(uid).then(({ data, error }) => {
+            if (error) { reportServiceError(error, { label: 'your conversations' }); return; }
+            if (data) setConversations(data);
+          });
           return prev;
         }
         const updated = [...prev];
@@ -90,8 +101,11 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
 
     const uid = userIdRef.current;
     if (!uid) return;
-    getThread(uid, partner.id).then(({ data }) => {
+    getThread(uid, partner.id).then(({ data, error }) => {
       setActiveThread(prev => (prev && prev.partner.id === partner.id ? { ...prev, messages: data ?? [], isLoading: false } : prev));
+      if (error) {
+        reportServiceError(error, { label: `your conversation with ${partner.name}`, retry: () => openThreadWith(partner) });
+      }
     });
   }, []);
 
@@ -104,8 +118,13 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
       const partner = current?.partner;
       if (!uid || !partner || !trimmed) return current;
 
-      sendMessageService(uid, partner.id, trimmed).then(({ data }) => {
-        if (!data) return;
+      sendMessageService(uid, partner.id, trimmed).then(({ data, error }) => {
+        if (error || !data) {
+          reportServiceError(error ?? 'Failed to send message.', {
+            retry: () => sendMessage(trimmed),
+          });
+          return;
+        }
         setActiveThread(prev => (prev && prev.partner.id === partner.id ? { ...prev, messages: [...prev.messages, data] } : prev));
         setConversations(prev => {
           const idx = prev.findIndex(c => c.partnerId === partner.id);

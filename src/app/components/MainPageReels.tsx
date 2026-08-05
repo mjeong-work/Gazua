@@ -7,6 +7,7 @@ import ReelEngagementActions from './reels/ReelEngagementActions';
 import type { SavedContentInput } from '../contexts/SavedContentContext';
 import { MOCK_REELS, type Reel } from '../data/reels';
 import { getReels, getReelsByTicker, getReelsByCreatorIds, likeReel, unlikeReel, getUserLikedReelIds } from '../../lib/services/reels.service';
+import { reportServiceError } from '../hooks/useServiceQuery';
 import type { ReelWithCreator as DbReel } from '../../types/database';
 import { useFollow, isUUID } from '../contexts/FollowContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -67,6 +68,7 @@ export default function MainPageReels() {
   const { followedIds, isFollowing: isFollowingFn, toggleFollow, isLoading: followLoading } = useFollow();
   const [followingReels, setFollowingReels] = useState<Reel[] | null>(null);
   const [followingReelsLoading, setFollowingReelsLoading] = useState(false);
+  const [followingReelsRefreshKey, setFollowingReelsRefreshKey] = useState(0);
 
   // Like state — keyed by db_id (UUID) for DB reels, or 'local-{id}' for mock reels.
   const [likedReels, setLikedReels] = useState<Set<string>>(() => {
@@ -163,14 +165,20 @@ export default function MainPageReels() {
     let cancelled = false;
     setFollowingReelsLoading(true);
 
-    getReelsByCreatorIds(dbCreatorIds).then(({ data }) => {
+    getReelsByCreatorIds(dbCreatorIds).then(({ data, error }) => {
       if (cancelled) return;
+      if (error) {
+        reportServiceError(error, {
+          label: 'reels from creators you follow',
+          retry: () => setFollowingReelsRefreshKey(k => k + 1),
+        });
+      }
       setFollowingReels(data ? data.map(normalizeDbReel) : []);
       setFollowingReelsLoading(false);
     });
 
     return () => { cancelled = true; };
-  }, [activeTab, followedIdsKey, followLoading]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [activeTab, followedIdsKey, followLoading, followingReelsRefreshKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filteredReels = useMemo((): Reel[] => {
     // Supabase returned real data — already filtered at the DB level.
@@ -215,10 +223,18 @@ export default function MainPageReels() {
   // On login: hydrate liked reels from Supabase
   useEffect(() => {
     if (!user) return;
-    getUserLikedReelIds(user.id).then(({ data }) => {
-      if (!data?.length) return;
-      setLikedReels(prev => new Set([...prev, ...data]));
-    });
+    const userId = user.id;
+    const hydrateLikedReels = () => {
+      getUserLikedReelIds(userId).then(({ data, error }) => {
+        if (error) {
+          reportServiceError(error, { label: 'your liked reels', retry: hydrateLikedReels });
+          return;
+        }
+        if (!data?.length) return;
+        setLikedReels(prev => new Set([...prev, ...data]));
+      });
+    };
+    hydrateLikedReels();
   }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Keep localStorage in sync (only non-UUID keys)

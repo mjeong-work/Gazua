@@ -2,6 +2,7 @@ import { useState, useMemo, useRef, useEffect, type ChangeEvent, type ReactNode 
 import { useNavigate, useSearchParams } from 'react-router';
 import { toast } from 'sonner';
 import { useAuth } from '../contexts/AuthContext';
+import { useServiceQuery } from '../hooks/useServiceQuery';
 import { getVideosByCreator } from '../../lib/services/reels.service';
 import { updateProfile } from '../../lib/services/profiles.service';
 import { formatDurationSeconds, formatCount } from './reels/format';
@@ -186,22 +187,22 @@ export default function MyProfilePage() {
   const [deleteVideoId, setDeleteVideoId] = useState<string | null>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
 
-  const refreshVideos = () => {
-    if (!profile?.id) return;
-    getVideosByCreator(profile.id).then(({ data }) => {
-      if (!data) return;
-      setVideos(data.map((v, i) => ({
-        id: v.id,
-        title: v.title,
-        thumbnail: v.thumbnail_url ?? VIDEO_FALLBACK_GRADIENTS[i % VIDEO_FALLBACK_GRADIENTS.length],
-        duration: formatDurationSeconds(v.duration_seconds ?? 0),
-        views: formatCount(v.view_count),
-        uploadedAt: new Date(v.created_at).toLocaleDateString(),
-      })));
-    });
-  };
-
-  useEffect(refreshVideos, [profile?.id]);
+  const { data: videoRows, refetch: refreshVideos } = useServiceQuery(
+    () => getVideosByCreator(profile!.id),
+    [profile?.id],
+    { enabled: !!profile?.id, label: 'videos' },
+  );
+  useEffect(() => {
+    if (!videoRows) return;
+    setVideos(videoRows.map((v, i) => ({
+      id: v.id,
+      title: v.title,
+      thumbnail: v.thumbnail_url ?? VIDEO_FALLBACK_GRADIENTS[i % VIDEO_FALLBACK_GRADIENTS.length],
+      duration: formatDurationSeconds(v.duration_seconds ?? 0),
+      views: formatCount(v.view_count),
+      uploadedAt: new Date(v.created_at).toLocaleDateString(),
+    })));
+  }, [videoRows]);
 
   // Post state
   const [posts, setPosts] = useState(INIT_POSTS);

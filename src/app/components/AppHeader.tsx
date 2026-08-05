@@ -24,6 +24,7 @@ import CreatePostModal from './CreatePostModal';
 import CreateReelModal from './CreateReelModal';
 import UploadVideoModal from './UploadVideoModal';
 import { useAuth } from '../contexts/AuthContext';
+import { useServiceQuery } from '../hooks/useServiceQuery';
 import { getUnreadCount, subscribeToNotifications } from '../../lib/services/notifications.service';
 import { getUnreadMessageCount, subscribeToMessages } from '../../lib/services/messages.service';
 
@@ -47,26 +48,30 @@ export default function AppHeader() {
     setActiveCreateModal(type);
   };
 
-  useEffect(() => {
-    if (!user) {
-      setUnreadCount(0);
-      return;
-    }
-    getUnreadCount(user.id).then(({ data }) => setUnreadCount(data ?? 0));
+  const { data: unreadCountData } = useServiceQuery(
+    () => getUnreadCount(user!.id),
+    [user?.id],
+    { enabled: !!user, label: 'notifications' },
+  );
+  useEffect(() => setUnreadCount(unreadCountData ?? 0), [unreadCountData]);
 
+  useEffect(() => {
+    if (!user) return;
     const channel = subscribeToNotifications(user.id, () => {
       setUnreadCount(prev => prev + 1);
     });
     return () => { channel.unsubscribe(); };
   }, [user]);
 
-  useEffect(() => {
-    if (!user) {
-      setUnreadMessageCount(0);
-      return;
-    }
-    getUnreadMessageCount(user.id).then(({ data }) => setUnreadMessageCount(data ?? 0));
+  const { data: unreadMessageCountData } = useServiceQuery(
+    () => getUnreadMessageCount(user!.id),
+    [user?.id],
+    { enabled: !!user, label: 'messages' },
+  );
+  useEffect(() => setUnreadMessageCount(unreadMessageCountData ?? 0), [unreadMessageCountData]);
 
+  useEffect(() => {
+    if (!user) return;
     const channel = subscribeToMessages(user.id, () => {
       setUnreadMessageCount(prev => prev + 1);
     }, 'badge');

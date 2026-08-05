@@ -7,6 +7,7 @@ import {
   type SavedContentItem,
   type SavedContentInput,
 } from '../../lib/services/savedContent.service';
+import { reportServiceError } from '../hooks/useServiceQuery';
 
 export type { SavedContentItem, SavedContentInput, SavedContentType, SavedContentSurface } from '../../lib/services/savedContent.service';
 
@@ -36,9 +37,14 @@ export function SavedContentProvider({ children }: { children: ReactNode }) {
   // leak one user's saves into another's view).
   useEffect(() => {
     let cancelled = false;
-    getSavedItems(userId).then(({ data }) => {
-      if (!cancelled) setSavedItems(data ?? []);
-    });
+    const load = () => {
+      getSavedItems(userId).then(({ data, error }) => {
+        if (cancelled) return;
+        if (error) { reportServiceError(error, { label: 'your saved items', retry: load }); return; }
+        setSavedItems(data ?? []);
+      });
+    };
+    load();
     return () => { cancelled = true; };
   }, [userId]);
 
@@ -53,8 +59,15 @@ export function SavedContentProvider({ children }: { children: ReactNode }) {
 
       if (alreadySaved) {
         // Optimistic update, mirroring the pattern used by WatchlistContext/FollowContext.
+        // Rolled back on failure so state can't silently drift from what's actually saved.
+        const removed = savedItems.find((i) => i.contentId === item.contentId);
         setSavedItems((prev) => prev.filter((i) => i.contentId !== item.contentId));
-        removeItem(userId, item.contentId).then(({ data }) => {
+        removeItem(userId, item.contentId).then(({ data, error }) => {
+          if (error) {
+            reportServiceError(error, { label: 'unsaving this' });
+            if (removed) setSavedItems((prev) => [removed, ...prev]);
+            return;
+          }
           if (data) setSavedItems(data);
         });
         return;
@@ -62,7 +75,12 @@ export function SavedContentProvider({ children }: { children: ReactNode }) {
 
       const optimisticItem: SavedContentItem = { ...item, userId, savedAt: new Date().toISOString() };
       setSavedItems((prev) => [optimisticItem, ...prev]);
-      saveItem({ ...item, userId }).then(({ data }) => {
+      saveItem({ ...item, userId }).then(({ data, error }) => {
+        if (error) {
+          reportServiceError(error, { label: 'saving this' });
+          setSavedItems((prev) => prev.filter((i) => i.contentId !== item.contentId));
+          return;
+        }
         if (data) setSavedItems(data);
       });
     },
@@ -71,12 +89,18 @@ export function SavedContentProvider({ children }: { children: ReactNode }) {
 
   const removeSavedContent = useCallback(
     (contentId: string) => {
+      const removed = savedItems.find((i) => i.contentId === contentId);
       setSavedItems((prev) => prev.filter((i) => i.contentId !== contentId));
-      removeItem(userId, contentId).then(({ data }) => {
+      removeItem(userId, contentId).then(({ data, error }) => {
+        if (error) {
+          reportServiceError(error, { label: 'removing this' });
+          if (removed) setSavedItems((prev) => [removed, ...prev]);
+          return;
+        }
         if (data) setSavedItems(data);
       });
     },
-    [userId],
+    [userId, savedItems],
   );
 
   return (

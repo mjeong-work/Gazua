@@ -25,6 +25,7 @@ import ReportButton from './compliance/ReportButton';
 import { AlgorithmicLabel, derivePostLabel } from './compliance/AlgorithmicLabel';
 import SendIcon from '@mui/icons-material/Send';
 import { getComments, addComment, type CommentWithAuthor } from '../../lib/services/comments.service';
+import { useServiceQuery, reportServiceError } from '../hooks/useServiceQuery';
 import CommentPanel from './CommentPanel';
 import Footer from './Footer';
 
@@ -95,19 +96,16 @@ function InlineComments({
 }) {
   const { user, profile } = useAuth();
   const [comments, setComments] = useState<CommentWithAuthor[]>([]);
-  const [loading, setLoading] = useState(true);
   const [text, setText] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!postId) { setLoading(false); return; }
-    setLoading(true);
-    getComments(postId).then(({ data }) => {
-      setComments(data ?? []);
-      setLoading(false);
-    });
-  }, [postId]);
+  const { data: commentsData, loading } = useServiceQuery(
+    () => getComments(postId),
+    [postId],
+    { enabled: !!postId, label: 'comments' },
+  );
+  useEffect(() => { if (commentsData) setComments(commentsData); }, [commentsData]);
 
   const handleSubmit = async () => {
     const trimmed = text.trim();
@@ -266,6 +264,7 @@ export default function MainPagePosting() {
   const { followedIds, isLoading: followLoading } = useFollow();
   const [followingPosts, setFollowingPosts] = useState<Post[] | null>(null);
   const [followingPostsLoading, setFollowingPostsLoading] = useState(false);
+  const [followingPostsRefreshKey, setFollowingPostsRefreshKey] = useState(0);
 
   // Supabase-backed post data. null = not yet resolved (use mock fallback).
   const [dbPosts, setDbPosts] = useState<Post[] | null>(null);
@@ -310,14 +309,20 @@ export default function MainPagePosting() {
     let cancelled = false;
     setFollowingPostsLoading(true);
 
-    getPostsByCreatorIds(dbCreatorIds).then(({ data }) => {
+    getPostsByCreatorIds(dbCreatorIds).then(({ data, error }) => {
       if (cancelled) return;
+      if (error) {
+        reportServiceError(error, {
+          label: 'posts from creators you follow',
+          retry: () => setFollowingPostsRefreshKey(k => k + 1),
+        });
+      }
       setFollowingPosts(data ? data.map(normalizeDbPost) : []);
       setFollowingPostsLoading(false);
     });
 
     return () => { cancelled = true; };
-  }, [activeTab, followedIdsKey, followLoading]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [activeTab, followedIdsKey, followLoading, followingPostsRefreshKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [liveIndices, setLiveIndices] = useState<MarketIndex[]>(MARKET_INDICES);
   const [indicesLoading, setIndicesLoading] = useState(true);
@@ -409,12 +414,20 @@ export default function MainPagePosting() {
   // post.likes from the DB already includes the user's own like.
   useEffect(() => {
     if (!user) return;
-    getUserLikedPostIds(user.id).then(({ data }) => {
-      if (!data?.length) return;
-      const ids = new Set(data as string[]);
-      setHydratedLikedIds(ids);
-      setLikedPosts(prev => new Set([...prev, ...data]));
-    });
+    const userId = user.id;
+    const hydrateLikedPosts = () => {
+      getUserLikedPostIds(userId).then(({ data, error }) => {
+        if (error) {
+          reportServiceError(error, { label: 'your liked posts', retry: hydrateLikedPosts });
+          return;
+        }
+        if (!data?.length) return;
+        const ids = new Set(data as string[]);
+        setHydratedLikedIds(ids);
+        setLikedPosts(prev => new Set([...prev, ...data]));
+      });
+    };
+    hydrateLikedPosts();
   }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Keep localStorage in sync (only save non-UUID keys — local/mock likes)

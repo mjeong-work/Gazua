@@ -4,6 +4,7 @@ import SendIcon from '@mui/icons-material/Send';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { useAuth } from '../contexts/AuthContext';
 import { useDragToDismissSheet } from '../hooks/useDragToDismissSheet';
+import { useServiceQuery } from '../hooks/useServiceQuery';
 import { getComments, addComment, deleteComment, type CommentWithAuthor } from '../../lib/services/comments.service';
 
 function formatRelative(iso: string): string {
@@ -50,7 +51,6 @@ export default function CommentPanel({
 }: CommentPanelProps) {
   const { user, profile } = useAuth();
   const [comments, setComments] = useState<CommentWithAuthor[]>([]);
-  const [loading, setLoading] = useState(true);
   const [text, setText] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -63,17 +63,12 @@ export default function CommentPanel({
     return () => cancelAnimationFrame(id);
   }, []);
 
-  useEffect(() => {
-    if (!postId) { setLoading(false); return; }
-    let cancelled = false;
-    setLoading(true);
-    getComments(postId).then(({ data }) => {
-      if (cancelled) return;
-      setComments(data ?? []);
-      setLoading(false);
-    });
-    return () => { cancelled = true; };
-  }, [postId]);
+  const { data: commentsData, loading } = useServiceQuery(
+    () => getComments(postId),
+    [postId],
+    { enabled: !!postId, label: 'comments' },
+  );
+  useEffect(() => { if (commentsData) setComments(commentsData); }, [commentsData]);
 
   const count = comments.length || initialCount;
 
