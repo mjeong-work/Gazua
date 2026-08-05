@@ -10,7 +10,6 @@ import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'rec
 import { useOnboarding } from '../contexts/OnboardingContext';
 import { CHART_TOOLTIP_STYLE, chartCurrencyFormatter, showChartLabel } from '../utils/chartTooltip';
 import AppHeader from './AppHeader';
-import CreatePostModal from './CreatePostModal';
 import { MOCK_POSTS, type Post } from '../data/posts';
 import { getPosts, getPostsByCreatorIds, likePost, unlikePost, getUserLikedPostIds, incrementShareCount } from '../../lib/services/posts.service';
 import type { PostWithCreator as DbPost } from '../../types/database';
@@ -248,7 +247,6 @@ export default function MainPagePosting() {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastSubtitle, setToastSubtitle] = useState('');
-  const [showCreatePost, setShowCreatePost] = useState(false);
   const { isPanelOpen, openPanel, closePanel, swipeHandlers } = useSwipePanel();
 
   // Inline comment expansion — key matches getLikeKey(post)
@@ -384,9 +382,9 @@ export default function MainPagePosting() {
     }
   };
 
-  const handleSaveToWatchlist = (post: Post) => {
+  const handleSaveToWatchlist = async (post: Post) => {
     if (!isSaved('post', post.db_id)) {
-      addToWatchlist({
+      const saved = await addToWatchlist({
         ticker: post.asset,
         name: post.asset,
         assetType: categoryToAssetType(post.category),
@@ -394,7 +392,9 @@ export default function MainPagePosting() {
         source_content_id: post.db_id,
         source: `Saved from post by ${post.creator}`,
       });
-      triggerToast('Saved to Watchlist', 'Build your thesis in the Watchlist tab');
+      if (saved) {
+        triggerToast('Saved to Watchlist', 'Build your thesis in the Watchlist tab');
+      }
     } else {
       removeBySource('post', post.db_id);
       triggerToast('Removed from Watchlist');
@@ -931,24 +931,6 @@ export default function MainPagePosting() {
         </div>
       </div>
 
-      {showCreatePost && (
-        <CreatePostModal
-          onClose={() => setShowCreatePost(false)}
-          onSuccess={(msg) => { triggerToast(msg); setPostsRefreshKey(k => k + 1); }}
-        />
-      )}
-
-      {/* Floating Create Button */}
-      <button
-        onClick={() => setShowCreatePost(true)}
-        className="fixed bottom-24 right-4 lg:bottom-8 lg:right-8 w-14 h-14 bg-mint text-black rounded-full shadow-lg hover:bg-mint-hover transition-all hover:scale-110 flex items-center justify-center z-40 group"
-        title="Create Post"
-      >
-        <AddCircleOutlineIcon sx={{ fontSize: 28 }} />
-        <span className="absolute bottom-full right-0 mb-2 px-3 py-1 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 pointer-coarse:hidden transition-opacity whitespace-nowrap pointer-events-none">
-          Create Post
-        </span>
-      </button>
 
       {/* Toast */}
       {showToast && (

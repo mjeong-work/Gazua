@@ -8,7 +8,8 @@ import PeopleIcon from '@mui/icons-material/People';
 import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
 import PersonIcon from '@mui/icons-material/Person';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-import AddIcon from '@mui/icons-material/Add';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import NotificationsIcon from '@mui/icons-material/Notifications';
@@ -222,16 +223,14 @@ export default function AppHeader() {
             <span className="text-[10px] font-medium">Creators</span>
           </button>
 
-          {/* Create — deliberately not styled like the other tabs (no icon/label pair, no
-              text-brand active state): a raised, filled circular button, same treatment as
-              this app's other floating create buttons, so it reads as an action, not a
-              destination. Always goes to /create regardless of current tab. */}
           <button
             onClick={() => navigate('/create')}
-            aria-label="Create"
-            className="flex items-center justify-center w-12 h-12 -mt-5 bg-mint text-black rounded-full shadow-lg hover:bg-mint-hover active:scale-95 transition-all"
+            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/create']) ? 'text-brand' : 'text-gray-500'}`}
           >
-            <AddIcon sx={{ fontSize: 28 }} />
+            {active(['/create'])
+              ? <AddCircleIcon sx={{ fontSize: 24 }} />
+              : <AddCircleOutlineIcon sx={{ fontSize: 24 }} />}
+            <span className="text-[10px] font-medium">Create</span>
           </button>
 
           <button

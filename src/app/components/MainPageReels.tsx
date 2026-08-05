@@ -1,10 +1,8 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import AppHeader from './AppHeader';
-import CreateReelModal from './CreateReelModal';
 import ReelEngagementActions from './reels/ReelEngagementActions';
 import type { SavedContentInput } from '../contexts/SavedContentContext';
 import { MOCK_REELS, type Reel } from '../data/reels';
@@ -92,7 +90,6 @@ export default function MainPageReels() {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastSubtitle, setToastSubtitle] = useState('');
-  const [showCreateReel, setShowCreateReel] = useState(false);
   const { isPanelOpen, openPanel, closePanel, swipeHandlers } = useSwipePanel();
 
   const [liveIndices, setLiveIndices] = useState<MarketIndex[]>(MARKET_INDICES);
@@ -259,14 +256,14 @@ export default function MainPageReels() {
     }
   };
 
-  const handleSaveToWatchlist = (reel: Reel) => {
+  const handleSaveToWatchlist = async (reel: Reel) => {
     if (!isSaved('reel', reel.db_id)) {
       const ticker = reel.tickers[0] ?? reel.caption.match(/#([A-Za-z]{1,5})\b/)?.[1]?.toUpperCase() ?? '';
       if (!ticker) {
         triggerToast('Could not identify a ticker in this reel');
         return;
       }
-      addToWatchlist({
+      const saved = await addToWatchlist({
         ticker,
         name: reel.caption.substring(0, 60),
         assetType: 'Strategy',
@@ -274,7 +271,9 @@ export default function MainPageReels() {
         source_content_id: reel.db_id,
         source: `Saved from reel by ${reel.creator}`,
       });
-      triggerToast('Saved to Watchlist', 'Build your thesis in the Watchlist tab');
+      if (saved) {
+        triggerToast('Saved to Watchlist', 'Build your thesis in the Watchlist tab');
+      }
     } else {
       removeBySource('reel', reel.db_id);
       triggerToast('Removed from Watchlist');
@@ -677,33 +676,6 @@ export default function MainPageReels() {
           </div>
         </div>
       </div>
-
-      {showCreateReel && (
-        <CreateReelModal
-          onClose={() => setShowCreateReel(false)}
-          onSuccess={(msg) => triggerToast(msg)}
-        />
-      )}
-
-      {/* Floating Create Button — hidden while the comments panel is open, since it
-          otherwise sits directly on top of the comment composer's send button.
-          On mobile the engagement rail (Like/Comment/Save/More, see railClassName above)
-          occupies right-3 from bottom-24 up to roughly bottom-24+~15rem, so this needs to sit
-          above all of it rather than sharing bottom-24 like the equivalent button on the
-          Posting feed (which has no competing right-side rail). Desktop's rail sits higher
-          (lg:bottom-32) with more room below it, so lg:bottom-8 already clears it. */}
-      {!isCommentsOpen && (
-      <button
-        onClick={() => setShowCreateReel(true)}
-        className="fixed bottom-[22rem] right-4 lg:bottom-8 lg:right-8 w-14 h-14 bg-mint text-black rounded-full shadow-lg hover:bg-mint-hover transition-all hover:scale-110 flex items-center justify-center z-40 group"
-        title="Create Reel"
-      >
-        <AddCircleOutlineIcon sx={{ fontSize: 28 }} />
-        <span className="absolute bottom-full right-0 mb-2 px-3 py-1 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 pointer-coarse:hidden transition-opacity whitespace-nowrap pointer-events-none">
-          Create Reel
-        </span>
-      </button>
-      )}
 
       {/* Toast */}
       {showToast && (
