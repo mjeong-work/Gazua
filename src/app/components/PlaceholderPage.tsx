@@ -12,12 +12,12 @@ export default function PlaceholderPage({ title, description, icon }: Placeholde
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
-      <header className="border-b border-gray-200 bg-white">
+      <header className="border-b border-neutral-200 bg-white">
         <div className="px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate(-1)}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2 hover:bg-neutral-100 rounded-full transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -39,7 +39,7 @@ export default function PlaceholderPage({ title, description, icon }: Placeholde
         <div className="max-w-md text-center">
           <div className="text-6xl mb-6">{icon}</div>
           <h2 className="text-3xl font-bold mb-4">{title}</h2>
-          <p className="text-gray-600 mb-8 leading-relaxed">{description}</p>
+          <p className="text-neutral-600 mb-8 leading-relaxed">{description}</p>
           <div className="flex gap-3 justify-center">
             <button
               onClick={() => navigate('/main')}
@@ -49,7 +49,7 @@ export default function PlaceholderPage({ title, description, icon }: Placeholde
             </button>
             <button
               onClick={() => navigate(-1)}
-              className="px-6 py-3 border-2 border-gray-200 rounded-full hover:border-gray-300 hover:bg-gray-50 transition-colors"
+              className="px-6 py-3 border-2 border-neutral-200 rounded-full hover:border-neutral-300 hover:bg-neutral-50 transition-colors"
             >
               Go Back
             </button>

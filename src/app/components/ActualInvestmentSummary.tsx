@@ -17,12 +17,12 @@ export default function ActualInvestmentSummary() {
     <div className="space-y-5">
       {/* Design-preview toggle (not shown to end users — remove in production) */}
       <div className="flex items-center justify-end">
-        <div className="flex items-center gap-2 text-xs text-gray-400">
+        <div className="flex items-center gap-2 text-xs text-neutral-400">
           <span>Preview:</span>
           <button
             onClick={() => setShowConnected(false)}
             className={`px-2.5 py-1 rounded-md transition-colors ${
-              !showConnected ? 'bg-gray-200 text-gray-700 font-medium' : 'hover:bg-gray-100 text-gray-400'
+              !showConnected ? 'bg-neutral-200 text-neutral-700 font-medium' : 'hover:bg-neutral-100 text-neutral-400'
             }`}
           >
             Disconnected
@@ -30,7 +30,7 @@ export default function ActualInvestmentSummary() {
           <button
             onClick={() => setShowConnected(true)}
             className={`px-2.5 py-1 rounded-md transition-colors ${
-              showConnected ? 'bg-gray-200 text-gray-700 font-medium' : 'hover:bg-gray-100 text-gray-400'
+              showConnected ? 'bg-neutral-200 text-neutral-700 font-medium' : 'hover:bg-neutral-100 text-neutral-400'
             }`}
           >
             Connected
@@ -40,9 +40,9 @@ export default function ActualInvestmentSummary() {
 
       {!data.connected ? (
         /* ── Empty state ── */
-        <div className="border border-gray-200 rounded-2xl p-10 flex flex-col items-center justify-center text-center">
-          <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-            <svg className="w-7 h-7 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="border border-neutral-200 rounded-2xl p-10 flex flex-col items-center justify-center text-center">
+          <div className="w-14 h-14 rounded-full bg-neutral-100 flex items-center justify-center mb-4">
+            <svg className="w-7 h-7 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -51,8 +51,8 @@ export default function ActualInvestmentSummary() {
               />
             </svg>
           </div>
-          <h3 className="font-semibold text-gray-800 mb-2">No brokerage account connected</h3>
-          <p className="text-sm text-gray-500 max-w-sm mb-6">
+          <h3 className="font-semibold text-neutral-800 mb-2">No brokerage account connected</h3>
+          <p className="text-sm text-neutral-500 max-w-sm mb-6">
             Connect your brokerage account to display verified investment performance.
           </p>
           <button className="px-6 py-2.5 bg-black text-white text-sm font-medium rounded-full hover:bg-black/80 transition-colors">
@@ -63,15 +63,15 @@ export default function ActualInvestmentSummary() {
         /* ── Connected state ── */
         <div className="space-y-4">
           {/* Account header */}
-          <div className="border border-gray-200 rounded-2xl p-5">
+          <div className="border border-neutral-200 rounded-2xl p-5">
             <div className="flex items-center justify-between mb-5">
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   <span className="w-2 h-2 rounded-full bg-green-500" />
                   <span className="text-xs text-green-600 font-medium">Live</span>
                 </div>
-                <h3 className="font-semibold text-gray-900">{data.brokerName} Account</h3>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <h3 className="font-semibold text-neutral-900">{data.brokerName} Account</h3>
+                <p className="text-xs text-neutral-400 mt-0.5">
                   Last synced:{' '}
                   {data.lastSyncedAt
                     ? new Date(data.lastSyncedAt).toLocaleString('en-US', {
@@ -83,16 +83,16 @@ export default function ActualInvestmentSummary() {
                     : '—'}
                 </p>
               </div>
-              <button className="text-xs text-gray-400 hover:text-gray-600 border border-gray-200 rounded-lg px-3 py-1.5 transition-colors">
+              <button className="text-xs text-neutral-400 hover:text-neutral-600 border border-neutral-200 rounded-lg px-3 py-1.5 transition-colors">
                 Sync now
               </button>
             </div>
 
             {/* Summary cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="bg-gray-50 rounded-xl p-4">
-                <p className="text-xs text-gray-400 mb-1">Account Value</p>
-                <p className="text-xl font-bold text-gray-900">
+              <div className="bg-neutral-50 rounded-xl p-4">
+                <p className="text-xs text-neutral-400 mb-1">Account Value</p>
+                <p className="text-xl font-bold text-neutral-900">
                   {formatCurrency(data.accountValue ?? 0)}
                 </p>
               </div>

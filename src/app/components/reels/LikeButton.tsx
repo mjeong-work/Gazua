@@ -37,7 +37,7 @@ export default function LikeButton({ isLiked, likeCount, onToggle, variant = 'ra
       activeBgClass="bg-red-500"
       pop={pop}
     >
-      <span className={rail ? 'text-xs font-medium text-white' : 'text-sm font-medium text-gray-700'}>
+      <span className={rail ? 'text-xs font-medium text-white' : 'text-sm font-medium text-neutral-700'}>
         {formatCount(likeCount)}
       </span>
     </ReelActionButton>

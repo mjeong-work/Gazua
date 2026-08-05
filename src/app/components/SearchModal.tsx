@@ -194,7 +194,7 @@ export default function SearchModal({ onClose }: SearchModalProps) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search Input */}
-        <div className="p-4 border-b border-gray-200 flex items-center gap-3">
+        <div className="p-4 border-b border-neutral-200 flex items-center gap-3">
           <SearchIcon sx={{ fontSize: 24, color: 'var(--icon-muted)' }} />
           <input
             type="text"
@@ -207,7 +207,7 @@ export default function SearchModal({ onClose }: SearchModalProps) {
           />
           <button
             onClick={onClose}
-            className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-1 hover:bg-neutral-100 rounded-full transition-colors"
           >
             <CloseIcon sx={{ fontSize: 20 }} />
           </button>
@@ -221,11 +221,11 @@ export default function SearchModal({ onClose }: SearchModalProps) {
                 <button
                   key={index}
                   onClick={() => handleResultClick(result)}
-                  className="w-full p-3 flex items-center gap-3 hover:bg-gray-50 rounded-lg transition-colors text-left"
+                  className="w-full p-3 flex items-center gap-3 hover:bg-neutral-50 rounded-lg transition-colors text-left"
                 >
                   {result.type === 'creator' ? (
                     <>
-                      <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-xl flex-shrink-0">
+                      <div className="w-10 h-10 rounded-full bg-neutral-200 flex items-center justify-center text-xl flex-shrink-0">
                         {result.avatar}
                       </div>
                       <div className="flex-1">
@@ -237,9 +237,9 @@ export default function SearchModal({ onClose }: SearchModalProps) {
                             </svg>
                           )}
                         </div>
-                        <span className="text-xs text-gray-500">{result.handle}</span>
+                        <span className="text-xs text-neutral-500">{result.handle}</span>
                       </div>
-                      <span className="text-xs text-gray-400">Creator</span>
+                      <span className="text-xs text-neutral-400">Creator</span>
                     </>
                   ) : (
                     <>
@@ -250,20 +250,20 @@ export default function SearchModal({ onClose }: SearchModalProps) {
                       </div>
                       <div className="flex-1">
                         <span className="font-bold text-sm block">{result.name}</span>
-                        <span className="text-xs text-gray-500">{result.description}</span>
+                        <span className="text-xs text-neutral-500">{result.description}</span>
                       </div>
-                      <span className="text-xs text-gray-400 capitalize">{result.type}</span>
+                      <span className="text-xs text-neutral-400 capitalize">{result.type}</span>
                     </>
                   )}
                 </button>
               ))}
             </div>
           ) : isSearchingCreators ? (
-            <div className="p-12 text-center text-gray-500">
+            <div className="p-12 text-center text-neutral-500">
               <p>Searching...</p>
             </div>
           ) : (
-            <div className="p-12 text-center text-gray-500">
+            <div className="p-12 text-center text-neutral-500">
               <SearchIcon sx={{ fontSize: 48, color: '#d1d5db' }} />
               <p className="mt-4">No results found for "{query}"</p>
             </div>
@@ -271,8 +271,8 @@ export default function SearchModal({ onClose }: SearchModalProps) {
         </div>
 
         {/* Footer */}
-        <div className="p-3 border-t border-gray-200 text-xs text-gray-500 text-center">
-          Press <kbd className="px-2 py-1 bg-gray-100 rounded">ESC</kbd> to close
+        <div className="p-3 border-t border-neutral-200 text-xs text-neutral-500 text-center">
+          Press <kbd className="px-2 py-1 bg-neutral-100 rounded">ESC</kbd> to close
         </div>
       </div>
     </div>

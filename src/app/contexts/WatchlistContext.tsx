@@ -25,7 +25,8 @@ export interface AddToWatchlistPayload {
 
 interface WatchlistContextType {
   watchlistItems: WatchlistItem[];
-  addToWatchlist: (payload: AddToWatchlistPayload) => void;
+  /** Resolves true once the item is actually persisted (or added locally for a guest), false if the save failed. */
+  addToWatchlist: (payload: AddToWatchlistPayload) => Promise<boolean>;
   removeFromWatchlist: (id: string) => void;
   removeBySource: (source_type: WatchlistSourceType, source_content_id: string | undefined) => void;
   updateItem: (id: string, updates: Partial<WatchlistItem>) => void;
@@ -64,7 +65,7 @@ export function WatchlistProvider({ children }: { children: ReactNode }) {
     setWatchlistItems(data);
   };
 
-  const addToWatchlist = (payload: AddToWatchlistPayload) => {
+  const addToWatchlist = (payload: AddToWatchlistPayload): Promise<boolean> => {
     const uid = userIdRef.current;
     const ticker = payload.ticker.toUpperCase();
     const srcId = payload.source_content_id;
@@ -74,7 +75,7 @@ export function WatchlistProvider({ children }: { children: ReactNode }) {
         ? item.source_type === payload.source_type && item.source_content_id === srcId
         : item.ticker === ticker
     );
-    if (alreadySaved) return;
+    if (alreadySaved) return Promise.resolve(true);
 
     const optimisticItem: WatchlistItem = {
       id: `optimistic-${Date.now()}`,
@@ -100,33 +101,38 @@ export function WatchlistProvider({ children }: { children: ReactNode }) {
 
     setWatchlistItems(prev => [optimisticItem, ...prev]);
 
-    if (uid) {
-      dbAdd(uid, {
-        ticker,
-        name: payload.name ?? ticker,
-        asset_type: payload.assetType ?? 'Strategy',
-        source_type: payload.source_type,
-        source_content_id: srcId,
-        source_label: payload.source,
-      }).then(({ data: saved, error }) => {
-        if (error || !saved) {
-          // Roll back the optimistic item — it was never actually persisted, so leaving it
-          // in state would show as "saved" until the next refetch silently drops it.
-          setWatchlistItems(prev => prev.filter(item => item.id !== optimisticItem.id));
-          toast.error(error ?? 'Failed to save to watchlist. Please try again.');
-          return;
-        }
-        setWatchlistItems(prev =>
-          prev.map(item => item.id === optimisticItem.id ? saved : item)
-        );
-      }).catch(() => {
-        // Unexpected rejection (e.g. network failure before Supabase could return
-        // an error object) — same rollback as an explicit error, so a thrown
-        // exception can't leave a phantom "saved" item that vanishes on refetch.
-        setWatchlistItems(prev => prev.filter(item => item.id !== optimisticItem.id));
-        toast.error('Failed to save to watchlist. Please try again.');
-      });
+    if (!uid) {
+      // No account to persist to — the optimistic item just lives in local state.
+      return Promise.resolve(true);
     }
+
+    return dbAdd(uid, {
+      ticker,
+      name: payload.name ?? ticker,
+      asset_type: payload.assetType ?? 'Strategy',
+      source_type: payload.source_type,
+      source_content_id: srcId,
+      source_label: payload.source,
+    }).then(({ data: saved, error }) => {
+      if (error || !saved) {
+        // Roll back the optimistic item — it was never actually persisted, so leaving it
+        // in state would show as "saved" until the next refetch silently drops it.
+        setWatchlistItems(prev => prev.filter(item => item.id !== optimisticItem.id));
+        toast.error(error ?? 'Failed to save to watchlist. Please try again.');
+        return false;
+      }
+      setWatchlistItems(prev =>
+        prev.map(item => item.id === optimisticItem.id ? saved : item)
+      );
+      return true;
+    }).catch(() => {
+      // Unexpected rejection (e.g. network failure before Supabase could return
+      // an error object) — same rollback as an explicit error, so a thrown
+      // exception can't leave a phantom "saved" item that vanishes on refetch.
+      setWatchlistItems(prev => prev.filter(item => item.id !== optimisticItem.id));
+      toast.error('Failed to save to watchlist. Please try again.');
+      return false;
+    });
   };
 
   const removeFromWatchlist = (id: string) => {

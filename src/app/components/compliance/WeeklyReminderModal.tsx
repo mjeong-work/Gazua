@@ -45,27 +45,27 @@ export default function WeeklyReminderModal() {
       onClick={dismiss}
     >
       <div
-        className="bg-white dark:bg-neutral-900 rounded-2xl max-w-sm w-full p-6"
+        className="bg-white rounded-2xl max-w-sm w-full p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between mb-4">
-          <h2 className="text-lg font-bold dark:text-white">Before You Continue</h2>
+          <h2 className="text-lg font-bold">Before You Continue</h2>
           <button
             onClick={dismiss}
-            className="p-1.5 -mt-1 -mr-1 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors"
+            className="icon-tap-target p-1.5 -mt-1 -mr-1 hover:bg-neutral-100 rounded-full transition-colors"
             aria-label="Dismiss reminder"
           >
             <CloseIcon sx={{ fontSize: 18 }} />
           </button>
         </div>
 
-        <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3">
+        <p className="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-3">
           Remember
         </p>
         <ul className="space-y-2 mb-6">
           {REMINDERS.map((line) => (
-            <li key={line} className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-300 leading-snug">
-              <span className="mt-1.5 w-1 h-1 rounded-full bg-gray-400 dark:bg-gray-600 flex-shrink-0" />
+            <li key={line} className="flex items-start gap-2 text-sm text-neutral-700 leading-snug">
+              <span className="mt-1.5 w-1 h-1 rounded-full bg-neutral-400 flex-shrink-0" />
               {line}
             </li>
           ))}
@@ -73,7 +73,7 @@ export default function WeeklyReminderModal() {
 
         <button
           onClick={dismiss}
-          className="w-full py-3 bg-black dark:bg-white text-white dark:text-black rounded-full text-sm font-bold hover:bg-black/80 dark:hover:bg-white/80 transition-colors"
+          className="w-full py-3 bg-black text-white rounded-full text-sm font-bold hover:bg-black/80 transition-colors"
         >
           Continue
         </button>

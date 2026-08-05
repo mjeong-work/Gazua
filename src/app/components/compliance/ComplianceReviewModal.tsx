@@ -95,11 +95,11 @@ export default function ComplianceReviewModal({
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+        <div className="sticky top-0 bg-white border-b border-neutral-200 px-6 py-4 flex items-center justify-between">
           <h2 className="text-lg font-bold">Content Review</h2>
           <button
             onClick={onCancel}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-neutral-100 rounded-full transition-colors"
           >
             <CloseIcon sx={{ fontSize: 20 }} />
           </button>
@@ -115,14 +115,14 @@ export default function ComplianceReviewModal({
           {/* Flagged / blocked reasons */}
           {result.reasons.length > 0 && (
             <div>
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">
+              <p className="text-xs font-bold text-neutral-500 uppercase tracking-widest mb-2">
                 {isBlocked ? 'Blocked Content' : 'Flagged Language'}
               </p>
               <ul className="space-y-2">
                 {result.reasons.map((r, i) => (
                   <li key={i} className="flex gap-2 text-sm items-start">
                     <span className={`mt-0.5 ${REASON_DOT_COLOR[r.category]}`}>●</span>
-                    <span className="text-gray-700">{r.message}</span>
+                    <span className="text-neutral-700">{r.message}</span>
                   </li>
                 ))}
               </ul>
@@ -132,10 +132,10 @@ export default function ComplianceReviewModal({
           {/* Disclosures (hidden when BLOCKED) */}
           {!isBlocked && result.requiredDisclosures.length > 0 && (
             <div>
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">
+              <p className="text-xs font-bold text-neutral-500 uppercase tracking-widest mb-1">
                 Disclosures
               </p>
-              <p className="text-xs text-gray-400 mb-3">Select all that apply.</p>
+              <p className="text-xs text-neutral-400 mb-3">Select all that apply.</p>
               <ul className="space-y-2.5">
                 {result.requiredDisclosures.map(d => (
                   <li key={d}>
@@ -146,7 +146,7 @@ export default function ComplianceReviewModal({
                         onChange={() => toggle(d)}
                         className="mt-0.5 accent-black flex-shrink-0"
                       />
-                      <span className="text-sm text-gray-700 leading-snug">
+                      <span className="text-sm text-neutral-700 leading-snug">
                         {DISCLOSURE_LABELS[d]}
                       </span>
                     </label>
@@ -158,7 +158,7 @@ export default function ComplianceReviewModal({
 
           {/* Mandatory platform disclaimer */}
           {!isBlocked && (
-            <div className="border-t border-gray-100 pt-4">
+            <div className="border-t border-neutral-100 pt-4">
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
                   type="checkbox"
@@ -166,7 +166,7 @@ export default function ComplianceReviewModal({
                   onChange={e => setDisclaimerChecked(e.target.checked)}
                   className="mt-0.5 accent-black flex-shrink-0"
                 />
-                <span className="text-sm text-gray-600 leading-snug">
+                <span className="text-sm text-neutral-600 leading-snug">
                   I understand this content represents my personal opinion and is not professional investment advice. Gazua does not endorse or guarantee any content posted on this platform.
                 </span>
               </label>
@@ -177,7 +177,7 @@ export default function ComplianceReviewModal({
           <div className="flex gap-3 pt-1">
             <button
               onClick={onCancel}
-              className="flex-1 py-3 border border-gray-200 rounded-full text-sm font-medium hover:bg-gray-50 transition-colors"
+              className="flex-1 py-3 border border-neutral-200 rounded-full text-sm font-medium hover:bg-neutral-50 transition-colors"
             >
               {isBlocked ? 'Edit Content' : 'Go Back'}
             </button>
@@ -185,7 +185,7 @@ export default function ComplianceReviewModal({
               <button
                 onClick={() => onApprove([...accepted])}
                 disabled={!canPublish}
-                className="flex-1 py-3 bg-black text-white rounded-full text-sm font-bold hover:bg-black/80 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                className="flex-1 py-3 bg-black text-white rounded-full text-sm font-bold hover:bg-black/80 transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed"
               >
                 Confirm & Publish
               </button>

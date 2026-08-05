@@ -17,18 +17,18 @@ interface LegalDocumentRendererProps {
 
 // Maps markdown elements to the exact typography classes TermsPage/PrivacyPage used
 // (max-w-3xl reading column, text-sm/gray-700 body copy, brand-token links), so rendered
-// markdown is visually indistinguishable from the old hardcoded-JSX pages, now with
-// dark-mode variants and scroll-margin for anchor-linked headings under the sticky header.
+// markdown is visually indistinguishable from the old hardcoded-JSX pages, with
+// scroll-margin for anchor-linked headings under the sticky header.
 export default function LegalDocumentRenderer({ markdown }: LegalDocumentRendererProps) {
   return (
-    <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+    <div className="text-sm text-neutral-700 leading-relaxed">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
           h2: ({ children }) => {
             const id = slugifyHeading(flattenToText(children));
             return (
-              <h2 id={id} className="text-lg font-bold text-black dark:text-white mt-10 first:mt-0 mb-3 scroll-mt-24">
+              <h2 id={id} className="text-lg font-bold text-black mt-10 first:mt-0 mb-3 scroll-mt-24">
                 {children}
               </h2>
             );
@@ -36,7 +36,7 @@ export default function LegalDocumentRenderer({ markdown }: LegalDocumentRendere
           h3: ({ children }) => {
             const id = slugifyHeading(flattenToText(children));
             return (
-              <h3 id={id} className="text-base font-semibold text-black dark:text-white mt-6 mb-2 scroll-mt-24">
+              <h3 id={id} className="text-base font-semibold text-black mt-6 mb-2 scroll-mt-24">
                 {children}
               </h3>
             );
@@ -45,8 +45,8 @@ export default function LegalDocumentRenderer({ markdown }: LegalDocumentRendere
           ul: ({ children }) => <ul className="list-disc list-inside space-y-2 ml-2 mb-3">{children}</ul>,
           ol: ({ children }) => <ol className="list-decimal list-inside space-y-2 ml-2 mb-3">{children}</ol>,
           li: ({ children }) => <li className="leading-relaxed">{children}</li>,
-          strong: ({ children }) => <strong className="font-semibold text-black dark:text-white">{children}</strong>,
-          hr: () => <hr className="my-8 border-gray-200 dark:border-gray-800" />,
+          strong: ({ children }) => <strong className="font-semibold text-black">{children}</strong>,
+          hr: () => <hr className="my-8 border-neutral-200" />,
           a: ({ href, children }) => {
             if (!href) return <>{children}</>;
             const isInternal = href.startsWith('/');
@@ -62,12 +62,12 @@ export default function LegalDocumentRenderer({ markdown }: LegalDocumentRendere
             </div>
           ),
           th: ({ children }) => (
-            <th className="border border-gray-200 dark:border-gray-800 px-3 py-2 text-left font-semibold text-black dark:text-white">
+            <th className="border border-neutral-200 px-3 py-2 text-left font-semibold text-black">
               {children}
             </th>
           ),
           td: ({ children }) => (
-            <td className="border border-gray-200 dark:border-gray-800 px-3 py-2 align-top">{children}</td>
+            <td className="border border-neutral-200 px-3 py-2 align-top">{children}</td>
           ),
         }}
       >

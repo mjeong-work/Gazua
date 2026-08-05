@@ -61,26 +61,26 @@ export default function CommentBody({ theme, comments, onAddComment, listPointer
       >
         {comments.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center py-16">
-            <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${dark ? 'bg-white/10' : 'bg-gray-100'}`}>
-              <svg className={`w-8 h-8 ${dark ? 'text-white/40' : 'text-gray-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 ${dark ? 'bg-white/10' : 'bg-neutral-100'}`}>
+              <svg className={`w-8 h-8 ${dark ? 'text-white/40' : 'text-neutral-400'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
             </div>
-            <p className={`font-medium text-sm ${dark ? 'text-white/70' : 'text-gray-500'}`}>No comments yet</p>
-            <p className={`text-xs mt-1 ${dark ? 'text-white/40' : 'text-gray-400'}`}>Be the first to share your thoughts</p>
+            <p className={`font-medium text-sm ${dark ? 'text-white/70' : 'text-neutral-500'}`}>No comments yet</p>
+            <p className={`text-xs mt-1 ${dark ? 'text-white/40' : 'text-neutral-400'}`}>Be the first to share your thoughts</p>
           </div>
         )}
 
         {comments.map((comment) => (
           <div key={comment.id} className="flex gap-3">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-base flex-shrink-0 ${dark ? 'bg-white/10' : 'bg-gray-100'}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-base flex-shrink-0 ${dark ? 'bg-white/10' : 'bg-neutral-100'}`}>
               {comment.avatar}
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-baseline gap-2 flex-wrap">
                 <span className="text-sm font-bold leading-tight">{comment.authorName}</span>
-                <span className={`text-xs ${dark ? 'text-white/40' : 'text-gray-400'}`}>{comment.authorHandle}</span>
-                <span className={`text-xs ${dark ? 'text-white/40' : 'text-gray-400'}`}>· {formatRelative(comment.createdAt)}</span>
+                <span className={`text-xs ${dark ? 'text-white/40' : 'text-neutral-400'}`}>{comment.authorHandle}</span>
+                <span className={`text-xs ${dark ? 'text-white/40' : 'text-neutral-400'}`}>· {formatRelative(comment.createdAt)}</span>
               </div>
               <p className="text-sm mt-1 leading-relaxed break-words">{comment.content}</p>
             </div>
@@ -88,9 +88,9 @@ export default function CommentBody({ theme, comments, onAddComment, listPointer
         ))}
       </div>
 
-      <div className={`flex-shrink-0 border-t px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] ${dark ? 'border-white/10' : 'border-gray-100'}`}>
+      <div className={`flex-shrink-0 border-t px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] ${dark ? 'border-white/10' : 'border-neutral-100'}`}>
         {!user ? (
-          <p className={`text-center text-sm py-2 ${dark ? 'text-white/50' : 'text-gray-500'}`}>Sign in to leave a comment</p>
+          <p className={`text-center text-sm py-2 ${dark ? 'text-white/50' : 'text-neutral-500'}`}>Sign in to leave a comment</p>
         ) : (
           <form
             onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}
@@ -102,7 +102,7 @@ export default function CommentBody({ theme, comments, onAddComment, listPointer
               value={text}
               onChange={(e) => setText(e.target.value.slice(0, 500))}
               className={`flex-1 px-3 py-1.5 border rounded-full text-sm focus:outline-none focus:border-brand transition-colors ${
-                dark ? 'bg-white/10 border-white/20 text-white placeholder:text-white/40' : 'bg-gray-50 border-gray-200'
+                dark ? 'bg-white/10 border-white/20 text-white placeholder:text-white/40' : 'bg-neutral-50 border-neutral-200'
               }`}
             />
             <button

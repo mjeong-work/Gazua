@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router';
+import { AnimatePresence } from 'motion/react';
+import { toast } from 'sonner';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import HomeIcon from '@mui/icons-material/Home';
@@ -8,15 +10,21 @@ import PeopleIcon from '@mui/icons-material/People';
 import PeopleOutlinedIcon from '@mui/icons-material/PeopleOutlined';
 import PersonIcon from '@mui/icons-material/Person';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-import SettingsIcon from '@mui/icons-material/Settings';
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import AddIcon from '@mui/icons-material/Add';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import SearchModal from './SearchModal';
 import RiskBanner from './AppHeader/RiskBanner';
+import CreateOptionsSheet, { type CreateContentType } from './CreateOptionsSheet';
+import CreatePostModal from './CreatePostModal';
+import CreateReelModal from './CreateReelModal';
+import UploadVideoModal from './UploadVideoModal';
 import { useAuth } from '../contexts/AuthContext';
+import { useServiceQuery } from '../hooks/useServiceQuery';
 import { getUnreadCount, subscribeToNotifications } from '../../lib/services/notifications.service';
 import { getUnreadMessageCount, subscribeToMessages } from '../../lib/services/messages.service';
 
@@ -30,26 +38,40 @@ export default function AppHeader() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
 
-  useEffect(() => {
-    if (!user) {
-      setUnreadCount(0);
-      return;
-    }
-    getUnreadCount(user.id).then(({ data }) => setUnreadCount(data ?? 0));
+  // Create bottom sheet + whichever composer it opens — self-contained here so every page
+  // gets the same "+" behavior without each page owning its own create modal/FAB.
+  const [showCreateSheet, setShowCreateSheet] = useState(false);
+  const [activeCreateModal, setActiveCreateModal] = useState<CreateContentType | null>(null);
 
+  const handleSelectCreateType = (type: CreateContentType) => {
+    setShowCreateSheet(false);
+    setActiveCreateModal(type);
+  };
+
+  const { data: unreadCountData } = useServiceQuery(
+    () => getUnreadCount(user!.id),
+    [user?.id],
+    { enabled: !!user, label: 'notifications' },
+  );
+  useEffect(() => setUnreadCount(unreadCountData ?? 0), [unreadCountData]);
+
+  useEffect(() => {
+    if (!user) return;
     const channel = subscribeToNotifications(user.id, () => {
       setUnreadCount(prev => prev + 1);
     });
     return () => { channel.unsubscribe(); };
   }, [user]);
 
-  useEffect(() => {
-    if (!user) {
-      setUnreadMessageCount(0);
-      return;
-    }
-    getUnreadMessageCount(user.id).then(({ data }) => setUnreadMessageCount(data ?? 0));
+  const { data: unreadMessageCountData } = useServiceQuery(
+    () => getUnreadMessageCount(user!.id),
+    [user?.id],
+    { enabled: !!user, label: 'messages' },
+  );
+  useEffect(() => setUnreadMessageCount(unreadMessageCountData ?? 0), [unreadMessageCountData]);
 
+  useEffect(() => {
+    if (!user) return;
     const channel = subscribeToMessages(user.id, () => {
       setUnreadMessageCount(prev => prev + 1);
     }, 'badge');
@@ -71,7 +93,7 @@ export default function AppHeader() {
       </div>
 
       {/* Mobile top bar */}
-      <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200 shrink-0">
+      <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-white border-b border-neutral-200 shrink-0">
         <h1
           onClick={() => navigate('/main')}
           className="text-xl font-bold tracking-tight cursor-pointer"
@@ -93,14 +115,14 @@ export default function AppHeader() {
           )}
           <button
             onClick={() => setShowSearch(true)}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-neutral-100 rounded-full transition-colors"
             aria-label="Search"
           >
             <SearchIcon sx={{ fontSize: 22 }} />
           </button>
           <button
             onClick={() => navigate('/notifications')}
-            className="relative p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="relative p-2 hover:bg-neutral-100 rounded-full transition-colors"
             aria-label="Notifications"
           >
             {active(['/notifications'])
@@ -114,7 +136,7 @@ export default function AppHeader() {
       </div>
 
       {/* Desktop header */}
-      <header className="hidden lg:block border-b border-gray-200 bg-white shrink-0">
+      <header className="hidden lg:block border-b border-neutral-200 bg-white shrink-0">
         <div className="px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-8">
             <h1
@@ -138,7 +160,7 @@ export default function AppHeader() {
                     color: 'var(--icon-muted)',
                   }}
                 />
-                <div className="pl-10 pr-4 py-2 w-full border border-gray-200 rounded-full text-sm text-left text-gray-500 hover:border-gray-300 transition-colors cursor-pointer">
+                <div className="pl-10 pr-4 py-2 w-full border border-neutral-200 rounded-full text-sm text-left text-neutral-500 hover:border-neutral-300 transition-colors cursor-pointer">
                   Search
                 </div>
               </button>
@@ -173,7 +195,7 @@ export default function AppHeader() {
                 <span className="absolute -top-1 -right-2.5 w-2 h-2 bg-brand rounded-full" />
               )}
             </button>
-            <button onClick={() => navigate('/account')} className={cls(['/account'])}>
+            <button onClick={() => navigate('/my-profile/settings')} className={cls(['/my-profile/settings'])}>
               Account
             </button>
             {profile?.role === 'admin' && (
@@ -183,7 +205,7 @@ export default function AppHeader() {
             )}
             <button
               onClick={() => navigate('/notifications')}
-              className={`relative p-2 -m-2 rounded-full hover:bg-gray-100 transition-colors ${active(['/notifications']) ? 'text-brand' : ''}`}
+              className={`relative p-2 -m-2 rounded-full hover:bg-neutral-100 transition-colors ${active(['/notifications']) ? 'text-brand' : ''}`}
               aria-label="Notifications"
             >
               {active(['/notifications'])
@@ -199,12 +221,14 @@ export default function AppHeader() {
 
       <RiskBanner />
 
-      {/* Mobile bottom nav */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30">
+      {/* Mobile bottom nav — Home, Creators, [+ Create], Messages, Profile. Account no longer
+          lives here; its content moved to My Profile > Settings (gear icon), reached the same
+          way as before but nested under Profile instead of being its own tab. */}
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-neutral-200 z-30 pb-[env(safe-area-inset-bottom)]">
         <div className="flex items-center justify-around h-16">
           <button
             onClick={() => navigate('/main')}
-            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/main', '/home']) ? 'text-brand' : 'text-gray-500'}`}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/main', '/home']) ? 'text-brand' : 'text-neutral-500'}`}
           >
             {active(['/main', '/home'])
               ? <HomeIcon sx={{ fontSize: 24 }} />
@@ -213,25 +237,27 @@ export default function AppHeader() {
           </button>
           <button
             onClick={() => navigate('/creators')}
-            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/creators', '/profile']) ? 'text-brand' : 'text-gray-500'}`}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/creators', '/profile']) ? 'text-brand' : 'text-neutral-500'}`}
           >
             {active(['/creators', '/profile'])
               ? <PeopleIcon sx={{ fontSize: 24 }} />
               : <PeopleOutlinedIcon sx={{ fontSize: 24 }} />}
             <span className="text-[10px] font-medium">Creators</span>
           </button>
+
           <button
-            onClick={() => navigate('/my-profile')}
-            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/my-profile']) ? 'text-brand' : 'text-gray-500'}`}
+            onClick={() => setShowCreateSheet(true)}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${showCreateSheet || activeCreateModal ? 'text-brand' : 'text-neutral-500'}`}
           >
-            {active(['/my-profile'])
-              ? <PersonIcon sx={{ fontSize: 24 }} />
-              : <PersonOutlineIcon sx={{ fontSize: 24 }} />}
-            <span className="text-[10px] font-medium">Profile</span>
+            {showCreateSheet || activeCreateModal
+              ? <AddCircleIcon sx={{ fontSize: 24 }} />
+              : <AddCircleOutlineIcon sx={{ fontSize: 24 }} />}
+            <span className="text-[10px] font-medium">Create</span>
           </button>
+
           <button
             onClick={() => navigate('/messages')}
-            className={`relative flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/messages']) ? 'text-brand' : 'text-gray-500'}`}
+            className={`relative flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/messages']) ? 'text-brand' : 'text-neutral-500'}`}
           >
             {active(['/messages'])
               ? <ChatBubbleIcon sx={{ fontSize: 24 }} />
@@ -242,18 +268,57 @@ export default function AppHeader() {
             <span className="text-[10px] font-medium">Messages</span>
           </button>
           <button
-            onClick={() => navigate('/account')}
-            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/account']) ? 'text-brand' : 'text-gray-500'}`}
+            onClick={() => navigate('/my-profile')}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/my-profile']) ? 'text-brand' : 'text-neutral-500'}`}
           >
-            {active(['/account'])
-              ? <SettingsIcon sx={{ fontSize: 24 }} />
-              : <SettingsOutlinedIcon sx={{ fontSize: 24 }} />}
-            <span className="text-[10px] font-medium">Account</span>
+            {active(['/my-profile'])
+              ? <PersonIcon sx={{ fontSize: 24 }} />
+              : <PersonOutlineIcon sx={{ fontSize: 24 }} />}
+            <span className="text-[10px] font-medium">Profile</span>
           </button>
         </div>
       </nav>
 
+      {/* Desktop Create FAB — mobile reaches the same picker via the bottom nav's + tab above,
+          so this only needs to exist at lg and up (matches CreateOptionsSheet's own desktop
+          breakpoint, which is what switches it from a bottom sheet to a centered dialog). */}
+      <button
+        onClick={() => setShowCreateSheet(true)}
+        className="hidden lg:flex fixed bottom-8 right-8 w-14 h-14 bg-mint text-black rounded-full shadow-lg hover:bg-mint-hover hover:shadow-xl transition-all items-center justify-center z-40"
+        aria-label="Create"
+      >
+        <AddIcon sx={{ fontSize: 28 }} />
+      </button>
+
       {showSearch && <SearchModal onClose={() => setShowSearch(false)} />}
+
+      <AnimatePresence>
+        {showCreateSheet && (
+          <CreateOptionsSheet
+            onClose={() => setShowCreateSheet(false)}
+            onSelect={handleSelectCreateType}
+          />
+        )}
+      </AnimatePresence>
+
+      {activeCreateModal === 'post' && (
+        <CreatePostModal
+          onClose={() => setActiveCreateModal(null)}
+          onSuccess={(msg) => { setActiveCreateModal(null); toast.success(msg); navigate('/main'); }}
+        />
+      )}
+      {activeCreateModal === 'reel' && (
+        <CreateReelModal
+          onClose={() => setActiveCreateModal(null)}
+          onSuccess={(msg) => { setActiveCreateModal(null); toast.success(msg); navigate('/main/reels'); }}
+        />
+      )}
+      {activeCreateModal === 'video' && (
+        <UploadVideoModal
+          onClose={() => setActiveCreateModal(null)}
+          onSuccess={(msg) => { setActiveCreateModal(null); toast.success(msg); navigate('/my-profile?tab=videos'); }}
+        />
+      )}
     </>
   );
 }

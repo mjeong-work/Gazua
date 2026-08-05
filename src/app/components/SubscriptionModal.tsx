@@ -61,14 +61,14 @@ export default function SubscriptionModal({ onClose, creatorName }: Subscription
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-8 py-6 flex items-center justify-between">
+        <div className="sticky top-0 bg-white border-b border-neutral-200 px-8 py-6 flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold mb-1">Subscribe to {creatorName}</h2>
-            <p className="text-sm text-gray-600">Choose a membership tier to unlock exclusive content</p>
+            <p className="text-sm text-neutral-600">Choose a membership tier to unlock exclusive content</p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-neutral-100 rounded-full transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -84,7 +84,7 @@ export default function SubscriptionModal({ onClose, creatorName }: Subscription
                 className={`relative border-2 rounded-xl p-6 cursor-pointer transition-all ${
                   selectedTier === tier.id
                     ? 'border-brand bg-brand/5'
-                    : 'border-gray-200 hover:border-gray-300'
+                    : 'border-neutral-200 hover:border-neutral-300'
                 }`}
               >
                 {tier.badge && (
@@ -100,7 +100,7 @@ export default function SubscriptionModal({ onClose, creatorName }: Subscription
                       className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
                         selectedTier === tier.id
                           ? 'border-brand bg-brand'
-                          : 'border-gray-300'
+                          : 'border-neutral-300'
                       }`}
                     >
                       {selectedTier === tier.id && (
@@ -115,10 +115,10 @@ export default function SubscriptionModal({ onClose, creatorName }: Subscription
                       <h3 className="text-xl font-bold">{tier.name}</h3>
                       <div className="flex items-baseline gap-1">
                         <span className="text-2xl font-bold">${tier.price}</span>
-                        <span className="text-sm text-gray-600">/month</span>
+                        <span className="text-sm text-neutral-600">/month</span>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600 mb-4">{tier.description}</p>
+                    <p className="text-sm text-neutral-600 mb-4">{tier.description}</p>
 
                     <ul className="space-y-2">
                       {tier.features.map((feature) => (
@@ -143,7 +143,7 @@ export default function SubscriptionModal({ onClose, creatorName }: Subscription
           </button>
 
           {/* Footer Note */}
-          <p className="text-xs text-center text-gray-500">
+          <p className="text-xs text-center text-neutral-500">
             Cancel anytime. Renews automatically. By subscribing, you agree to our Terms of Service and Privacy Policy.
           </p>
         </div>

@@ -58,10 +58,10 @@ export default function WatchlistPage() {
     triggerToast('Thesis updated');
   };
 
-  const handleAddAsset = () => {
+  const handleAddAsset = async () => {
     if (!newTicker.trim()) return;
     const ticker = newTicker.toUpperCase();
-    addToWatchlist({
+    const saved = await addToWatchlist({
       ticker,
       name: newName || ticker,
       assetType: newAssetType,
@@ -72,7 +72,9 @@ export default function WatchlistPage() {
     setNewName('');
     setNewAssetType('Stock');
     setShowAddModal(false);
-    triggerToast(`${ticker} added to Watchlist`);
+    if (saved) {
+      triggerToast(`${ticker} added to Watchlist`);
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -81,16 +83,16 @@ export default function WatchlistPage() {
       case 'Building Thesis': return 'bg-amber-100 text-amber-700';
       case 'Ready to Act': return 'bg-green-100 text-green-700';
       case 'Reviewing': return 'bg-purple-100 text-purple-700';
-      default: return 'bg-gray-100 text-gray-700';
+      default: return 'bg-neutral-100 text-neutral-700';
     }
   };
 
   const getInterestColor = (level: string) => {
     switch (level) {
-      case 'Low': return 'bg-gray-100 text-gray-600';
+      case 'Low': return 'bg-neutral-100 text-neutral-600';
       case 'Medium': return 'bg-blue-100 text-blue-700';
       case 'High': return 'bg-mint text-black';
-      default: return 'bg-gray-100 text-gray-700';
+      default: return 'bg-neutral-100 text-neutral-700';
     }
   };
 
@@ -110,7 +112,7 @@ export default function WatchlistPage() {
           {/* Hero */}
           <div className="mb-8 sm:mb-12">
             <h1 className="text-3xl sm:text-5xl font-bold mb-3 sm:mb-4">Investment Watchlist</h1>
-            <p className="text-base sm:text-xl text-gray-600">Track your investment ideas, build structured theses, and move from content to conviction.</p>
+            <p className="text-base sm:text-xl text-neutral-600">Track your investment ideas, build structured theses, and move from content to conviction.</p>
           </div>
 
           {/* Learning Paths */}
@@ -118,10 +120,10 @@ export default function WatchlistPage() {
             <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Build your investing logic</h2>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {learningPaths.map((path, idx) => (
-                <div key={idx} className="border border-gray-200 rounded-xl p-5 hover:border-gray-300 transition-colors bg-white">
+                <div key={idx} className="border border-neutral-200 rounded-xl p-5 hover:border-neutral-300 transition-colors bg-white">
                   <div className="text-4xl mb-3">{path.icon}</div>
                   <h3 className="font-bold mb-2">{path.title}</h3>
-                  <p className="text-sm text-gray-600 mb-4 leading-relaxed">{path.description}</p>
+                  <p className="text-sm text-neutral-600 mb-4 leading-relaxed">{path.description}</p>
                   <button onClick={() => navigate(path.route)} className="text-sm font-medium text-brand hover:underline">
                     {path.action} →
                   </button>
@@ -148,16 +150,16 @@ export default function WatchlistPage() {
                 {watchlistItems.map(item => (
                   <div
                     key={item.id}
-                    className="border border-gray-200 rounded-xl p-6 hover:border-gray-300 transition-colors bg-white cursor-pointer"
+                    className="border border-neutral-200 rounded-xl p-6 hover:border-neutral-300 transition-colors bg-white cursor-pointer"
                     onClick={() => setSelectedItem(item)}
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="text-xl font-bold">{item.ticker}</h3>
-                          <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-xs font-medium">{item.asset_type}</span>
+                          <span className="px-2 py-0.5 bg-neutral-100 text-neutral-700 rounded text-xs font-medium">{item.asset_type}</span>
                         </div>
-                        <p className="text-sm text-gray-600 mb-2">{item.name ?? item.ticker}</p>
+                        <p className="text-sm text-neutral-600 mb-2">{item.name ?? item.ticker}</p>
                       </div>
                       <div className="text-right">
                         {(() => {
@@ -188,11 +190,11 @@ export default function WatchlistPage() {
                     </div>
 
                     <div className="mb-4">
-                      <p className="text-sm text-gray-600 mb-1">{item.source_label ?? 'Added manually'}</p>
-                      <p className="text-xs text-gray-500">Updated {formatDistanceToNow(new Date(item.updated_at), { addSuffix: true })}</p>
+                      <p className="text-sm text-neutral-600 mb-1">{item.source_label ?? 'Added manually'}</p>
+                      <p className="text-xs text-neutral-500">Updated {formatDistanceToNow(new Date(item.updated_at), { addSuffix: true })}</p>
                     </div>
 
-                    <p className="text-sm text-gray-700 line-clamp-2 mb-4">{item.thesis || 'No thesis yet — click to add one.'}</p>
+                    <p className="text-sm text-neutral-700 line-clamp-2 mb-4">{item.thesis || 'No thesis yet — click to add one.'}</p>
 
                     {/* relatedPosts/relatedReels/relatedModels: out of scope for this
                         mock→live refactor — watchlist_items has no aggregate columns for
@@ -201,7 +203,7 @@ export default function WatchlistPage() {
 
                     <button
                       onClick={(e) => { e.stopPropagation(); setSelectedItem(item); }}
-                      className="w-full py-2 border border-gray-200 rounded-full text-sm font-medium hover:bg-gray-50 transition-colors"
+                      className="w-full py-2 border border-neutral-200 rounded-full text-sm font-medium hover:bg-neutral-50 transition-colors"
                     >
                       View Thesis
                     </button>
@@ -211,12 +213,12 @@ export default function WatchlistPage() {
             </>
           ) : (
             <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-6 text-5xl">📊</div>
+              <div className="w-24 h-24 bg-neutral-100 rounded-full flex items-center justify-center mb-6 text-5xl">📊</div>
               <h3 className="text-2xl font-bold mb-2">Start Building Your Watchlist</h3>
-              <p className="text-gray-600 mb-8 max-w-md">Save investing ideas from posts, reels, and models to track your thesis and build conviction over time.</p>
+              <p className="text-neutral-600 mb-8 max-w-md">Save investing ideas from posts, reels, and models to track your thesis and build conviction over time.</p>
               <div className="flex items-center gap-3">
                 <button onClick={() => navigate('/main')} className="px-6 py-3 bg-black text-white rounded-full hover:bg-black/90 transition-colors">Explore Content</button>
-                <button onClick={() => setShowAddModal(true)} className="px-6 py-3 border-2 border-gray-200 rounded-full hover:border-gray-300 hover:bg-gray-50 transition-colors">Add Asset</button>
+                <button onClick={() => setShowAddModal(true)} className="px-6 py-3 border-2 border-neutral-200 rounded-full hover:border-neutral-300 hover:bg-neutral-50 transition-colors">Add Asset</button>
               </div>
             </div>
           )}
@@ -228,16 +230,16 @@ export default function WatchlistPage() {
       {selectedItem && !editingThesis && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setSelectedItem(null)}>
           <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-8 py-6 flex items-center justify-between">
+            <div className="sticky top-0 bg-white border-b border-neutral-200 px-8 py-6 flex items-center justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <h2 className="text-3xl font-bold">{selectedItem.ticker}</h2>
-                  <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">{selectedItem.asset_type}</span>
+                  <span className="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-sm font-medium">{selectedItem.asset_type}</span>
                   <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(selectedItem.status)}`}>{selectedItem.status}</span>
                 </div>
-                <p className="text-gray-600">{selectedItem.name ?? selectedItem.ticker}</p>
+                <p className="text-neutral-600">{selectedItem.name ?? selectedItem.ticker}</p>
               </div>
-              <button onClick={() => setSelectedItem(null)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+              <button onClick={() => setSelectedItem(null)} className="p-2 hover:bg-neutral-100 rounded-full transition-colors">
                 <CloseIcon sx={{ fontSize: 20 }} />
               </button>
             </div>
@@ -248,15 +250,15 @@ export default function WatchlistPage() {
               {(() => {
                 const lp = livePrices.get(selectedItem.ticker);
                 return (
-                  <div className="flex items-center flex-wrap gap-4 sm:gap-8 pb-6 border-b border-gray-200">
-                    <div><p className="text-sm text-gray-600 mb-1">Current Price</p><p className="text-3xl font-bold">{lp?.price ?? '—'}</p></div>
+                  <div className="flex items-center flex-wrap gap-4 sm:gap-8 pb-6 border-b border-neutral-200">
+                    <div><p className="text-sm text-neutral-600 mb-1">Current Price</p><p className="text-3xl font-bold">{lp?.price ?? '—'}</p></div>
                     <div>
-                      <p className="text-sm text-gray-600 mb-1">1D Change</p>
-                      <p className={`text-xl font-bold ${lp ? (lp.change1D >= 0 ? 'text-brand' : 'text-red-500') : 'text-gray-400'}`}>
+                      <p className="text-sm text-neutral-600 mb-1">1D Change</p>
+                      <p className={`text-xl font-bold ${lp ? (lp.change1D >= 0 ? 'text-brand' : 'text-red-500') : 'text-neutral-400'}`}>
                         {lp ? `${lp.change1D >= 0 ? '+' : ''}${lp.change1D}%` : '—'}
                       </p>
                     </div>
-                    <div><p className="text-sm text-gray-600 mb-1">Time Horizon</p><p className="text-lg font-medium">{selectedItem.time_horizon}</p></div>
+                    <div><p className="text-sm text-neutral-600 mb-1">Time Horizon</p><p className="text-lg font-medium">{selectedItem.time_horizon}</p></div>
                   </div>
                 );
               })()}
@@ -264,8 +266,8 @@ export default function WatchlistPage() {
               {/* My Thesis */}
               <div>
                 <h3 className="font-bold mb-3">My Thesis</h3>
-                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <p className="text-gray-700 leading-relaxed">{selectedItem.thesis || 'No thesis written yet.'}</p>
+                <div className="p-4 bg-neutral-50 rounded-lg border border-neutral-200">
+                  <p className="text-neutral-700 leading-relaxed">{selectedItem.thesis || 'No thesis written yet.'}</p>
                 </div>
               </div>
 
@@ -274,7 +276,7 @@ export default function WatchlistPage() {
                 <div>
                   <h3 className="font-bold mb-3">Why I'm Watching This</h3>
                   <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <p className="text-gray-700 leading-relaxed">{selectedItem.why_watching}</p>
+                    <p className="text-neutral-700 leading-relaxed">{selectedItem.why_watching}</p>
                   </div>
                 </div>
               )}
@@ -285,9 +287,9 @@ export default function WatchlistPage() {
                   <h3 className="font-bold mb-3">Key Assumptions</h3>
                   <ul className="space-y-2">
                     {selectedItem.assumptions.map((a, i) => (
-                      <li key={i} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                      <li key={i} className="flex items-start gap-3 p-3 bg-neutral-50 rounded-lg">
                         <span className="text-brand mt-0.5">✓</span>
-                        <span className="text-gray-700">{a}</span>
+                        <span className="text-neutral-700">{a}</span>
                       </li>
                     ))}
                   </ul>
@@ -302,7 +304,7 @@ export default function WatchlistPage() {
                     {selectedItem.upside_drivers.map((d, i) => (
                       <li key={i} className="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
                         <span className="text-green-600 mt-0.5">↗</span>
-                        <span className="text-gray-700">{d}</span>
+                        <span className="text-neutral-700">{d}</span>
                       </li>
                     ))}
                   </ul>
@@ -317,7 +319,7 @@ export default function WatchlistPage() {
                     {selectedItem.downside.map((r, i) => (
                       <li key={i} className="flex items-start gap-3 p-3 bg-red-50 rounded-lg">
                         <span className="text-red-600 mt-0.5">⚠</span>
-                        <span className="text-gray-700">{r}</span>
+                        <span className="text-neutral-700">{r}</span>
                       </li>
                     ))}
                   </ul>
@@ -331,20 +333,20 @@ export default function WatchlistPage() {
               <div>
                 <h3 className="font-bold mb-3">Related Content</h3>
                 <div className="grid grid-cols-3 gap-4">
-                  <div className="p-4 bg-gray-50 rounded-lg text-center">
+                  <div className="p-4 bg-neutral-50 rounded-lg text-center">
                     <ArticleIcon sx={{ fontSize: 32, color: 'var(--icon-muted)', marginBottom: 1 }} />
-                    <p className="text-sm text-gray-400 mb-1">Coming soon</p>
-                    <p className="text-sm text-gray-600">Posts</p>
+                    <p className="text-sm text-neutral-400 mb-1">Coming soon</p>
+                    <p className="text-sm text-neutral-600">Posts</p>
                   </div>
-                  <div className="p-4 bg-gray-50 rounded-lg text-center">
+                  <div className="p-4 bg-neutral-50 rounded-lg text-center">
                     <VideoLibraryIcon sx={{ fontSize: 32, color: 'var(--icon-muted)', marginBottom: 1 }} />
-                    <p className="text-sm text-gray-400 mb-1">Coming soon</p>
-                    <p className="text-sm text-gray-600">Reels</p>
+                    <p className="text-sm text-neutral-400 mb-1">Coming soon</p>
+                    <p className="text-sm text-neutral-600">Reels</p>
                   </div>
-                  <div className="p-4 bg-gray-50 rounded-lg text-center">
+                  <div className="p-4 bg-neutral-50 rounded-lg text-center">
                     <InsertChartIcon sx={{ fontSize: 32, color: 'var(--icon-muted)', marginBottom: 1 }} />
-                    <p className="text-sm text-gray-400 mb-1">Coming soon</p>
-                    <p className="text-sm text-gray-600">Models</p>
+                    <p className="text-sm text-neutral-400 mb-1">Coming soon</p>
+                    <p className="text-sm text-neutral-600">Models</p>
                   </div>
                 </div>
               </div>
@@ -354,7 +356,7 @@ export default function WatchlistPage() {
                 <div>
                   <h3 className="font-bold mb-3">Decision Notes</h3>
                   <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
-                    <p className="text-gray-700 leading-relaxed">{selectedItem.decision_notes}</p>
+                    <p className="text-neutral-700 leading-relaxed">{selectedItem.decision_notes}</p>
                   </div>
                 </div>
               )}
@@ -385,7 +387,7 @@ export default function WatchlistPage() {
           <div className="bg-white rounded-2xl max-w-2xl w-full p-8" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold">Edit Thesis — {selectedItem.ticker}</h2>
-              <button onClick={() => setEditingThesis(false)} className="p-2 hover:bg-gray-100 rounded-full">
+              <button onClick={() => setEditingThesis(false)} className="p-2 hover:bg-neutral-100 rounded-full">
                 <CloseIcon sx={{ fontSize: 20 }} />
               </button>
             </div>
@@ -394,13 +396,13 @@ export default function WatchlistPage() {
               onChange={e => setEditThesisText(e.target.value)}
               rows={8}
               placeholder="Write your investment thesis here..."
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand resize-none mb-4"
+              className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand resize-none mb-4"
             />
             <div className="flex gap-3">
               <button onClick={handleSaveThesis} className="flex-1 py-3 bg-black text-white rounded-full font-medium hover:bg-black/80 transition-colors">
                 Save Thesis
               </button>
-              <button onClick={() => setEditingThesis(false)} className="flex-1 py-3 border-2 border-gray-200 rounded-full font-medium hover:bg-gray-50 transition-colors">
+              <button onClick={() => setEditingThesis(false)} className="flex-1 py-3 border-2 border-neutral-200 rounded-full font-medium hover:bg-neutral-50 transition-colors">
                 Cancel
               </button>
             </div>
@@ -414,37 +416,37 @@ export default function WatchlistPage() {
           <div className="bg-white rounded-2xl max-w-lg w-full p-8" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold">Add to Watchlist</h2>
-              <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-gray-100 rounded-full">
+              <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-neutral-100 rounded-full">
                 <CloseIcon sx={{ fontSize: 20 }} />
               </button>
             </div>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Ticker Symbol</label>
+                <label className="block text-sm font-bold text-neutral-700 mb-2">Ticker Symbol</label>
                 <input
                   type="text"
                   placeholder="e.g., AAPL, BTC, SPY"
                   value={newTicker}
                   onChange={e => setNewTicker(e.target.value.toUpperCase())}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                  className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Company / Asset Name</label>
+                <label className="block text-sm font-bold text-neutral-700 mb-2">Company / Asset Name</label>
                 <input
                   type="text"
                   placeholder="e.g., Apple Inc."
                   value={newName}
                   onChange={e => setNewName(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                  className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Asset Type</label>
+                <label className="block text-sm font-bold text-neutral-700 mb-2">Asset Type</label>
                 <select
                   value={newAssetType}
                   onChange={e => setNewAssetType(e.target.value as WatchlistItem['asset_type'])}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                  className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
                 >
                   <option value="Stock">Stock</option>
                   <option value="ETF">ETF</option>

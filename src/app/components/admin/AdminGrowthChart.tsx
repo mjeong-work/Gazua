@@ -14,7 +14,7 @@ interface AdminGrowthChartProps {
 // tightly coupled to currency-formatted simulation data) — just the same established styling.
 export default function AdminGrowthChart({ data, bucket, onBucketChange }: AdminGrowthChartProps) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4">
+    <div className="bg-white border border-neutral-200 rounded-xl p-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-base font-semibold">User Growth</h2>
         <div className="flex items-center gap-1 text-xs font-medium">
@@ -23,7 +23,7 @@ export default function AdminGrowthChart({ data, bucket, onBucketChange }: Admin
               key={b}
               onClick={() => onBucketChange(b)}
               className={`px-2.5 py-1 rounded-full capitalize transition-colors ${
-                bucket === b ? 'bg-black text-white' : 'text-gray-500 hover:bg-gray-100'
+                bucket === b ? 'bg-black text-white' : 'text-neutral-500 hover:bg-neutral-100'
               }`}
             >
               {b}
@@ -33,7 +33,7 @@ export default function AdminGrowthChart({ data, bucket, onBucketChange }: Admin
       </div>
 
       {data.length === 0 ? (
-        <p className="text-center text-sm text-gray-400 py-16">No signups in this range yet.</p>
+        <p className="text-center text-sm text-neutral-400 py-16">No signups in this range yet.</p>
       ) : (
         <div className="h-56 w-full">
           <ResponsiveContainer width="100%" height="100%">
@@ -47,8 +47,8 @@ export default function AdminGrowthChart({ data, bucket, onBucketChange }: Admin
             </LineChart>
           </ResponsiveContainer>
           <div className="flex items-center justify-center gap-4 mt-3">
-            <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-brand" /><span className="text-xs font-medium text-gray-600">New users</span></div>
-            <div className="flex items-center gap-1.5"><div style={{ borderTop: '2px dashed #7c3aed', height: 0 }} className="w-3" /><span className="text-xs font-medium text-gray-600">New creators</span></div>
+            <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-brand" /><span className="text-xs font-medium text-neutral-600">New users</span></div>
+            <div className="flex items-center gap-1.5"><div style={{ borderTop: '2px dashed #7c3aed', height: 0 }} className="w-3" /><span className="text-xs font-medium text-neutral-600">New creators</span></div>
           </div>
         </div>
       )}

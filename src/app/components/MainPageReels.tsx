@@ -1,14 +1,13 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer } from 'recharts';
 import AppHeader from './AppHeader';
-import CreateReelModal from './CreateReelModal';
 import ReelEngagementActions from './reels/ReelEngagementActions';
 import type { SavedContentInput } from '../contexts/SavedContentContext';
 import { MOCK_REELS, type Reel } from '../data/reels';
 import { getReels, getReelsByTicker, getReelsByCreatorIds, likeReel, unlikeReel, getUserLikedReelIds } from '../../lib/services/reels.service';
+import { reportServiceError } from '../hooks/useServiceQuery';
 import type { ReelWithCreator as DbReel } from '../../types/database';
 import { useFollow, isUUID } from '../contexts/FollowContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -69,6 +68,7 @@ export default function MainPageReels() {
   const { followedIds, isFollowing: isFollowingFn, toggleFollow, isLoading: followLoading } = useFollow();
   const [followingReels, setFollowingReels] = useState<Reel[] | null>(null);
   const [followingReelsLoading, setFollowingReelsLoading] = useState(false);
+  const [followingReelsRefreshKey, setFollowingReelsRefreshKey] = useState(0);
 
   // Like state — keyed by db_id (UUID) for DB reels, or 'local-{id}' for mock reels.
   const [likedReels, setLikedReels] = useState<Set<string>>(() => {
@@ -92,7 +92,6 @@ export default function MainPageReels() {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastSubtitle, setToastSubtitle] = useState('');
-  const [showCreateReel, setShowCreateReel] = useState(false);
   const { isPanelOpen, openPanel, closePanel, swipeHandlers } = useSwipePanel();
 
   const [liveIndices, setLiveIndices] = useState<MarketIndex[]>(MARKET_INDICES);
@@ -166,14 +165,20 @@ export default function MainPageReels() {
     let cancelled = false;
     setFollowingReelsLoading(true);
 
-    getReelsByCreatorIds(dbCreatorIds).then(({ data }) => {
+    getReelsByCreatorIds(dbCreatorIds).then(({ data, error }) => {
       if (cancelled) return;
+      if (error) {
+        reportServiceError(error, {
+          label: 'reels from creators you follow',
+          retry: () => setFollowingReelsRefreshKey(k => k + 1),
+        });
+      }
       setFollowingReels(data ? data.map(normalizeDbReel) : []);
       setFollowingReelsLoading(false);
     });
 
     return () => { cancelled = true; };
-  }, [activeTab, followedIdsKey, followLoading]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [activeTab, followedIdsKey, followLoading, followingReelsRefreshKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filteredReels = useMemo((): Reel[] => {
     // Supabase returned real data — already filtered at the DB level.
@@ -218,10 +223,18 @@ export default function MainPageReels() {
   // On login: hydrate liked reels from Supabase
   useEffect(() => {
     if (!user) return;
-    getUserLikedReelIds(user.id).then(({ data }) => {
-      if (!data?.length) return;
-      setLikedReels(prev => new Set([...prev, ...data]));
-    });
+    const userId = user.id;
+    const hydrateLikedReels = () => {
+      getUserLikedReelIds(userId).then(({ data, error }) => {
+        if (error) {
+          reportServiceError(error, { label: 'your liked reels', retry: hydrateLikedReels });
+          return;
+        }
+        if (!data?.length) return;
+        setLikedReels(prev => new Set([...prev, ...data]));
+      });
+    };
+    hydrateLikedReels();
   }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Keep localStorage in sync (only non-UUID keys)
@@ -259,14 +272,14 @@ export default function MainPageReels() {
     }
   };
 
-  const handleSaveToWatchlist = (reel: Reel) => {
+  const handleSaveToWatchlist = async (reel: Reel) => {
     if (!isSaved('reel', reel.db_id)) {
       const ticker = reel.tickers[0] ?? reel.caption.match(/#([A-Za-z]{1,5})\b/)?.[1]?.toUpperCase() ?? '';
       if (!ticker) {
         triggerToast('Could not identify a ticker in this reel');
         return;
       }
-      addToWatchlist({
+      const saved = await addToWatchlist({
         ticker,
         name: reel.caption.substring(0, 60),
         assetType: 'Strategy',
@@ -274,7 +287,9 @@ export default function MainPageReels() {
         source_content_id: reel.db_id,
         source: `Saved from reel by ${reel.creator}`,
       });
-      triggerToast('Saved to Watchlist', 'Build your thesis in the Watchlist tab');
+      if (saved) {
+        triggerToast('Saved to Watchlist', 'Build your thesis in the Watchlist tab');
+      }
     } else {
       removeBySource('reel', reel.db_id);
       triggerToast('Removed from Watchlist');
@@ -317,7 +332,7 @@ export default function MainPageReels() {
           <div
             className={[
               'absolute inset-y-0 left-0 w-[85vw] z-20 bg-white overflow-y-auto',
-              'border-r border-gray-200 px-6 pt-4 pb-20',
+              'border-r border-neutral-200 px-6 pt-4 pb-20',
               'transition-transform duration-300 ease-in-out',
               isPanelOpen ? 'translate-x-0' : '-translate-x-full',
               'lg:static lg:inset-auto lg:z-auto lg:flex-1 lg:translate-x-0 lg:pb-6',
@@ -328,11 +343,11 @@ export default function MainPageReels() {
                 <h2 className="text-3xl font-bold">
                   {tickerInfo?.price ?? '—'}
                 </h2>
-                <span className={`text-sm font-medium ${tickerInfo ? (tickerInfo.positive ? 'text-brand' : 'text-red-500') : 'text-gray-400'}`}>
+                <span className={`text-sm font-medium ${tickerInfo ? (tickerInfo.positive ? 'text-brand' : 'text-red-500') : 'text-neutral-400'}`}>
                   {tickerInfo ? `${tickerInfo.changeAmt} (${tickerInfo.change})` : ''}
                 </span>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-neutral-600">
                 {ticker ? `$${ticker}` : 'S&P 500'}
               </p>
             </div>
@@ -363,7 +378,7 @@ export default function MainPageReels() {
                     className={`px-3 py-1 rounded transition-colors ${
                       activeTimeRange === range
                         ? 'bg-black text-white'
-                        : 'hover:bg-gray-100 text-gray-600'
+                        : 'hover:bg-neutral-100 text-neutral-600'
                     }`}
                   >
                     {range}
@@ -376,18 +391,18 @@ export default function MainPageReels() {
             <div className="space-y-3">
               {indicesLoading
                 ? [1, 2, 3, 4].map(n => (
-                    <div key={n} className="p-4 bg-gray-50 rounded-lg animate-pulse">
+                    <div key={n} className="p-4 bg-neutral-50 rounded-lg animate-pulse">
                       <div className="flex items-center justify-between mb-2">
-                        <div className="h-3 bg-gray-200 rounded w-20" />
-                        <div className="h-3 bg-gray-200 rounded w-12" />
+                        <div className="h-3 bg-neutral-200 rounded w-20" />
+                        <div className="h-3 bg-neutral-200 rounded w-12" />
                       </div>
-                      <div className="h-5 bg-gray-200 rounded w-24" />
+                      <div className="h-5 bg-neutral-200 rounded w-24" />
                     </div>
                   ))
                 : liveIndices.map(index => (
-                    <div key={index.id} className="p-4 bg-gray-50 rounded-lg">
+                    <div key={index.id} className="p-4 bg-neutral-50 rounded-lg">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">{index.name}</span>
+                        <span className="text-sm text-neutral-600">{index.name}</span>
                         <span className={`text-xs font-medium ${index.positive ? 'text-brand' : 'text-red-500'}`}>{index.change}</span>
                       </div>
                       <p className="text-xl font-bold mt-1">{index.value}</p>
@@ -677,33 +692,6 @@ export default function MainPageReels() {
           </div>
         </div>
       </div>
-
-      {showCreateReel && (
-        <CreateReelModal
-          onClose={() => setShowCreateReel(false)}
-          onSuccess={(msg) => triggerToast(msg)}
-        />
-      )}
-
-      {/* Floating Create Button — hidden while the comments panel is open, since it
-          otherwise sits directly on top of the comment composer's send button.
-          On mobile the engagement rail (Like/Comment/Save/More, see railClassName above)
-          occupies right-3 from bottom-24 up to roughly bottom-24+~15rem, so this needs to sit
-          above all of it rather than sharing bottom-24 like the equivalent button on the
-          Posting feed (which has no competing right-side rail). Desktop's rail sits higher
-          (lg:bottom-32) with more room below it, so lg:bottom-8 already clears it. */}
-      {!isCommentsOpen && (
-      <button
-        onClick={() => setShowCreateReel(true)}
-        className="fixed bottom-[22rem] right-4 lg:bottom-8 lg:right-8 w-14 h-14 bg-mint text-black rounded-full shadow-lg hover:bg-mint-hover transition-all hover:scale-110 flex items-center justify-center z-40 group"
-        title="Create Reel"
-      >
-        <AddCircleOutlineIcon sx={{ fontSize: 28 }} />
-        <span className="absolute bottom-full right-0 mb-2 px-3 py-1 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 pointer-coarse:hidden transition-opacity whitespace-nowrap pointer-events-none">
-          Create Reel
-        </span>
-      </button>
-      )}
 
       {/* Toast */}
       {showToast && (

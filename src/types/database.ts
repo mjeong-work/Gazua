@@ -17,6 +17,11 @@ export type ProfileRole = 'user' | 'admin'
 export type ProfileStatus = 'active' | 'warned' | 'suspended'
 export type ContentModerationStatus = 'visible' | 'removed'
 export type SubscriptionTier = 'free' | 'analyst' | 'educator'
+// Trust/expertise ladder — entirely separate from SubscriptionTier (billing). Admin-assigned
+// only; see admin_set_credibility_level() in supabase/migrations. Default for new signups is
+// 'explorer'. The "verified" badge in the UI is gated on this being 'verified_pro', not on
+// is_verified (see is_verified's own comment below).
+export type CredibilityLevel = 'explorer' | 'contributor' | 'analyst' | 'educator' | 'verified_pro'
 export type SubscriptionStatus =
   | 'active' | 'trialing' | 'past_due' | 'canceled'
   | 'incomplete' | 'incomplete_expired' | 'paused' | 'unpaid'
@@ -84,7 +89,10 @@ export interface Database {
           tagline: string | null
           tags: string[]
           is_creator: boolean
+          // Internal ops flag: identity/portfolio due-diligence completed. NOT what drives the
+          // "verified" badge — see credibility_level.
           is_verified: boolean
+          credibility_level: CredibilityLevel
           featured_category: FeaturedCategory | null
           portfolio_allocation: Json | null
           subscription_tier: SubscriptionTier
@@ -113,6 +121,7 @@ export interface Database {
           tags?: string[]
           is_creator?: boolean
           is_verified?: boolean
+          credibility_level?: CredibilityLevel
           featured_category?: FeaturedCategory | null
           portfolio_allocation?: Json | null
           subscription_tier?: SubscriptionTier
@@ -141,6 +150,7 @@ export interface Database {
           tags?: string[]
           is_creator?: boolean
           is_verified?: boolean
+          credibility_level?: CredibilityLevel
           featured_category?: FeaturedCategory | null
           portfolio_allocation?: Json | null
           subscription_tier?: SubscriptionTier

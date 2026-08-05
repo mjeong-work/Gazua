@@ -160,18 +160,18 @@ export default function PricingPage() {
         <h2 className="text-5xl font-bold tracking-tight mb-4">
           Invest in Your Financial Education
         </h2>
-        <p className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto">
+        <p className="text-xl text-neutral-600 mb-12 max-w-2xl mx-auto">
           Learn from trusted creators, track real portfolios, and grow your investment knowledge.
         </p>
 
         {/* Beta Notice */}
         <div className="mb-8 rounded-2xl border border-mint/40 bg-mint/10 px-6 py-5 text-left">
           <p className="font-bold text-black">🚧 Gazua is currently in Beta</p>
-          <p className="mt-1 text-sm text-gray-600">
+          <p className="mt-1 text-sm text-neutral-600">
             During the beta testing period, all premium features are available through the Free plan.
             Feel free to continue with the Free option while we gather feedback and improve the platform.
           </p>
-          <p className="mt-1 text-xs text-gray-500">Paid plans will become available in a future release.</p>
+          <p className="mt-1 text-xs text-neutral-500">Paid plans will become available in a future release.</p>
         </div>
 
         {/* Pricing Cards */}
@@ -190,7 +190,7 @@ export default function PricingPage() {
                 className={`relative rounded-2xl border-2 p-8 text-left transition-all ${
                   tier.highlighted
                     ? 'border-mint shadow-xl scale-105 bg-gradient-to-b from-mint/5 to-white'
-                    : 'border-gray-200 hover:border-gray-300'
+                    : 'border-neutral-200 hover:border-neutral-300'
                 }`}
               >
                 {tier.highlighted && (
@@ -201,7 +201,7 @@ export default function PricingPage() {
 
                 <div className="mb-6">
                   <h3 className="text-2xl font-bold mb-2">{tier.name}</h3>
-                  <p className="text-sm text-gray-600 mb-4">{tier.description}</p>
+                  <p className="text-sm text-neutral-600 mb-4">{tier.description}</p>
                   {tier.price === 0 ? (
                     <div className="flex items-baseline gap-1">
                       <span className="text-4xl font-bold">Free</span>
@@ -209,7 +209,7 @@ export default function PricingPage() {
                   ) : (
                     <>
                       <div className="flex items-baseline gap-2 flex-wrap">
-                        <span className="text-lg text-gray-400 line-through">${tier.price}{tier.period}</span>
+                        <span className="text-lg text-neutral-400 line-through">${tier.price}{tier.period}</span>
                         <span className="text-4xl font-bold">Beta: $0{tier.period}</span>
                       </div>
                       <span className="inline-block mt-2 bg-brand/15 text-brand text-xs font-bold px-2.5 py-1 rounded-full">
@@ -230,7 +230,7 @@ export default function PricingPage() {
                     className={`w-full py-3 rounded-full font-medium mb-8 transition-all disabled:opacity-60 disabled:cursor-not-allowed ${
                       tier.highlighted
                         ? 'bg-black text-white hover:bg-black/80'
-                        : 'bg-gray-100 hover:bg-gray-200'
+                        : 'bg-neutral-100 hover:bg-neutral-200'
                     }`}
                   >
                     {isLoading ? 'Redirecting…' : tier.cta}
@@ -240,7 +240,7 @@ export default function PricingPage() {
                 <ul className="space-y-3">
                   {tier.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-3 text-sm">
-                      <Check className={`w-5 h-5 flex-shrink-0 mt-0.5 ${tier.highlighted ? 'text-brand' : 'text-gray-400'}`} />
+                      <Check className={`w-5 h-5 flex-shrink-0 mt-0.5 ${tier.highlighted ? 'text-brand' : 'text-neutral-400'}`} />
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -251,7 +251,7 @@ export default function PricingPage() {
         </div>
 
         <div className="mt-20">
-          <p className="text-sm text-gray-500 text-center">
+          <p className="text-sm text-neutral-500 text-center">
             All content on Gazua is for educational purposes only and does not constitute financial advice.
           </p>
           <Footer variant="full" />

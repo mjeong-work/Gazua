@@ -41,22 +41,22 @@ export default function AdminSidebar({ isMobileOpen, onMobileClose }: AdminSideb
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-200 overflow-y-auto transition-all duration-300 ease-in-out
+        className={`fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-neutral-200 overflow-y-auto transition-all duration-300 ease-in-out
           ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:static lg:translate-x-0 lg:z-auto lg:flex-shrink-0 lg:h-full lg:overflow-x-hidden
           ${isExpanded ? 'lg:w-56' : 'lg:w-14'}`}
       >
-        <div className="flex items-center justify-between px-4 py-4 border-b border-gray-200 lg:hidden">
+        <div className="flex items-center justify-between px-4 py-4 border-b border-neutral-200 lg:hidden">
           <span className="font-bold text-lg">Admin</span>
-          <button onClick={onMobileClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors" aria-label="Close menu">
+          <button onClick={onMobileClose} className="p-2 hover:bg-neutral-100 rounded-full transition-colors" aria-label="Close menu">
             <CloseIcon sx={{ fontSize: 18 }} />
           </button>
         </div>
 
-        <div className={`hidden lg:flex items-center border-b border-gray-200 py-3 ${isExpanded ? 'justify-end px-2' : 'justify-center px-0'}`}>
+        <div className={`hidden lg:flex items-center border-b border-neutral-200 py-3 ${isExpanded ? 'justify-end px-2' : 'justify-center px-0'}`}>
           <button
             onClick={() => setIsExpanded(v => !v)}
-            className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+            className="icon-tap-target p-1.5 hover:bg-neutral-100 rounded-full transition-colors"
             aria-label={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
           >
             {isExpanded ? <ChevronLeftIcon sx={{ fontSize: 18 }} /> : <ChevronRightIcon sx={{ fontSize: 18 }} />}
@@ -74,7 +74,7 @@ export default function AdminSidebar({ isMobileOpen, onMobileClose }: AdminSideb
                 title={!isExpanded ? item.label : undefined}
                 className={`w-full flex items-center gap-2.5 py-2.5 rounded-full text-left transition-colors ${
                   isExpanded ? 'px-3' : 'px-3 lg:px-0 lg:justify-center'
-                } ${active ? 'bg-brand/10 text-brand' : 'text-gray-600 hover:bg-gray-100'}`}
+                } ${active ? 'bg-brand/10 text-brand' : 'text-neutral-600 hover:bg-neutral-100'}`}
               >
                 <Icon sx={{ fontSize: 20 }} />
                 <span className={`text-sm font-medium ${isExpanded ? '' : 'lg:hidden'}`}>{item.label}</span>

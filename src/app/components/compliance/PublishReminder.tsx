@@ -19,7 +19,7 @@ export default function PublishReminder({
     return (
       <div className={`flex items-start gap-1.5 ${className}`}>
         <InfoOutlinedIcon sx={{ fontSize: 14, color: 'var(--icon-muted)' }} className="mt-0.5 flex-shrink-0" />
-        <p className="text-[11px] text-gray-400 leading-snug">
+        <p className="text-[11px] text-neutral-400 leading-snug">
           Please share research, not investment recommendations. Avoid misleading claims or guarantees of returns.
         </p>
       </div>
@@ -27,9 +27,9 @@ export default function PublishReminder({
   }
 
   return (
-    <div className={`border-t border-gray-100 pt-3 ${className}`}>
-      <p className="text-xs text-gray-500 leading-snug">
-        <span className="font-medium text-gray-600">Remember: </span>
+    <div className={`border-t border-neutral-100 pt-3 ${className}`}>
+      <p className="text-xs text-neutral-500 leading-snug">
+        <span className="font-medium text-neutral-600">Remember: </span>
         Please share research, not investment recommendations. Avoid misleading claims or guarantees of returns.
       </p>
     </div>

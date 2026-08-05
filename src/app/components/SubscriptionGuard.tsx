@@ -17,10 +17,10 @@ function DefaultUpgradePrompt({ requiredTier }: { requiredTier: SubscriptionTier
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-12 px-6 text-center">
       <div className="text-4xl">🔒</div>
-      <p className="text-sm font-medium text-gray-800">
+      <p className="text-sm font-medium text-neutral-800">
         {label} plan required
       </p>
-      <p className="text-sm text-gray-500 max-w-xs">
+      <p className="text-sm text-neutral-500 max-w-xs">
         Upgrade to access this content.
       </p>
       <button

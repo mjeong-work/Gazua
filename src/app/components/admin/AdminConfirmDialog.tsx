@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '../ui/dialog';
+import { Button } from '../ui/button';
 
 interface AdminConfirmDialogProps {
   title: string;
@@ -14,8 +16,10 @@ interface AdminConfirmDialogProps {
   onClose: () => void;
 }
 
-// Reuses the app's real modal convention (MyProfilePage.tsx's Overlay component) rather than
-// the unused ui/dialog.tsx — fixed inset-0 + centered backdrop + stopPropagation inner wrapper.
+// Built on ui/dialog.tsx (Radix Dialog) — see audit Issue 9. Always rendered `open` since the
+// caller already only mounts this component when it should be shown ({showDialog && <.../>});
+// onOpenChange routes Radix's own close triggers (Escape, overlay click, the built-in X button)
+// back through the same onClose prop callers already pass.
 export default function AdminConfirmDialog({
   title,
   body,
@@ -36,16 +40,14 @@ export default function AdminConfirmDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4" onClick={onClose}>
-      <div
-        onClick={e => e.stopPropagation()}
-        className="w-full max-w-sm bg-white rounded-2xl border border-gray-200 shadow-xl p-6"
-        role="alertdialog"
-        aria-modal="true"
-        aria-label={title}
-      >
-        <h2 className="text-base font-bold mb-1">{title}</h2>
-        {body && <p className="text-sm text-gray-500 mb-4">{body}</p>}
+    <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DialogContent className="max-w-sm rounded-2xl p-6">
+        <DialogTitle className="text-base font-bold mb-1">{title}</DialogTitle>
+        {body ? (
+          <DialogDescription className="text-sm text-neutral-500 mb-4">{body}</DialogDescription>
+        ) : (
+          <DialogDescription className="sr-only">{title}</DialogDescription>
+        )}
 
         {withNotes && (
           <textarea
@@ -54,29 +56,30 @@ export default function AdminConfirmDialog({
             onChange={e => setNotes(e.target.value)}
             placeholder={notesPlaceholder}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none focus:outline-none focus:border-gray-400 mb-4"
+            className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm resize-none focus:outline-none focus:border-neutral-400 mb-4"
           />
         )}
 
         <div className={`flex items-center justify-end gap-2 ${withNotes ? '' : 'mt-2'}`}>
-          <button
+          <Button
             onClick={onClose}
             disabled={submitting}
-            className="px-4 py-2 text-xs font-medium rounded-full border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+            variant="pillOutline"
+            className="px-4 py-2 h-auto text-xs"
           >
             {cancelLabel}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleConfirm}
             disabled={submitting}
-            className={`px-4 py-2 text-xs font-medium rounded-full text-white transition-colors disabled:opacity-50 ${
+            className={`px-4 py-2 h-auto text-xs rounded-full text-white ${
               destructive ? 'bg-red-600 hover:bg-red-700' : 'bg-black hover:bg-black/80'
             }`}
           >
             {submitting ? '…' : confirmLabel}
-          </button>
+          </Button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

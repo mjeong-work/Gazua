@@ -59,10 +59,10 @@ interface AgreementCheckboxGroupProps {
 // the checked state and gates its submit button on every item being true.
 export default function AgreementCheckboxGroup({ values, onChange, className = '' }: AgreementCheckboxGroupProps) {
   return (
-    <div className={`border border-gray-200 rounded-xl p-4 ${className}`}>
+    <div className={`border border-neutral-200 rounded-xl p-4 ${className}`}>
       <p className="text-sm font-medium mb-2">Responsible Investing Acknowledgement</p>
       <Collapsible defaultOpen={false}>
-        <CollapsibleTrigger className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 transition-colors group">
+        <CollapsibleTrigger className="flex items-center gap-1.5 text-xs text-neutral-500 hover:text-neutral-700 transition-colors group">
           <span className="transition-transform duration-200 group-data-[state=open]:rotate-180">▼</span>
           Please review before creating your account
         </CollapsibleTrigger>
@@ -75,7 +75,7 @@ export default function AgreementCheckboxGroup({ values, onChange, className = '
                   onCheckedChange={(checked) => onChange(item.key, checked as boolean)}
                   className="mt-0.5"
                 />
-                <span className="text-sm text-gray-600 leading-snug">{item.label}</span>
+                <span className="text-sm text-neutral-600 leading-snug">{item.label}</span>
               </label>
             ))}
           </div>

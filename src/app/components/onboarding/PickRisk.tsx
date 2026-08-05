@@ -21,7 +21,7 @@ export default function PickRisk() {
       {/* Skip link */}
       <button
         onClick={() => { completeOnboarding(); navigate('/main'); }}
-        className="absolute top-6 right-6 text-sm text-gray-400 hover:text-gray-600 transition-colors"
+        className="absolute top-6 right-6 text-sm text-neutral-400 hover:text-neutral-600 transition-colors"
       >
         Skip →
       </button>
@@ -34,11 +34,11 @@ export default function PickRisk() {
 
         {/* Progress indicator */}
         <div className="mb-12">
-          <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+          <div className="flex items-center justify-between text-sm text-neutral-600 mb-2">
             <span>Step 4 of 4</span>
             <span>100%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-neutral-200 rounded-full h-2">
             <div className="bg-mint h-2 rounded-full transition-all" style={{ width: '100%' }}></div>
           </div>
         </div>
@@ -57,7 +57,7 @@ export default function PickRisk() {
               className={`p-6 rounded-2xl border-2 transition-all text-left relative ${
                 selectedRisk === style.id
                   ? `${style.color} ${style.selectedBg} shadow-md`
-                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                  : 'border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50'
               }`}
             >
               <div className="flex items-start justify-between mb-3">
@@ -69,7 +69,7 @@ export default function PickRisk() {
                 )}
               </div>
               <h3 className="text-xl font-bold mb-2">{style.title}</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
+              <p className="text-neutral-600 text-sm leading-relaxed">
                 {style.description}
               </p>
             </button>
@@ -88,7 +88,7 @@ export default function PickRisk() {
         {/* Back link */}
         <button
           onClick={() => navigate('/onboarding/interests')}
-          className="w-full text-center text-sm text-gray-500 hover:text-gray-700 mt-6"
+          className="w-full text-center text-sm text-neutral-500 hover:text-neutral-700 mt-6"
         >
           ← Back
         </button>

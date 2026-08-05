@@ -40,8 +40,8 @@ function StyleBar({ breakdown }: { breakdown: InvestmentInsights['styleBreakdown
               className="w-3 h-3 rounded-full flex-shrink-0"
               style={{ backgroundColor: SEGMENT_COLORS[i % SEGMENT_COLORS.length] }}
             />
-            <span className="text-gray-700 font-medium">{seg.label}</span>
-            <span className="text-gray-400">{seg.percentage}%</span>
+            <span className="text-neutral-700 font-medium">{seg.label}</span>
+            <span className="text-neutral-400">{seg.percentage}%</span>
           </div>
         ))}
       </div>
@@ -50,11 +50,11 @@ function StyleBar({ breakdown }: { breakdown: InvestmentInsights['styleBreakdown
 }
 
 function LoadingSkeleton() {
-  const pulse = 'animate-pulse bg-gray-100 rounded';
+  const pulse = 'animate-pulse bg-neutral-100 rounded';
   return (
     <div className="space-y-8">
       {/* Personality skeleton */}
-      <div className="border border-gray-200 rounded-xl p-8 space-y-4">
+      <div className="border border-neutral-200 rounded-xl p-8 space-y-4">
         <div className={`${pulse} h-8 w-2/3`} />
         <div className={`${pulse} h-4 w-full`} />
         <div className={`${pulse} h-4 w-5/6`} />
@@ -63,7 +63,7 @@ function LoadingSkeleton() {
         </div>
       </div>
       {/* Style bar skeleton */}
-      <div className="border border-gray-200 rounded-xl p-8 space-y-4">
+      <div className="border border-neutral-200 rounded-xl p-8 space-y-4">
         <div className={`${pulse} h-6 w-40`} />
         <div className={`${pulse} h-5 w-full rounded-full`} />
         <div className="flex gap-6">
@@ -80,12 +80,12 @@ function LoadingSkeleton() {
 
 function ErrorCard({ onRetry }: { onRetry: () => void }) {
   return (
-    <div className="border border-gray-200 rounded-xl p-10 text-center max-w-xl mx-auto">
-      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+    <div className="border border-neutral-200 rounded-xl p-10 text-center max-w-xl mx-auto">
+      <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4">
         <AutoAwesomeIcon sx={{ fontSize: 32, color: 'var(--icon-muted)' }} />
       </div>
       <h3 className="text-xl font-semibold mb-2">Analysis temporarily unavailable</h3>
-      <p className="text-gray-600 mb-6 text-sm leading-relaxed">
+      <p className="text-neutral-600 mb-6 text-sm leading-relaxed">
         We couldn't generate your profile right now. Your data is safe — try again in a moment.
       </p>
       <button
@@ -100,17 +100,17 @@ function ErrorCard({ onRetry }: { onRetry: () => void }) {
 
 function PersonalityCard({ personality }: { personality: InvestmentInsights['personality'] }) {
   return (
-    <div className="border border-gray-200 rounded-xl p-8">
+    <div className="border border-neutral-200 rounded-xl p-8">
       <div className="flex items-start gap-4 mb-5">
         <div className="w-12 h-12 bg-mint rounded-full flex items-center justify-center flex-shrink-0">
           <AutoAwesomeIcon sx={{ fontSize: 22, color: '#000' }} />
         </div>
         <div>
           <h2 className="text-2xl font-bold mb-1">{personality.title}</h2>
-          <p className="text-gray-600 leading-relaxed">{personality.summary}</p>
+          <p className="text-neutral-600 leading-relaxed">{personality.summary}</p>
         </div>
       </div>
-      <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-100">
+      <div className="flex flex-wrap gap-2 pt-2 border-t border-neutral-100">
         {personality.traits.map(trait => (
           <span
             key={trait}
@@ -126,11 +126,11 @@ function PersonalityCard({ personality }: { personality: InvestmentInsights['per
 
 function TrendingCard({ asset }: { asset: InvestmentInsights['trendingAssets'][number] }) {
   return (
-    <div className="border border-gray-200 rounded-xl p-5 hover:border-gray-300 transition-colors">
+    <div className="border border-neutral-200 rounded-xl p-5 hover:border-neutral-300 transition-colors">
       <div className="flex items-center gap-3 mb-2">
         <span className="text-lg font-bold font-mono">{asset.ticker}</span>
       </div>
-      <p className="text-sm text-gray-600 leading-relaxed">{asset.context}</p>
+      <p className="text-sm text-neutral-600 leading-relaxed">{asset.context}</p>
     </div>
   );
 }
@@ -143,14 +143,14 @@ const TYPE_LABEL: Record<string, string> = {
 
 function RecommendationCard({ rec }: { rec: InvestmentInsights['recommendations'][number] }) {
   return (
-    <div className="border border-gray-200 rounded-xl p-5 hover:border-gray-300 transition-colors">
+    <div className="border border-neutral-200 rounded-xl p-5 hover:border-neutral-300 transition-colors">
       <div className="flex items-center gap-2 mb-2">
-        <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs font-medium rounded">
+        <span className="px-2 py-0.5 bg-neutral-100 text-neutral-600 text-xs font-medium rounded">
           {TYPE_LABEL[rec.type] ?? rec.type}
         </span>
       </div>
       <p className="font-semibold text-sm mb-1 line-clamp-2">{rec.title}</p>
-      <p className="text-xs text-gray-500 mb-2">{rec.creator}</p>
+      <p className="text-xs text-neutral-500 mb-2">{rec.creator}</p>
       <p className="text-xs text-brand leading-relaxed">{rec.reason}</p>
     </div>
   );
@@ -205,11 +205,11 @@ export default function InvestmentProfilePage() {
         <AppHeader />
         <div className="flex-1 flex items-center justify-center px-6">
           <div className="max-w-md text-center">
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">
+            <div className="w-20 h-20 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">
               📊
             </div>
             <h2 className="text-2xl font-bold mb-3">Your profile builds as you explore</h2>
-            <p className="text-gray-600 mb-8 leading-relaxed">
+            <p className="text-neutral-600 mb-8 leading-relaxed">
               Complete onboarding, save posts to your watchlist, and follow creators
               to unlock your personalized investment profile.
             </p>
@@ -222,7 +222,7 @@ export default function InvestmentProfilePage() {
               </button>
               <button
                 onClick={() => navigate('/creators')}
-                className="px-6 py-3 border border-gray-200 rounded-full text-sm font-medium hover:bg-gray-50 transition-colors"
+                className="px-6 py-3 border border-neutral-200 rounded-full text-sm font-medium hover:bg-neutral-50 transition-colors"
               >
                 Discover Creators
               </button>
@@ -244,11 +244,11 @@ export default function InvestmentProfilePage() {
             <div className="flex items-start justify-between">
               <div>
                 <h1 className="text-5xl font-bold mb-3">My Investment Profile</h1>
-                <p className="text-gray-600 text-lg">
+                <p className="text-neutral-600 text-lg">
                   Patterns in what you've read, saved, and watched — for educational context only.
                 </p>
                 {generatedAt && (
-                  <p className="text-xs text-gray-400 mt-2">
+                  <p className="text-xs text-neutral-400 mt-2">
                     Last updated {generatedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 )}
@@ -279,7 +279,7 @@ export default function InvestmentProfilePage() {
               <PersonalityCard personality={state.insights.personality} />
 
               {/* Section 2 — Style Breakdown */}
-              <div className="border border-gray-200 rounded-xl p-8">
+              <div className="border border-neutral-200 rounded-xl p-8">
                 <h2 className="text-xl font-bold mb-6">Your Engagement Style</h2>
                 <StyleBar breakdown={state.insights.styleBreakdown} />
               </div>

@@ -21,7 +21,7 @@ interface AdminDataTableProps<T> {
 }
 
 // Generic sortable table shell used by Users/Reports/Content/AuditLog — plain Tailwind
-// (rounded-xl bordered card, gray-50 header, hover:bg-gray-50 rows), not ui/table.tsx.
+// (rounded-xl bordered card, gray-50 header, hover:bg-neutral-50 rows), not ui/table.tsx.
 export default function AdminDataTable<T>({
   columns,
   rows,
@@ -32,15 +32,15 @@ export default function AdminDataTable<T>({
   onRowClick,
 }: AdminDataTableProps<T>) {
   return (
-    <div className="border border-gray-200 rounded-xl overflow-hidden overflow-x-auto">
+    <div className="border border-neutral-200 rounded-xl overflow-hidden overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="bg-gray-50 border-b border-gray-200">
+          <tr className="bg-neutral-50 border-b border-neutral-200">
             {columns.map(col => (
               <th
                 key={col.key}
-                className={`text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide ${col.className ?? ''} ${
-                  col.sortable ? 'cursor-pointer select-none hover:text-gray-700' : ''
+                className={`text-left px-4 py-3 text-xs font-semibold text-neutral-500 uppercase tracking-wide ${col.className ?? ''} ${
+                  col.sortable ? 'cursor-pointer select-none hover:text-neutral-700' : ''
                 }`}
                 onClick={col.sortable ? () => onSort?.(col.key) : undefined}
               >
@@ -61,7 +61,7 @@ export default function AdminDataTable<T>({
             <tr
               key={rowKey(row)}
               onClick={onRowClick ? () => onRowClick(row) : undefined}
-              className={`border-b border-gray-100 last:border-0 ${onRowClick ? 'cursor-pointer hover:bg-gray-50' : ''} transition-colors`}
+              className={`border-b border-neutral-100 last:border-0 ${onRowClick ? 'cursor-pointer hover:bg-neutral-50' : ''} transition-colors`}
             >
               {columns.map(col => (
                 <td key={col.key} className={`px-4 py-3 ${col.className ?? ''}`}>

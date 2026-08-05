@@ -80,7 +80,7 @@ export default function AdminReportsPage() {
     <div className="space-y-4">
       <div>
         <h1 className="text-2xl font-bold">Reports</h1>
-        <p className="text-sm text-gray-500 mt-1">Review user-reported content and accounts.</p>
+        <p className="text-sm text-neutral-500 mt-1">Review user-reported content and accounts.</p>
       </div>
 
       <AdminSearchFilterBar
@@ -112,24 +112,24 @@ export default function AdminReportsPage() {
             {rows.map(report => (
               <div
                 key={report.id}
-                className={`border rounded-xl p-5 transition-opacity ${report.status !== 'pending' ? 'opacity-60' : ''} border-gray-200`}
+                className={`border rounded-xl p-5 transition-opacity ${report.status !== 'pending' ? 'opacity-60' : ''} border-neutral-200`}
               >
                 <div className="flex items-start gap-3 mb-3 flex-wrap">
-                  <span className="text-xs font-bold uppercase tracking-widest text-gray-400 mt-0.5">{report.content_type}</span>
+                  <span className="text-xs font-bold uppercase tracking-widest text-neutral-400 mt-0.5">{report.content_type}</span>
                   <span className="text-xs px-2 py-0.5 bg-red-50 text-red-700 rounded-full font-medium">
                     {REASON_LABELS[report.reason] ?? report.reason}
                   </span>
                   <AdminStatusBadge status={report.status} />
                 </div>
 
-                <p className="text-[11px] text-gray-400 mb-2 font-mono">
+                <p className="text-[11px] text-neutral-400 mb-2 font-mono">
                   {report.content_type}: {report.content_id}
                   <span className="ml-3 font-sans not-italic">· {new Date(report.created_at).toLocaleString()}</span>
                 </p>
 
                 {report.details && (
-                  <div className="bg-gray-50 border border-gray-100 rounded-lg px-3 py-2 mb-3">
-                    <p className="text-sm text-gray-700 italic">"{report.details}"</p>
+                  <div className="bg-neutral-50 border border-neutral-100 rounded-lg px-3 py-2 mb-3">
+                    <p className="text-sm text-neutral-700 italic">"{report.details}"</p>
                   </div>
                 )}
 
@@ -137,7 +137,7 @@ export default function AdminReportsPage() {
                   <div className="flex flex-wrap gap-2">
                     <button
                       onClick={() => runAction(report, 'dismissed')}
-                      className="px-4 py-2 text-xs font-medium rounded-full border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
+                      className="px-4 py-2 text-xs font-medium rounded-full border border-neutral-200 text-neutral-700 hover:bg-neutral-50 transition-colors"
                     >
                       Dismiss
                     </button>
@@ -145,7 +145,7 @@ export default function AdminReportsPage() {
                       <>
                         <button
                           onClick={() => setConfirm({ report, action: 'warning_sent' })}
-                          className="px-4 py-2 text-xs font-medium rounded-full border border-gray-800 text-gray-900 hover:bg-gray-100 transition-colors"
+                          className="px-4 py-2 text-xs font-medium rounded-full border border-neutral-800 text-neutral-900 hover:bg-neutral-100 transition-colors"
                         >
                           Send Warning
                         </button>

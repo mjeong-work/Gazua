@@ -18,5 +18,5 @@ export default function ReelMetadata({ likeCount, commentCount, viewCount, class
 
   if (parts.length === 0) return null;
 
-  return <p className={`text-sm text-gray-500 ${className}`}>{parts.join(' · ')}</p>;
+  return <p className={`text-sm text-neutral-500 ${className}`}>{parts.join(' · ')}</p>;
 }

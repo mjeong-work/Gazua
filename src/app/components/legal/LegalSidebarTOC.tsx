@@ -36,10 +36,10 @@ export default function LegalSidebarTOC({ headings, className = '' }: LegalSideb
 
   return (
     <nav aria-label="Table of contents" className={`sticky top-20 self-start ${className}`}>
-      <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3">
+      <p className="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-3">
         On this page
       </p>
-      <ul className="space-y-2 border-l border-gray-200 dark:border-gray-800">
+      <ul className="space-y-2 border-l border-neutral-200">
         {headings.map((heading) => (
           <li key={heading.id} style={{ paddingLeft: heading.depth === 3 ? '1.5rem' : '0.875rem' }}>
             <a
@@ -47,7 +47,7 @@ export default function LegalSidebarTOC({ headings, className = '' }: LegalSideb
               className={`block -ml-px border-l pl-3 text-sm transition-colors ${
                 activeId === heading.id
                   ? 'border-brand text-brand font-medium'
-                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white'
+                  : 'border-transparent text-neutral-500 hover:text-black'
               }`}
             >
               {heading.text}

@@ -44,7 +44,7 @@ export function AlgorithmicLabel({ label }: AlgorithmicLabelProps) {
   return (
     <span
       title={cfg.title}
-      className="inline-block px-2 py-0.5 bg-gray-100 text-gray-500 text-[10px] font-medium rounded-full border border-gray-200 select-none"
+      className="inline-block px-2 py-0.5 bg-neutral-100 text-neutral-500 text-[10px] font-medium rounded-full border border-neutral-200 select-none"
     >
       {cfg.text}
     </span>

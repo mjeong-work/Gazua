@@ -25,7 +25,7 @@ export default function Footer({ variant = 'compact' }: FooterProps) {
   if (variant === 'full') {
     const docsBySlug = new Map(getAllDocuments().map((d) => [d.slug, d]));
     return (
-      <div className="mt-12 pt-8 border-t border-gray-100 dark:border-gray-800">
+      <div className="mt-12 pt-8 border-t border-neutral-100">
         <nav aria-label="Legal" className="flex flex-wrap gap-x-6 gap-y-2 justify-center mb-6">
           {FOOTER_LEGAL_SLUGS.map((slug) => {
             const doc = docsBySlug.get(slug);
@@ -34,7 +34,7 @@ export default function Footer({ variant = 'compact' }: FooterProps) {
               <Link
                 key={slug}
                 to={`/legal/${slug}`}
-                className="text-xs text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
+                className="text-xs text-neutral-500 hover:text-black transition-colors"
               >
                 {doc.title}
               </Link>
@@ -42,12 +42,12 @@ export default function Footer({ variant = 'compact' }: FooterProps) {
           })}
           <a
             href="mailto:support@gazua.com"
-            className="text-xs text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors"
+            className="text-xs text-neutral-500 hover:text-black transition-colors"
           >
             Contact
           </a>
         </nav>
-        <p className="text-[10px] text-gray-400 dark:text-gray-500 text-center leading-relaxed">
+        <p className="text-[10px] text-neutral-400 text-center leading-relaxed">
           All content on Gazua is user-generated and for educational purposes only. Not investment advice.
           Gazua does not endorse or guarantee any content.
         </p>
@@ -56,13 +56,13 @@ export default function Footer({ variant = 'compact' }: FooterProps) {
   }
 
   return (
-    <div className="mt-8 pt-4 border-t border-gray-100">
-      <p className="text-[10px] text-gray-400 text-center leading-relaxed">
+    <div className="mt-8 pt-4 border-t border-neutral-100">
+      <p className="text-[10px] text-neutral-400 text-center leading-relaxed">
         All content on Gazua is user-generated and for educational purposes only. Not investment advice.
         Gazua does not endorse or guarantee any content.{' '}
-        <Link to="/legal/terms" className="underline hover:text-gray-500 transition-colors">Terms</Link>
+        <Link to="/legal/terms" className="underline hover:text-neutral-500 transition-colors">Terms</Link>
         {' · '}
-        <Link to="/legal/privacy" className="underline hover:text-gray-500 transition-colors">Privacy</Link>
+        <Link to="/legal/privacy" className="underline hover:text-neutral-500 transition-colors">Privacy</Link>
       </p>
     </div>
   );

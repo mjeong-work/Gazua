@@ -70,7 +70,7 @@ export default function CreatePage() {
           {/* Hero */}
           <div className="text-center mb-12">
             <h1 className="text-5xl font-bold mb-4">Create & Share</h1>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-neutral-600">
               Share your knowledge, insights, and models with the Gazua community.
             </p>
           </div>
@@ -81,13 +81,13 @@ export default function CreatePage() {
               <button
                 key={type.id}
                 onClick={() => handleCreate(type.id)}
-                className="text-left border-2 border-gray-200 rounded-2xl p-5 sm:p-8 hover:border-brand hover:shadow-lg transition-all bg-white group"
+                className="text-left border-2 border-neutral-200 rounded-2xl p-5 sm:p-8 hover:border-brand hover:shadow-lg transition-all bg-white group"
               >
                 <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${type.color} flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform`}>
                   {type.icon}
                 </div>
                 <h3 className="text-2xl font-bold mb-3">{type.title}</h3>
-                <p className="text-gray-600 mb-6 leading-relaxed">{type.description}</p>
+                <p className="text-neutral-600 mb-6 leading-relaxed">{type.description}</p>
                 <div className="flex items-center gap-2 text-brand font-medium">
                   <span>{type.action}</span>
                   <span>→</span>
@@ -99,7 +99,7 @@ export default function CreatePage() {
           {/* Tips Section */}
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
             <h3 className="font-bold mb-3">Tips for Great Content</h3>
-            <ul className="space-y-2 text-sm text-gray-700">
+            <ul className="space-y-2 text-sm text-neutral-700">
               <li className="flex items-start gap-2">
                 <span className="text-brand mt-0.5">•</span>
                 <span><strong>Be specific:</strong> Share concrete examples, data, or actionable insights</span>
@@ -150,18 +150,18 @@ export default function CreatePage() {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-8 py-6 flex items-center justify-between">
+            <div className="sticky top-0 bg-white border-b border-neutral-200 px-8 py-6 flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-bold mb-1">
                   {contentTypes.find(t => t.id === selectedType)?.title}
                 </h2>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-neutral-600">
                   {contentTypes.find(t => t.id === selectedType)?.description}
                 </p>
               </div>
               <button
                 onClick={handleCloseModal}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 hover:bg-neutral-100 rounded-full transition-colors"
               >
                 <CloseIcon sx={{ fontSize: 20 }} />
               </button>
@@ -174,7 +174,7 @@ export default function CreatePage() {
                   {contentTypes.find(t => t.id === selectedType)?.icon}
                 </div>
                 <h3 className="text-xl font-bold mb-2">Coming Soon</h3>
-                <p className="text-gray-600 mb-6 max-w-sm mx-auto">
+                <p className="text-neutral-600 mb-6 max-w-sm mx-auto">
                   Content creation tools are currently in development. You'll be able to create and publish {selectedType === 'post' ? 'posts' : selectedType === 'reel' ? 'reels' : selectedType === 'model' ? 'models' : 'market ideas'} soon.
                 </p>
                 <button

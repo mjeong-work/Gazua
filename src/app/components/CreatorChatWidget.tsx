@@ -54,28 +54,28 @@ export default function CreatorChatWidget({ creatorId, creatorName, creatorAvata
 
   return (
     <div
-      className={`fixed inset-x-0 bottom-0 z-50 w-full rounded-t-2xl border-t border-gray-200 bg-white shadow-xl flex flex-col overflow-hidden transition-all duration-300
+      className={`fixed inset-x-0 bottom-0 z-50 w-full rounded-t-2xl border-t border-neutral-200 bg-white shadow-xl flex flex-col overflow-hidden transition-all duration-300
         lg:inset-x-auto lg:bottom-6 lg:right-6 lg:w-80 lg:rounded-2xl lg:border
         ${isMinimized ? 'h-auto' : 'h-[60vh] lg:h-[380px]'}
         ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 flex-shrink-0">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-200 flex-shrink-0">
         <div className="flex items-center gap-2.5 min-w-0">
           {creatorAvatarUrl ? (
             <img src={creatorAvatarUrl} alt={creatorName} className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
           ) : (
-            <div className="w-9 h-9 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-sm font-semibold text-gray-600 flex-shrink-0">
+            <div className="w-9 h-9 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-sm font-semibold text-neutral-600 flex-shrink-0">
               {(creatorName[0] ?? '?').toUpperCase()}
             </div>
           )}
           <span className="text-sm font-semibold truncate">Chat with {creatorName}</span>
         </div>
         <div className="flex items-center gap-1 flex-shrink-0">
-          <button onClick={() => setIsMinimized(v => !v)} className="p-1.5 hover:bg-gray-100 rounded-full transition-colors" aria-label={isMinimized ? 'Expand' : 'Minimize'}>
+          <button onClick={() => setIsMinimized(v => !v)} className="icon-tap-target p-1.5 hover:bg-neutral-100 rounded-full transition-colors" aria-label={isMinimized ? 'Expand' : 'Minimize'}>
             <RemoveIcon sx={{ fontSize: 16 }} />
           </button>
-          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-full transition-colors" aria-label="Close">
+          <button onClick={onClose} className="icon-tap-target p-1.5 hover:bg-neutral-100 rounded-full transition-colors" aria-label="Close">
             <CloseIcon sx={{ fontSize: 16 }} />
           </button>
         </div>
@@ -86,13 +86,13 @@ export default function CreatorChatWidget({ creatorId, creatorName, creatorAvata
           {/* Thread */}
           <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2.5">
             {messages.length === 0 && (
-              <p className="text-sm text-gray-500 text-center mt-4">No messages yet — say hello!</p>
+              <p className="text-sm text-neutral-500 text-center mt-4">No messages yet — say hello!</p>
             )}
             {messages.map(m => {
               const isMine = m.sender_id === user?.id;
               return (
                 <div key={m.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm ${isMine ? 'bg-black text-white' : 'bg-gray-100 text-gray-800'}`}>
+                  <div className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm ${isMine ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-800'}`}>
                     {m.content}
                   </div>
                 </div>
@@ -102,13 +102,13 @@ export default function CreatorChatWidget({ creatorId, creatorName, creatorAvata
           </div>
 
           {/* Input */}
-          <div className="flex items-center gap-2 px-3 py-3 border-t border-gray-200 flex-shrink-0">
+          <div className="flex items-center gap-2 px-3 py-3 border-t border-neutral-200 flex-shrink-0">
             <input
               value={inputValue}
               onChange={e => setInputValue(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') handleSend(); }}
               placeholder="Type a message..."
-              className="flex-1 px-4 py-2 border border-gray-200 rounded-full text-sm focus:outline-none focus:border-black transition-colors"
+              className="flex-1 px-4 py-2 border border-neutral-200 rounded-full text-sm focus:outline-none focus:border-black transition-colors"
             />
             <button
               onClick={handleSend}

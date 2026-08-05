@@ -40,20 +40,20 @@ export default function AdminAuditLogPage() {
       label: 'Event',
       render: item => <span className="text-sm font-medium capitalize">{item.event_type.replace(/_/g, ' ')}</span>,
     },
-    { key: 'actor', label: 'Actor', render: item => <span className="text-gray-600">{item.actorUsername ? `@${item.actorUsername}` : '—'}</span> },
+    { key: 'actor', label: 'Actor', render: item => <span className="text-neutral-600">{item.actorUsername ? `@${item.actorUsername}` : '—'}</span> },
     {
       key: 'content',
       label: 'Target',
       render: item => (
         item.content_type ? (
-          <span className="text-xs text-gray-500 font-mono">{item.content_type}: {item.content_id}</span>
-        ) : <span className="text-gray-300">—</span>
+          <span className="text-xs text-neutral-500 font-mono">{item.content_type}: {item.content_id}</span>
+        ) : <span className="text-neutral-300">—</span>
       ),
     },
     {
       key: 'created_at',
       label: 'When',
-      render: item => <span className="text-gray-500">{new Date(item.created_at).toLocaleString()}</span>,
+      render: item => <span className="text-neutral-500">{new Date(item.created_at).toLocaleString()}</span>,
     },
   ];
 
@@ -63,14 +63,14 @@ export default function AdminAuditLogPage() {
     <div className="space-y-4">
       <div>
         <h1 className="text-2xl font-bold">Audit Log</h1>
-        <p className="text-sm text-gray-500 mt-1">Complete, read-only history of admin and compliance events.</p>
+        <p className="text-sm text-neutral-500 mt-1">Complete, read-only history of admin and compliance events.</p>
       </div>
 
       <div className="flex gap-2 flex-wrap">
         <button
           onClick={() => setEventTypeFilter('')}
           className={`px-4 py-2 text-xs font-medium rounded-full border transition-colors ${
-            eventTypeFilter === '' ? 'bg-black text-white border-black' : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+            eventTypeFilter === '' ? 'bg-black text-white border-black' : 'border-neutral-200 text-neutral-700 hover:bg-neutral-50'
           }`}
         >
           All events
@@ -80,7 +80,7 @@ export default function AdminAuditLogPage() {
             key={et}
             onClick={() => setEventTypeFilter(et)}
             className={`px-4 py-2 text-xs font-medium rounded-full border transition-colors capitalize ${
-              eventTypeFilter === et ? 'bg-black text-white border-black' : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+              eventTypeFilter === et ? 'bg-black text-white border-black' : 'border-neutral-200 text-neutral-700 hover:bg-neutral-50'
             }`}
           >
             {et.replace(/_/g, ' ')}

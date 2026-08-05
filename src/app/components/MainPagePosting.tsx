@@ -10,7 +10,6 @@ import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'rec
 import { useOnboarding } from '../contexts/OnboardingContext';
 import { CHART_TOOLTIP_STYLE, chartCurrencyFormatter, showChartLabel } from '../utils/chartTooltip';
 import AppHeader from './AppHeader';
-import CreatePostModal from './CreatePostModal';
 import { MOCK_POSTS, type Post } from '../data/posts';
 import { getPosts, getPostsByCreatorIds, likePost, unlikePost, getUserLikedPostIds, incrementShareCount } from '../../lib/services/posts.service';
 import type { PostWithCreator as DbPost } from '../../types/database';
@@ -26,6 +25,7 @@ import ReportButton from './compliance/ReportButton';
 import { AlgorithmicLabel, derivePostLabel } from './compliance/AlgorithmicLabel';
 import SendIcon from '@mui/icons-material/Send';
 import { getComments, addComment, type CommentWithAuthor } from '../../lib/services/comments.service';
+import { useServiceQuery, reportServiceError } from '../hooks/useServiceQuery';
 import CommentPanel from './CommentPanel';
 import Footer from './Footer';
 
@@ -96,19 +96,16 @@ function InlineComments({
 }) {
   const { user, profile } = useAuth();
   const [comments, setComments] = useState<CommentWithAuthor[]>([]);
-  const [loading, setLoading] = useState(true);
   const [text, setText] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!postId) { setLoading(false); return; }
-    setLoading(true);
-    getComments(postId).then(({ data }) => {
-      setComments(data ?? []);
-      setLoading(false);
-    });
-  }, [postId]);
+  const { data: commentsData, loading } = useServiceQuery(
+    () => getComments(postId),
+    [postId],
+    { enabled: !!postId, label: 'comments' },
+  );
+  useEffect(() => { if (commentsData) setComments(commentsData); }, [commentsData]);
 
   const handleSubmit = async () => {
     const trimmed = text.trim();
@@ -149,15 +146,15 @@ function InlineComments({
   };
 
   return (
-    <div className="border-t border-gray-100 mt-3 pt-3 pb-1">
+    <div className="border-t border-neutral-100 mt-3 pt-3 pb-1">
       {loading && (
         <div className="space-y-3 mb-3">
           {[1, 2].map(n => (
             <div key={n} className="flex gap-2 animate-pulse">
-              <div className="w-7 h-7 rounded-full bg-gray-200 flex-shrink-0" />
+              <div className="w-7 h-7 rounded-full bg-neutral-200 flex-shrink-0" />
               <div className="flex-1 space-y-1.5 pt-0.5">
-                <div className="h-2.5 bg-gray-200 rounded w-1/4" />
-                <div className="h-2.5 bg-gray-200 rounded w-3/4" />
+                <div className="h-2.5 bg-neutral-200 rounded w-1/4" />
+                <div className="h-2.5 bg-neutral-200 rounded w-3/4" />
               </div>
             </div>
           ))}
@@ -165,7 +162,7 @@ function InlineComments({
       )}
 
       {!loading && comments.length === 0 && (
-        <p className="text-xs text-gray-400 text-center py-2 mb-2">No comments yet. Be the first!</p>
+        <p className="text-xs text-neutral-400 text-center py-2 mb-2">No comments yet. Be the first!</p>
       )}
 
       {!loading && comments.length > 0 && (
@@ -181,9 +178,9 @@ function InlineComments({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-baseline gap-1.5 flex-wrap">
                     <span className="text-xs font-bold leading-tight">{c.author.full_name}</span>
-                    <span className="text-[10px] text-gray-400">{formatCommentTime(c.created_at)}</span>
+                    <span className="text-[10px] text-neutral-400">{formatCommentTime(c.created_at)}</span>
                   </div>
-                  <p className="text-xs text-gray-700 leading-relaxed break-words mt-0.5">{c.content}</p>
+                  <p className="text-xs text-neutral-700 leading-relaxed break-words mt-0.5">{c.content}</p>
                 </div>
               </div>
             );
@@ -192,9 +189,9 @@ function InlineComments({
       )}
 
       {!postId ? (
-        <p className="text-xs text-gray-400 text-center py-2">Comments available on published posts</p>
+        <p className="text-xs text-neutral-400 text-center py-2">Comments available on published posts</p>
       ) : !user ? (
-        <p className="text-xs text-gray-400 text-center py-1">Sign in to leave a comment</p>
+        <p className="text-xs text-neutral-400 text-center py-1">Sign in to leave a comment</p>
       ) : (
         <>
           {error && <p className="text-xs text-red-500 mb-2">{error}</p>}
@@ -206,7 +203,7 @@ function InlineComments({
               onChange={e => setText(e.target.value.slice(0, 500))}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }}
               disabled={submitting}
-              className="flex-1 px-3 py-1.5 border border-gray-200 rounded-full text-xs focus:outline-none focus:border-brand transition-colors disabled:opacity-50 bg-gray-50"
+              className="flex-1 px-3 py-1.5 border border-neutral-200 rounded-full text-xs focus:outline-none focus:border-brand transition-colors disabled:opacity-50 bg-neutral-50"
             />
             <button
               onClick={handleSubmit}
@@ -248,7 +245,6 @@ export default function MainPagePosting() {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastSubtitle, setToastSubtitle] = useState('');
-  const [showCreatePost, setShowCreatePost] = useState(false);
   const { isPanelOpen, openPanel, closePanel, swipeHandlers } = useSwipePanel();
 
   // Inline comment expansion — key matches getLikeKey(post)
@@ -268,6 +264,7 @@ export default function MainPagePosting() {
   const { followedIds, isLoading: followLoading } = useFollow();
   const [followingPosts, setFollowingPosts] = useState<Post[] | null>(null);
   const [followingPostsLoading, setFollowingPostsLoading] = useState(false);
+  const [followingPostsRefreshKey, setFollowingPostsRefreshKey] = useState(0);
 
   // Supabase-backed post data. null = not yet resolved (use mock fallback).
   const [dbPosts, setDbPosts] = useState<Post[] | null>(null);
@@ -312,14 +309,20 @@ export default function MainPagePosting() {
     let cancelled = false;
     setFollowingPostsLoading(true);
 
-    getPostsByCreatorIds(dbCreatorIds).then(({ data }) => {
+    getPostsByCreatorIds(dbCreatorIds).then(({ data, error }) => {
       if (cancelled) return;
+      if (error) {
+        reportServiceError(error, {
+          label: 'posts from creators you follow',
+          retry: () => setFollowingPostsRefreshKey(k => k + 1),
+        });
+      }
       setFollowingPosts(data ? data.map(normalizeDbPost) : []);
       setFollowingPostsLoading(false);
     });
 
     return () => { cancelled = true; };
-  }, [activeTab, followedIdsKey, followLoading]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [activeTab, followedIdsKey, followLoading, followingPostsRefreshKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [liveIndices, setLiveIndices] = useState<MarketIndex[]>(MARKET_INDICES);
   const [indicesLoading, setIndicesLoading] = useState(true);
@@ -384,9 +387,9 @@ export default function MainPagePosting() {
     }
   };
 
-  const handleSaveToWatchlist = (post: Post) => {
+  const handleSaveToWatchlist = async (post: Post) => {
     if (!isSaved('post', post.db_id)) {
-      addToWatchlist({
+      const saved = await addToWatchlist({
         ticker: post.asset,
         name: post.asset,
         assetType: categoryToAssetType(post.category),
@@ -394,7 +397,9 @@ export default function MainPagePosting() {
         source_content_id: post.db_id,
         source: `Saved from post by ${post.creator}`,
       });
-      triggerToast('Saved to Watchlist', 'Build your thesis in the Watchlist tab');
+      if (saved) {
+        triggerToast('Saved to Watchlist', 'Build your thesis in the Watchlist tab');
+      }
     } else {
       removeBySource('post', post.db_id);
       triggerToast('Removed from Watchlist');
@@ -409,12 +414,20 @@ export default function MainPagePosting() {
   // post.likes from the DB already includes the user's own like.
   useEffect(() => {
     if (!user) return;
-    getUserLikedPostIds(user.id).then(({ data }) => {
-      if (!data?.length) return;
-      const ids = new Set(data as string[]);
-      setHydratedLikedIds(ids);
-      setLikedPosts(prev => new Set([...prev, ...data]));
-    });
+    const userId = user.id;
+    const hydrateLikedPosts = () => {
+      getUserLikedPostIds(userId).then(({ data, error }) => {
+        if (error) {
+          reportServiceError(error, { label: 'your liked posts', retry: hydrateLikedPosts });
+          return;
+        }
+        if (!data?.length) return;
+        const ids = new Set(data as string[]);
+        setHydratedLikedIds(ids);
+        setLikedPosts(prev => new Set([...prev, ...data]));
+      });
+    };
+    hydrateLikedPosts();
   }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Keep localStorage in sync (only save non-UUID keys — local/mock likes)
@@ -506,7 +519,7 @@ export default function MainPagePosting() {
           <div
             className={[
               'absolute inset-y-0 left-0 w-screen z-20 bg-white overflow-y-auto',
-              'border-r border-gray-200 px-6 pt-4 pb-20',
+              'border-r border-neutral-200 px-6 pt-4 pb-20',
               'transition-transform duration-300 ease-in-out',
               isPanelOpen ? 'translate-x-0' : '-translate-x-full',
               'lg:static lg:inset-auto lg:z-auto lg:flex-1 lg:translate-x-0 lg:pb-6',
@@ -517,10 +530,10 @@ export default function MainPagePosting() {
               onClick={closePanel}
               aria-label="Return to feed"
               className="absolute right-0 top-1/2 -translate-y-1/2 z-10 lg:hidden
-                         w-5 h-14 bg-gray-100 rounded-l-full border border-r-0 border-gray-200
+                         w-5 h-14 bg-neutral-100 rounded-l-full border border-r-0 border-neutral-200
                          flex items-center justify-center"
             >
-              <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3 h-3 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
@@ -530,11 +543,11 @@ export default function MainPagePosting() {
                 <h2 className="text-3xl font-bold">
                   {tickerInfo?.price ?? '—'}
                 </h2>
-                <span className={`text-sm font-medium ${tickerInfo ? (tickerInfo.positive ? 'text-brand' : 'text-red-500') : 'text-gray-400'}`}>
+                <span className={`text-sm font-medium ${tickerInfo ? (tickerInfo.positive ? 'text-brand' : 'text-red-500') : 'text-neutral-400'}`}>
                   {tickerInfo ? `${tickerInfo.changeAmt} (${tickerInfo.change})` : ''}
                 </span>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-neutral-600">
                 {ticker ? `$${ticker}` : 'S&P 500'}
               </p>
             </div>
@@ -566,7 +579,7 @@ export default function MainPagePosting() {
                     className={`px-3 py-1 rounded transition-colors ${
                       activeTimeRange === range
                         ? 'bg-black text-white'
-                        : 'hover:bg-gray-100 text-gray-600'
+                        : 'hover:bg-neutral-100 text-neutral-600'
                     }`}
                   >
                     {range}
@@ -579,18 +592,18 @@ export default function MainPagePosting() {
             <div className="space-y-3">
               {indicesLoading
                 ? [1, 2, 3, 4].map(n => (
-                    <div key={n} className="p-4 bg-gray-50 rounded-lg animate-pulse">
+                    <div key={n} className="p-4 bg-neutral-50 rounded-lg animate-pulse">
                       <div className="flex items-center justify-between mb-2">
-                        <div className="h-3 bg-gray-200 rounded w-20" />
-                        <div className="h-3 bg-gray-200 rounded w-12" />
+                        <div className="h-3 bg-neutral-200 rounded w-20" />
+                        <div className="h-3 bg-neutral-200 rounded w-12" />
                       </div>
-                      <div className="h-5 bg-gray-200 rounded w-24" />
+                      <div className="h-5 bg-neutral-200 rounded w-24" />
                     </div>
                   ))
                 : liveIndices.map(index => (
-                    <div key={index.id} className="p-4 bg-gray-50 rounded-lg">
+                    <div key={index.id} className="p-4 bg-neutral-50 rounded-lg">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">{index.name}</span>
+                        <span className="text-sm text-neutral-600">{index.name}</span>
                         <span className={`text-xs font-medium ${index.positive ? 'text-brand' : 'text-red-500'}`}>{index.change}</span>
                       </div>
                       <p className="text-xl font-bold mt-1">{index.value}</p>
@@ -628,32 +641,32 @@ export default function MainPagePosting() {
               onClick={openPanel}
               aria-label="Show market chart"
               className="absolute left-0 top-1/2 -translate-y-1/2 z-10 lg:hidden
-                         w-5 h-14 bg-gray-100 rounded-r-full border border-l-0 border-gray-200
+                         w-5 h-14 bg-neutral-100 rounded-r-full border border-l-0 border-neutral-200
                          flex items-center justify-center"
             >
-              <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3 h-3 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
 
             {/* Tabs */}
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 pt-6 pb-0 z-10">
+            <div className="sticky top-0 bg-white border-b border-neutral-200 px-6 pt-6 pb-0 z-10">
               <div className="flex gap-4">
                 <button
                   onClick={() => setActiveTab('posting')}
-                  className={`pb-3 px-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'posting' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                  className={`pb-3 px-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'posting' ? 'border-black text-black' : 'border-transparent text-neutral-500 hover:text-neutral-700'}`}
                 >
                   Posting
                 </button>
                 <button
                   onClick={() => { setActiveTab('reels'); navigate(reelsPath); }}
-                  className={`pb-3 px-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'reels' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                  className={`pb-3 px-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'reels' ? 'border-black text-black' : 'border-transparent text-neutral-500 hover:text-neutral-700'}`}
                 >
                   Reels
                 </button>
                 <button
                   onClick={() => setActiveTab('following')}
-                  className={`pb-3 px-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'following' ? 'border-black text-black' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
+                  className={`pb-3 px-2 font-medium text-sm border-b-2 transition-colors ${activeTab === 'following' ? 'border-black text-black' : 'border-transparent text-neutral-500 hover:text-neutral-700'}`}
                 >
                   Following
                 </button>
@@ -665,7 +678,7 @@ export default function MainPagePosting() {
                     <button
                       key={filter}
                       onClick={() => setContentFilter(filter)}
-                      className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${contentFilter === filter ? 'bg-black text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                      className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${contentFilter === filter ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'}`}
                     >
                       {filter}
                     </button>
@@ -689,13 +702,13 @@ export default function MainPagePosting() {
                     {/* ── Following tab: no followed creators yet ────────── */}
                     {isFollowingTab && !followLoading && followedIds.size === 0 && (
                       <div className="flex flex-col items-center justify-center py-20 text-center">
-                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-6">
-                          <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="w-20 h-20 bg-neutral-100 rounded-full flex items-center justify-center mb-6">
+                          <svg className="w-10 h-10 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                           </svg>
                         </div>
                         <h3 className="text-xl font-bold mb-2">Follow Creators to See Their Content</h3>
-                        <p className="text-gray-600 mb-6 max-w-sm">When you follow creators, their posts will appear here. Discover and follow investors who share your interests.</p>
+                        <p className="text-neutral-600 mb-6 max-w-sm">When you follow creators, their posts will appear here. Discover and follow investors who share your interests.</p>
                         <button onClick={() => setActiveTab('posting')} className="px-6 py-3 bg-black text-white rounded-full hover:bg-black/90 transition-colors">
                           Explore All Posts
                         </button>
@@ -710,7 +723,7 @@ export default function MainPagePosting() {
                             <h3 className="text-lg font-bold mb-1">
                               Welcome, {onboardingData.level === 'beginner' ? 'Explorer' : onboardingData.level === 'experienced' ? 'Analyst' : 'Expert'}! 🎉
                             </h3>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-neutral-600">
                               {onboardingData.level === 'beginner' && "We've curated beginner-friendly content to help you start your investment journey."}
                               {onboardingData.level === 'experienced' && "Discover insights tailored to your investment experience."}
                               {onboardingData.level === 'confident' && "Explore advanced strategies and market analysis."}
@@ -719,7 +732,7 @@ export default function MainPagePosting() {
                         </div>
                         {onboardingData.interests.length > 0 && (
                           <div className="flex flex-wrap gap-2 mb-2">
-                            <span className="text-xs text-gray-600">Your interests:</span>
+                            <span className="text-xs text-neutral-600">Your interests:</span>
                             {onboardingData.interests.map(interest => (
                               <span key={interest} className="px-2 py-1 bg-mint/20 text-brand text-xs font-medium rounded-full border border-mint/30">
                                 {interest}
@@ -728,7 +741,7 @@ export default function MainPagePosting() {
                           </div>
                         )}
                         {onboardingData.riskStyle && (
-                          <div className="flex items-center gap-2 text-xs text-gray-600">
+                          <div className="flex items-center gap-2 text-xs text-neutral-600">
                             <span>Investment style:</span>
                             <span className="px-2 py-1 bg-white/50 rounded font-medium capitalize">{onboardingData.riskStyle}</span>
                           </div>
@@ -740,18 +753,18 @@ export default function MainPagePosting() {
                     {activePostsLoading && (
                       <div className="space-y-4">
                         {[1, 2, 3].map(n => (
-                          <div key={n} className="bg-white border border-gray-200 rounded-xl p-5 animate-pulse">
+                          <div key={n} className="bg-white border border-neutral-200 rounded-xl p-5 animate-pulse">
                             <div className="flex items-start gap-3 mb-3">
-                              <div className="w-10 h-10 rounded-full bg-gray-200 flex-shrink-0" />
+                              <div className="w-10 h-10 rounded-full bg-neutral-200 flex-shrink-0" />
                               <div className="flex-1 space-y-2">
-                                <div className="h-3 bg-gray-200 rounded w-1/3" />
-                                <div className="h-3 bg-gray-200 rounded w-1/5" />
+                                <div className="h-3 bg-neutral-200 rounded w-1/3" />
+                                <div className="h-3 bg-neutral-200 rounded w-1/5" />
                               </div>
                             </div>
                             <div className="space-y-2">
-                              <div className="h-3 bg-gray-200 rounded w-full" />
-                              <div className="h-3 bg-gray-200 rounded w-5/6" />
-                              <div className="h-3 bg-gray-200 rounded w-4/6" />
+                              <div className="h-3 bg-neutral-200 rounded w-full" />
+                              <div className="h-3 bg-neutral-200 rounded w-5/6" />
+                              <div className="h-3 bg-neutral-200 rounded w-4/6" />
                             </div>
                           </div>
                         ))}
@@ -761,7 +774,7 @@ export default function MainPagePosting() {
                     {/* ── Posting tab: empty states ─────────────────────────── */}
                     {!isFollowingTab && !postsLoading && posts.length === 0 && ticker && (
                       <div className="flex flex-col items-center justify-center py-20 text-center">
-                        <p className="text-gray-500 text-sm">No posts tagged <span className="font-semibold">${ticker}</span> yet.</p>
+                        <p className="text-neutral-500 text-sm">No posts tagged <span className="font-semibold">${ticker}</span> yet.</p>
                         <button onClick={() => setSearchParams({})} className="mt-4 text-sm font-medium underline hover:text-black transition-colors">
                           Clear filter
                         </button>
@@ -769,7 +782,7 @@ export default function MainPagePosting() {
                     )}
                     {!isFollowingTab && !postsLoading && posts.length === 0 && contentFilter !== 'All' && !ticker && (
                       <div className="flex flex-col items-center justify-center py-20 text-center">
-                        <p className="text-gray-500 text-sm">No {contentFilter} posts yet.</p>
+                        <p className="text-neutral-500 text-sm">No {contentFilter} posts yet.</p>
                         <button onClick={() => setContentFilter('All')} className="mt-4 text-sm font-medium underline hover:text-black transition-colors">
                           Clear filter
                         </button>
@@ -778,20 +791,20 @@ export default function MainPagePosting() {
                     {!isFollowingTab && !postsLoading && posts.length === 0 && contentFilter === 'All' && !ticker && (
                       <div className="flex flex-col items-center justify-center py-20 text-center">
                         <h3 className="text-xl font-bold mb-2">No posts yet</h3>
-                        <p className="text-gray-600 max-w-sm">Check back soon for new investing insights.</p>
+                        <p className="text-neutral-600 max-w-sm">Check back soon for new investing insights.</p>
                       </div>
                     )}
 
                     {/* ── Following tab: followed creators but no posts yet ──── */}
                     {isFollowingTab && !activePostsLoading && followedIds.size > 0 && activePosts.length === 0 && (
                       <div className="flex flex-col items-center justify-center py-20 text-center">
-                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                          <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mb-4">
+                          <svg className="w-8 h-8 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                           </svg>
                         </div>
                         <h3 className="text-xl font-bold mb-2">No posts yet</h3>
-                        <p className="text-gray-600 max-w-sm">The creators you follow haven't posted anything yet. Check back soon!</p>
+                        <p className="text-neutral-600 max-w-sm">The creators you follow haven't posted anything yet. Check back soon!</p>
                       </div>
                     )}
 
@@ -807,11 +820,11 @@ export default function MainPagePosting() {
                       const isPostSaved = isSaved('post', post.db_id);
                       const algoLabel = derivePostLabel(post.likes, post.shares, post.verified, post.category);
                       return (
-                        <div key={post.id} className="bg-white border border-gray-200 rounded-xl p-5 hover:border-gray-300 transition-colors">
+                        <div key={post.id} className="bg-white border border-neutral-200 rounded-xl p-5 hover:border-neutral-300 transition-colors">
                           <div className="flex items-start gap-3 mb-3">
                             <button
                               onClick={() => navigate(`/profile/${post.creator_id}/investment`)}
-                              className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-xl hover:opacity-80"
+                              className="w-10 h-10 rounded-full bg-neutral-200 flex items-center justify-center text-xl hover:opacity-80"
                             >
                               {post.avatar}
                             </button>
@@ -827,7 +840,7 @@ export default function MainPagePosting() {
                                     </svg>
                                   </span>
                                 )}
-                                <span className="text-xs text-gray-500">• {post.created_at}</span>
+                                <span className="text-xs text-neutral-500">• {post.created_at}</span>
                               </div>
                               <div className="flex items-center gap-2 mt-1 flex-wrap">
                                 <button
@@ -856,7 +869,7 @@ export default function MainPagePosting() {
                             </button>
                           )}
 
-                          <div className="flex items-center gap-6 text-gray-500">
+                          <div className="flex items-center gap-6 text-neutral-500">
                             <button
                               onClick={() => toggleLike(post)}
                               className={`flex items-center gap-2 transition-colors ${isLiked ? 'text-red-500' : 'hover:text-red-500'}`}
@@ -931,24 +944,6 @@ export default function MainPagePosting() {
         </div>
       </div>
 
-      {showCreatePost && (
-        <CreatePostModal
-          onClose={() => setShowCreatePost(false)}
-          onSuccess={(msg) => { triggerToast(msg); setPostsRefreshKey(k => k + 1); }}
-        />
-      )}
-
-      {/* Floating Create Button */}
-      <button
-        onClick={() => setShowCreatePost(true)}
-        className="fixed bottom-24 right-4 lg:bottom-8 lg:right-8 w-14 h-14 bg-mint text-black rounded-full shadow-lg hover:bg-mint-hover transition-all hover:scale-110 flex items-center justify-center z-40 group"
-        title="Create Post"
-      >
-        <AddCircleOutlineIcon sx={{ fontSize: 28 }} />
-        <span className="absolute bottom-full right-0 mb-2 px-3 py-1 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 pointer-coarse:hidden transition-opacity whitespace-nowrap pointer-events-none">
-          Create Post
-        </span>
-      </button>
 
       {/* Toast */}
       {showToast && (

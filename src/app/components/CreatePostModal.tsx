@@ -95,7 +95,7 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
           <h2 className="text-base font-semibold">Create Post</h2>
           <button
             onClick={onClose}
-            className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+            className="icon-tap-target p-1.5 hover:bg-neutral-100 rounded-full transition-colors"
           >
             <CloseIcon sx={{ fontSize: 20 }} />
           </button>
@@ -107,7 +107,7 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
               + audience-selector row (this app has no post-visibility concept, so category
               fills that "context for this post" slot instead of a fake control). */}
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-full bg-gray-200 flex-shrink-0 flex items-center justify-center text-sm font-semibold text-gray-600 overflow-hidden">
+            <div className="w-11 h-11 rounded-full bg-neutral-200 flex-shrink-0 flex items-center justify-center text-sm font-semibold text-neutral-600 overflow-hidden">
               {profile?.avatar_url
                 ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                 : (profile?.full_name?.[0]?.toUpperCase() ?? '?')}
@@ -117,7 +117,7 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as typeof CATEGORIES[number])}
-                className="text-xs text-gray-500 bg-gray-100 rounded-full px-2.5 py-0.5 mt-0.5 border-none focus:outline-none cursor-pointer"
+                className="text-xs text-neutral-500 bg-neutral-100 rounded-full px-2.5 py-0.5 mt-0.5 border-none focus:outline-none cursor-pointer"
               >
                 {CATEGORIES.map(c => <option key={c}>{c}</option>)}
               </select>
@@ -131,9 +131,9 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
             value={content}
             onChange={(e) => setContent(e.target.value)}
             autoFocus
-            className="w-full text-[15px] focus:outline-none resize-none placeholder:text-gray-400 min-h-[120px]"
+            className="w-full text-[15px] focus:outline-none resize-none placeholder:text-neutral-400 min-h-[120px]"
           />
-          <p className="text-[11px] text-gray-400 text-right -mt-3">
+          <p className="text-[11px] text-neutral-400 text-right -mt-3">
             {content.length} / 500
           </p>
 
@@ -141,13 +141,13 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
               kept as one compact row instead of two separate labeled sections. */}
           <div className="flex items-center gap-2 flex-wrap">
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs font-medium">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 text-xs font-medium">$</span>
               <input
                 type="text"
                 placeholder="Ticker"
                 value={ticker}
                 onChange={(e) => setTicker(e.target.value)}
-                className="w-28 pl-6 pr-3 py-1.5 border border-gray-200 rounded-full text-xs focus:outline-none focus:border-brand"
+                className="w-28 pl-6 pr-3 py-1.5 border border-neutral-200 rounded-full text-xs focus:outline-none focus:border-brand"
               />
             </div>
 
@@ -156,7 +156,7 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
                 onClick={() => setSentiment('Bullish')}
                 title="Bullish"
                 className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-                  sentiment === 'Bullish' ? 'bg-green-100 text-green-700' : 'text-gray-400 hover:bg-gray-100'
+                  sentiment === 'Bullish' ? 'bg-green-100 text-green-700' : 'text-neutral-400 hover:bg-neutral-100'
                 }`}
               >
                 <TrendingUpIcon sx={{ fontSize: 18 }} />
@@ -165,7 +165,7 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
                 onClick={() => setSentiment('Neutral')}
                 title="Neutral"
                 className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-                  sentiment === 'Neutral' ? 'bg-blue-100 text-blue-700' : 'text-gray-400 hover:bg-gray-100'
+                  sentiment === 'Neutral' ? 'bg-blue-100 text-blue-700' : 'text-neutral-400 hover:bg-neutral-100'
                 }`}
               >
                 <TrendingFlatIcon sx={{ fontSize: 18 }} />
@@ -174,7 +174,7 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
                 onClick={() => setSentiment('Bearish')}
                 title="Bearish"
                 className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-                  sentiment === 'Bearish' ? 'bg-red-100 text-red-700' : 'text-gray-400 hover:bg-gray-100'
+                  sentiment === 'Bearish' ? 'bg-red-100 text-red-700' : 'text-neutral-400 hover:bg-neutral-100'
                 }`}
               >
                 <TrendingDownIcon sx={{ fontSize: 18 }} />
@@ -192,7 +192,7 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
           <button
             onClick={handleSubmit}
             disabled={!ticker.trim() || !content.trim() || submitting}
-            className="w-full py-3 bg-black text-white font-bold rounded-full hover:bg-black/80 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="w-full py-3 bg-black text-white font-bold rounded-full hover:bg-black/80 transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed"
           >
             {submitting ? 'Publishing…' : 'Publish Post'}
           </button>

@@ -93,7 +93,7 @@ export default function ReelEngagementBar({
           onClick={() => (engagement.isCommentPanelOpen ? engagement.closeCommentPanel() : engagement.openCommentPanel())}
           variant="bar"
         >
-          <span className="text-sm font-medium text-gray-700">{formatCount(engagement.commentCount)}</span>
+          <span className="text-sm font-medium text-neutral-700">{formatCount(engagement.commentCount)}</span>
         </ReelActionButton>
 
         <SaveButton isSaved={isSaved} onToggle={() => toggleSavedContent(savedItem)} variant="bar" />
