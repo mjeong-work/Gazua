@@ -2,7 +2,7 @@
 // Gazua Admin Section — TypeScript Types
 // ================================================================
 
-import type { ProfileRole, ProfileStatus } from './database'
+import type { ProfileRole, ProfileStatus, CredibilityLevel } from './database'
 import type { ContentType, ModerationActionType, ReportReason } from './compliance'
 
 export type AdminRole = ProfileRole
@@ -50,6 +50,7 @@ export interface AdminUserListItem {
 export interface AdminUserDetail extends AdminUserListItem {
   bio: string | null
   handle: string | null
+  credibility_level: CredibilityLevel
   suspended_at: string | null
   suspended_reason: string | null
   postCount: number

@@ -9,12 +9,16 @@ import {
   getUserReportsAgainst,
   getUserModerationHistory,
   setUserStatus,
+  setCredibilityLevel,
 } from '../../../lib/services/adminUsers.service';
 import AdminStatusBadge from './AdminStatusBadge';
 import AdminConfirmDialog from './AdminConfirmDialog';
 import AdminLoadingSkeleton from './AdminLoadingSkeleton';
 import AdminErrorState from './AdminErrorState';
 import type { AdminUserDetail, AdminReportListItem, AdminModerationActionItem } from '../../../types/admin';
+import type { CredibilityLevel } from '../../../types/database';
+
+const CREDIBILITY_LEVELS: CredibilityLevel[] = ['explorer', 'contributor', 'analyst', 'educator', 'verified_pro'];
 
 type PendingAction = 'warning_sent' | 'user_suspended' | 'user_reinstated' | null;
 
@@ -55,6 +59,16 @@ export default function AdminUserDetailPage() {
 
   useEffect(() => { load(); }, [load]);
 
+  const handleChangeCredibilityLevel = async (level: CredibilityLevel) => {
+    const { success, error: err } = await setCredibilityLevel({ userId, level });
+    if (success) {
+      toast.success('Credibility level updated');
+      load();
+    } else {
+      toast.error(err ?? 'Failed to update credibility level');
+    }
+  };
+
   const handleConfirmAction = async (notes?: string) => {
     if (!pendingAction) return;
     const status = pendingAction === 'user_suspended' ? 'suspended' : pendingAction === 'user_reinstated' ? 'active' : 'warned';
@@ -87,6 +101,18 @@ export default function AdminUserDetailPage() {
               <AdminStatusBadge status={detail.status} />
             </div>
             <p className="text-sm text-gray-500">@{detail.username}{detail.handle ? ` · ${detail.handle}` : ''}</p>
+            <div className="flex items-center gap-2 mt-2">
+              <label className="text-xs font-medium text-gray-500">Credibility level</label>
+              <select
+                value={detail.credibility_level}
+                onChange={(e) => handleChangeCredibilityLevel(e.target.value as CredibilityLevel)}
+                className="text-xs border border-gray-200 rounded-full px-2.5 py-1 focus:outline-none focus:border-black transition-colors"
+              >
+                {CREDIBILITY_LEVELS.map((level) => (
+                  <option key={level} value={level}>{level}</option>
+                ))}
+              </select>
+            </div>
             {detail.bio && <p className="text-sm text-gray-600 mt-2 max-w-lg">{detail.bio}</p>}
             {detail.status === 'suspended' && detail.suspended_reason && (
               <p className="text-xs text-red-600 mt-2">Suspended: {detail.suspended_reason}</p>

@@ -1,4 +1,16 @@
-export type CreatorTier = 'Explorer' | 'Analyst' | 'Educator';
+import type { CredibilityLevel } from '../../types/database';
+
+// Re-exported so existing `import { type CreatorTier }` call sites keep working — this is now
+// just an alias for the real credibility_level enum (see Issue 5), not a separate mock-only tier.
+export type CreatorTier = CredibilityLevel;
+
+export const CREDIBILITY_LEVEL_LABELS: Record<CredibilityLevel, string> = {
+  explorer: 'Explorer',
+  contributor: 'Contributor',
+  analyst: 'Analyst',
+  educator: 'Educator',
+  verified_pro: 'Verified Pro',
+};
 
 export interface MockCreator {
   id: string;
@@ -11,7 +23,7 @@ export interface MockCreator {
   following: string;
   posts: string;
   focus: string;
-  tier: CreatorTier;
+  credibilityLevel: CredibilityLevel;
 }
 
 export const MOCK_CREATORS: Record<string, MockCreator> = {
@@ -26,7 +38,7 @@ export const MOCK_CREATORS: Record<string, MockCreator> = {
     following: '342',
     posts: '1.2K',
     focus: 'Value Investing',
-    tier: 'Educator',
+    credibilityLevel: 'educator',
   },
   'sarah-chen': {
     id: 'sarah-chen',
@@ -39,7 +51,7 @@ export const MOCK_CREATORS: Record<string, MockCreator> = {
     following: '218',
     posts: '847',
     focus: 'Growth Stocks',
-    tier: 'Analyst',
+    credibilityLevel: 'analyst',
   },
   'mike-ross': {
     id: 'mike-ross',
@@ -52,7 +64,7 @@ export const MOCK_CREATORS: Record<string, MockCreator> = {
     following: '134',
     posts: '423',
     focus: 'Quant & Models',
-    tier: 'Analyst',
+    credibilityLevel: 'analyst',
   },
   'emma-wilson': {
     id: 'emma-wilson',
@@ -65,7 +77,7 @@ export const MOCK_CREATORS: Record<string, MockCreator> = {
     following: '301',
     posts: '612',
     focus: 'Crypto',
-    tier: 'Explorer',
+    credibilityLevel: 'explorer',
   },
   'david-park': {
     id: 'david-park',
@@ -78,7 +90,7 @@ export const MOCK_CREATORS: Record<string, MockCreator> = {
     following: '89',
     posts: '934',
     focus: 'Index Funds',
-    tier: 'Educator',
+    credibilityLevel: 'educator',
   },
   'lisa-zhang': {
     id: 'lisa-zhang',
@@ -91,7 +103,7 @@ export const MOCK_CREATORS: Record<string, MockCreator> = {
     following: '178',
     posts: '712',
     focus: 'Options Trading',
-    tier: 'Analyst',
+    credibilityLevel: 'analyst',
   },
   'james-lee': {
     id: 'james-lee',
@@ -104,7 +116,7 @@ export const MOCK_CREATORS: Record<string, MockCreator> = {
     following: '204',
     posts: '1.1K',
     focus: 'Beginner Education',
-    tier: 'Educator',
+    credibilityLevel: 'educator',
   },
 };
 

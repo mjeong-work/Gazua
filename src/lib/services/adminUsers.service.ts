@@ -38,7 +38,7 @@ const USER_LIST_COLUMNS = `
 
 const USER_DETAIL_COLUMNS = `
   id, username, handle, full_name, avatar_url, bio, is_creator, subscription_tier,
-  role, status, suspended_at, suspended_reason, created_at
+  credibility_level, role, status, suspended_at, suspended_reason, created_at
 ` as const
 
 // ── listUsers ────────────────────────────────────────────────────
@@ -262,6 +262,32 @@ export async function setUserStatus(params: {
     contentType: 'creator_profile',
     contentId: params.userId,
     metadata: { status: params.status, reason: params.reason },
+  }).catch(() => {})
+
+  return { success: true }
+}
+
+// ── setCredibilityLevel ──────────────────────────────────────────
+/** Sets a user's credibility_level. Writes go through the admin_set_credibility_level
+ * RPC (server-enforced is_admin() check + enum validation) — see
+ * 20260805000000_credibility_level.sql. There is deliberately no in-app promotion logic
+ * here; this is a direct, manual admin assignment. */
+export async function setCredibilityLevel(params: {
+  userId: string
+  level: import('../../types/database').CredibilityLevel
+}): Promise<{ success: boolean; error?: string }> {
+  const { error: rpcError } = await supabase.rpc('admin_set_credibility_level', {
+    p_user_id: params.userId,
+    p_level: params.level,
+  })
+
+  if (rpcError) return { success: false, error: rpcError.message }
+
+  logAuditEvent({
+    eventType: 'admin_credibility_level_changed',
+    contentType: 'creator_profile',
+    contentId: params.userId,
+    metadata: { credibility_level: params.level },
   }).catch(() => {})
 
   return { success: true }

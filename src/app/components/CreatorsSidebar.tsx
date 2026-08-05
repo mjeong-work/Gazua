@@ -6,7 +6,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
-import { getCreator, type MockCreator } from '../data/creators';
+import { getCreator, CREDIBILITY_LEVEL_LABELS, type MockCreator } from '../data/creators';
 import { useFollow } from '../contexts/FollowContext';
 import { useWatchlist } from '../contexts/WatchlistContext';
 
@@ -108,7 +108,7 @@ export default function CreatorsSidebar() {
                         {creator.name}
                       </span>
                       <span className={`flex-shrink-0 px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-medium ${isExpanded ? '' : 'lg:hidden'}`}>
-                        {creator.tier}
+                        {CREDIBILITY_LEVEL_LABELS[creator.credibilityLevel]}
                       </span>
                     </button>
                   );
