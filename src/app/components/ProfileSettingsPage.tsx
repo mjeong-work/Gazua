@@ -152,7 +152,7 @@ export default function ProfileSettingsPage() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => navigate('/my-profile')}
-            className="p-1.5 -ml-1.5 hover:bg-gray-100 rounded-full transition-colors"
+            className="icon-tap-target p-1.5 -ml-1.5 hover:bg-gray-100 rounded-full transition-colors"
             aria-label="Back to profile"
           >
             <ArrowBackIcon sx={{ fontSize: 20 }} />

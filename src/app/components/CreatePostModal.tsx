@@ -95,7 +95,7 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
           <h2 className="text-base font-semibold">Create Post</h2>
           <button
             onClick={onClose}
-            className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+            className="icon-tap-target p-1.5 hover:bg-gray-100 rounded-full transition-colors"
           >
             <CloseIcon sx={{ fontSize: 20 }} />
           </button>

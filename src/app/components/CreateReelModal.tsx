@@ -158,7 +158,7 @@ export default function CreateReelModal({ onClose, onSuccess }: CreateReelModalP
         <div className="flex-shrink-0 flex items-center justify-between px-4 py-3">
           <button
             onClick={onClose}
-            className="p-1.5 -ml-1.5 hover:bg-gray-100 rounded-full transition-colors"
+            className="icon-tap-target p-1.5 -ml-1.5 hover:bg-gray-100 rounded-full transition-colors"
             aria-label="Close"
           >
             <CloseIcon sx={{ fontSize: 22 }} />

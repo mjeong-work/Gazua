@@ -112,7 +112,7 @@ export default function CreateOptionsSheet({ onClose, onSelect }: CreateOptionsS
             <h2 className="text-base font-bold">Create</h2>
             <button
               onClick={onClose}
-              className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+              className="icon-tap-target p-1.5 hover:bg-gray-100 rounded-full transition-colors"
               aria-label="Close"
             >
               <CloseIcon sx={{ fontSize: 18 }} />

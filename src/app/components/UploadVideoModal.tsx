@@ -106,7 +106,7 @@ export default function UploadVideoModal({ onClose, onSuccess }: UploadVideoModa
       >
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold">Upload Video</h2>
-          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-full transition-colors">
+          <button onClick={onClose} className="icon-tap-target p-1.5 hover:bg-gray-100 rounded-full transition-colors">
             <CloseIcon sx={{ fontSize: 18 }} />
           </button>
         </div>

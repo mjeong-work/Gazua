@@ -929,10 +929,10 @@ export default function MyProfilePage() {
                               </div>
                             )}
                             <div className="flex items-center gap-1">
-                              <button onClick={() => handleOpenEditPost(post)} className="p-1.5 hover:bg-gray-100 rounded-full transition-colors" title="Edit">
+                              <button onClick={() => handleOpenEditPost(post)} className="icon-tap-target p-1.5 hover:bg-gray-100 rounded-full transition-colors" title="Edit">
                                 <EditIcon sx={{ fontSize: 14, color: 'var(--icon-muted)' }} />
                               </button>
-                              <button onClick={() => setDeletePostId(post.id)} className="p-1.5 hover:bg-red-50 rounded-full transition-colors" title="Delete">
+                              <button onClick={() => setDeletePostId(post.id)} className="icon-tap-target p-1.5 hover:bg-red-50 rounded-full transition-colors" title="Delete">
                                 <DeleteOutlineIcon sx={{ fontSize: 14, color: 'var(--icon-muted)' }} />
                               </button>
                             </div>
@@ -1085,7 +1085,7 @@ export default function MyProfilePage() {
                           placeholder="Add area..."
                           className="flex-1 text-xs border border-gray-200 rounded-full px-3 py-1.5 focus:outline-none focus:border-black"
                         />
-                        <button onClick={handleAddFocusArea} className="p-1.5 bg-black text-white rounded-full hover:bg-black/80 transition-colors">
+                        <button onClick={handleAddFocusArea} className="icon-tap-target p-1.5 bg-black text-white rounded-full hover:bg-black/80 transition-colors">
                           <AddIcon sx={{ fontSize: 14 }} />
                         </button>
                       </div>
@@ -1312,7 +1312,7 @@ export default function MyProfilePage() {
             <div className="bg-white rounded-2xl shadow-xl w-[min(520px,90vw)] max-h-[85vh] overflow-y-auto p-6">
               <div className="flex items-center justify-between mb-5">
                 <h2 className="text-lg font-bold">New Simulation</h2>
-                <button onClick={handleCloseNewSimForm} className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"><CloseIcon sx={{ fontSize: 18 }} /></button>
+                <button onClick={handleCloseNewSimForm} className="icon-tap-target p-1.5 hover:bg-gray-100 rounded-full transition-colors"><CloseIcon sx={{ fontSize: 18 }} /></button>
               </div>
 
               <div className="space-y-4">
@@ -1423,7 +1423,7 @@ export default function MyProfilePage() {
           <div className="bg-white rounded-2xl shadow-xl w-[min(480px,90vw)] p-6">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold">Edit Profile</h2>
-              <button onClick={() => setShowEditProfile(false)} className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"><CloseIcon sx={{ fontSize: 18 }} /></button>
+              <button onClick={() => setShowEditProfile(false)} className="icon-tap-target p-1.5 hover:bg-gray-100 rounded-full transition-colors"><CloseIcon sx={{ fontSize: 18 }} /></button>
             </div>
             <div className="space-y-4">
               <div>
@@ -1476,7 +1476,7 @@ export default function MyProfilePage() {
           <div className="bg-white rounded-2xl shadow-xl w-[min(540px,90vw)] p-6">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold">{editingPostId ? 'Edit Post' : 'New Post'}</h2>
-              <button onClick={() => { setShowPostComposer(false); setEditingPostId(null); }} className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"><CloseIcon sx={{ fontSize: 18 }} /></button>
+              <button onClick={() => { setShowPostComposer(false); setEditingPostId(null); }} className="icon-tap-target p-1.5 hover:bg-gray-100 rounded-full transition-colors"><CloseIcon sx={{ fontSize: 18 }} /></button>
             </div>
 
             <div className="flex items-start gap-3 mb-4">

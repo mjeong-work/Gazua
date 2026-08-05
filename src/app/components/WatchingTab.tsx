@@ -146,7 +146,7 @@ export default function WatchingTab() {
               </div>
               <button
                 onClick={() => removeFromWatchlist(item.id)}
-                className="p-1.5 text-gray-300 hover:text-red-400 hover:bg-red-50 rounded-full transition-colors"
+                className="icon-tap-target p-1.5 text-gray-300 hover:text-red-400 hover:bg-red-50 rounded-full transition-colors"
                 title="Remove"
               >
                 <CloseIcon sx={{ fontSize: 16 }} />

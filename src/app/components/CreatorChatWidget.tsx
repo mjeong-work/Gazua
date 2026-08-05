@@ -72,10 +72,10 @@ export default function CreatorChatWidget({ creatorId, creatorName, creatorAvata
           <span className="text-sm font-semibold truncate">Chat with {creatorName}</span>
         </div>
         <div className="flex items-center gap-1 flex-shrink-0">
-          <button onClick={() => setIsMinimized(v => !v)} className="p-1.5 hover:bg-gray-100 rounded-full transition-colors" aria-label={isMinimized ? 'Expand' : 'Minimize'}>
+          <button onClick={() => setIsMinimized(v => !v)} className="icon-tap-target p-1.5 hover:bg-gray-100 rounded-full transition-colors" aria-label={isMinimized ? 'Expand' : 'Minimize'}>
             <RemoveIcon sx={{ fontSize: 16 }} />
           </button>
-          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-full transition-colors" aria-label="Close">
+          <button onClick={onClose} className="icon-tap-target p-1.5 hover:bg-gray-100 rounded-full transition-colors" aria-label="Close">
             <CloseIcon sx={{ fontSize: 16 }} />
           </button>
         </div>

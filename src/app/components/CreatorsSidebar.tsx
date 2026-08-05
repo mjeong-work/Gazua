@@ -72,7 +72,7 @@ export default function CreatorsSidebar() {
         <div className={`hidden lg:flex items-center border-b border-gray-200 py-3 ${isExpanded ? 'justify-end px-2' : 'justify-center px-0'}`}>
           <button
             onClick={() => setIsExpanded(v => !v)}
-            className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+            className="icon-tap-target p-1.5 hover:bg-gray-100 rounded-full transition-colors"
             aria-label={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
           >
             {isExpanded ? <ChevronLeftIcon sx={{ fontSize: 18 }} /> : <ChevronRightIcon sx={{ fontSize: 18 }} />}

@@ -13,3 +13,10 @@
     display: none;
   }
 }
+
+/* Bumps an icon-only button's hit area to the 44px minimum recommended touch
+   target (iOS HIG / Material) without changing its visual padding/size — the
+   icon still sits at whatever size it was, just centered in a larger box. */
+@utility icon-tap-target {
+  @apply inline-flex items-center justify-center min-w-11 min-h-11;
+}

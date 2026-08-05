@@ -52,7 +52,7 @@ export default function WeeklyReminderModal() {
           <h2 className="text-lg font-bold dark:text-white">Before You Continue</h2>
           <button
             onClick={dismiss}
-            className="p-1.5 -mt-1 -mr-1 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors"
+            className="icon-tap-target p-1.5 -mt-1 -mr-1 hover:bg-gray-100 dark:hover:bg-white/10 rounded-full transition-colors"
             aria-label="Dismiss reminder"
           >
             <CloseIcon sx={{ fontSize: 18 }} />
