@@ -1,3 +1,5 @@
+import { Badge } from '../ui/badge';
+
 // Generalizes ModerationPage.tsx's STATUS_COLORS map to cover every status/role pill used
 // across the admin section (report status, user status, content moderation status, role).
 const COLORS: Record<string, string> = {
@@ -25,10 +27,11 @@ interface AdminStatusBadgeProps {
 
 export default function AdminStatusBadge({ status, className = '' }: AdminStatusBadgeProps) {
   return (
-    <span
-      className={`text-xs px-2 py-0.5 rounded-full font-medium capitalize ${COLORS[status] ?? 'bg-neutral-100 text-neutral-500'} ${className}`}
+    <Badge
+      variant="outline"
+      className={`px-2 py-0.5 rounded-full border-transparent font-medium capitalize ${COLORS[status] ?? 'bg-neutral-100 text-neutral-500'} ${className}`}
     >
       {status}
-    </span>
+    </Badge>
   );
 }
