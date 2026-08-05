@@ -12,6 +12,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import AddIcon from '@mui/icons-material/Add';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import NotificationsIcon from '@mui/icons-material/Notifications';
@@ -180,15 +181,6 @@ export default function AppHeader() {
             <button onClick={() => navigate('/creators')} className={cls(['/creators', '/profile'])}>
               Creators
             </button>
-            <button
-              onClick={() => setShowCreateSheet(true)}
-              className={`flex items-center gap-1.5 hover:opacity-70 transition-opacity ${showCreateSheet || activeCreateModal ? 'text-brand' : ''}`}
-            >
-              {showCreateSheet || activeCreateModal
-                ? <AddCircleIcon sx={{ fontSize: 18 }} />
-                : <AddCircleOutlineIcon sx={{ fontSize: 18 }} />}
-              Create
-            </button>
             <button onClick={() => navigate('/my-profile')} className={cls(['/my-profile'])}>
               My Profile
             </button>
@@ -281,6 +273,17 @@ export default function AppHeader() {
           </button>
         </div>
       </nav>
+
+      {/* Desktop Create FAB — mobile reaches the same picker via the bottom nav's + tab above,
+          so this only needs to exist at lg and up (matches CreateOptionsSheet's own desktop
+          breakpoint, which is what switches it from a bottom sheet to a centered dialog). */}
+      <button
+        onClick={() => setShowCreateSheet(true)}
+        className="hidden lg:flex fixed bottom-8 right-8 w-14 h-14 bg-mint text-black rounded-full shadow-lg hover:bg-mint-hover hover:shadow-xl transition-all items-center justify-center z-40"
+        aria-label="Create"
+      >
+        <AddIcon sx={{ fontSize: 28 }} />
+      </button>
 
       {showSearch && <SearchModal onClose={() => setShowSearch(false)} />}
 
