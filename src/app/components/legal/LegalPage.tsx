@@ -21,12 +21,12 @@ export default function LegalPage() {
 
   if (!doc) {
     return (
-      <div className="min-h-screen flex flex-col bg-white dark:bg-black">
+      <div className="min-h-screen flex flex-col bg-white">
         <AppHeader />
         <div className="flex-1 flex items-center justify-center px-6 py-24 text-center">
           <div>
-            <h1 className="text-2xl font-bold mb-2 dark:text-white">Document not found</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+            <h1 className="text-2xl font-bold mb-2">Document not found</h1>
+            <p className="text-sm text-gray-500 mb-6">
               We couldn't find the legal document you're looking for.
             </p>
             <Link to="/legal/terms" className="text-brand hover:underline text-sm">
@@ -39,7 +39,7 @@ export default function LegalPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-black print:min-h-0">
+    <div className="min-h-screen flex flex-col bg-white print:min-h-0">
       <div className="print:hidden">
         <AppHeader />
       </div>
@@ -51,8 +51,8 @@ export default function LegalPage() {
           </div>
 
           <div className="max-w-3xl">
-            <h1 className="text-3xl font-bold mb-2 dark:text-white">{doc.title}</h1>
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-500 dark:text-gray-400 mb-10">
+            <h1 className="text-3xl font-bold mb-2">{doc.title}</h1>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-500 mb-10">
               <span>Effective {doc.effectiveDate}</span>
               <span aria-hidden="true">·</span>
               <span>Version {doc.version}</span>
@@ -68,7 +68,7 @@ export default function LegalPage() {
                         params.set('version', e.target.value);
                         window.location.search = params.toString();
                       }}
-                      className="text-sm text-gray-500 dark:text-gray-400 bg-transparent border-none underline hover:text-black dark:hover:text-white cursor-pointer"
+                      className="text-sm text-gray-500 bg-transparent border-none underline hover:text-black cursor-pointer"
                     >
                       {versions.map((v) => (
                         <option key={v.version} value={v.version}>

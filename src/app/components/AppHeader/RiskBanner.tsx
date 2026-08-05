@@ -10,7 +10,7 @@ export default function RiskBanner() {
   if (!ticker) return null;
 
   return (
-    <div className="bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-300 py-1.5 px-4 text-center text-xs shrink-0">
+    <div className="bg-amber-50 border-b border-amber-200 text-amber-800 py-1.5 px-4 text-center text-xs shrink-0">
       Content mentioning ${ticker} is for educational discussion only and is not a recommendation to buy or sell.
     </div>
   );
