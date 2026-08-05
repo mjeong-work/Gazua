@@ -73,16 +73,16 @@ export default function SubscriptionWelcome() {
         </h1>
 
         {/* Subtitle */}
-        <p className="text-gray-500 leading-relaxed mb-2">
+        <p className="text-neutral-500 leading-relaxed mb-2">
           {config.subtitle}
         </p>
-        <p className="text-sm text-gray-400 mb-10">
+        <p className="text-sm text-neutral-400 mb-10">
           {config.price} · Cancel anytime
         </p>
 
         {/* Feature list */}
-        <div className="bg-gray-50 rounded-2xl px-6 py-5 mb-8 text-left">
-          <p className="text-xs text-gray-400 font-medium uppercase tracking-widest mb-4">
+        <div className="bg-neutral-50 rounded-2xl px-6 py-5 mb-8 text-left">
+          <p className="text-xs text-neutral-400 font-medium uppercase tracking-widest mb-4">
             What you now have access to
           </p>
           <ul className="space-y-3">
@@ -91,7 +91,7 @@ export default function SubscriptionWelcome() {
                 <span className="flex-shrink-0 w-5 h-5 bg-mint rounded-full flex items-center justify-center">
                   <Check className="w-3 h-3 text-black" strokeWidth={3} />
                 </span>
-                <span className="text-sm text-gray-700">{feature}</span>
+                <span className="text-sm text-neutral-700">{feature}</span>
               </li>
             ))}
           </ul>
@@ -106,11 +106,11 @@ export default function SubscriptionWelcome() {
         </button>
 
         {/* Secondary */}
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-neutral-400">
           Manage billing in{' '}
           <button
             onClick={() => navigate('/my-profile/settings')}
-            className="underline underline-offset-2 hover:text-gray-600 transition-colors"
+            className="underline underline-offset-2 hover:text-neutral-600 transition-colors"
           >
             your profile settings
           </button>

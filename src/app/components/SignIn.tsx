@@ -68,7 +68,7 @@ export default function SignIn() {
       <div className="min-h-screen bg-white flex items-center justify-center px-6 relative">
         <button
           onClick={() => { setForgotMode(false); setResetSent(false); setResetError(null); }}
-          className="absolute top-6 left-6 text-sm text-gray-400 hover:text-gray-600 transition-colors"
+          className="absolute top-6 left-6 text-sm text-neutral-400 hover:text-neutral-600 transition-colors"
         >
           ← Back
         </button>
@@ -76,7 +76,7 @@ export default function SignIn() {
         <div className="max-w-md w-full">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold tracking-tight mb-2">Gazua</h1>
-            <p className="text-gray-600">Reset your password</p>
+            <p className="text-neutral-600">Reset your password</p>
           </div>
 
           {resetSent ? (
@@ -87,7 +87,7 @@ export default function SignIn() {
                 </svg>
               </div>
               <h2 className="text-xl font-bold mb-2">Check your email</h2>
-              <p className="text-gray-600 text-sm mb-6">
+              <p className="text-neutral-600 text-sm mb-6">
                 We've sent a password reset link to <strong>{resetEmail}</strong>.
               </p>
               <button
@@ -108,7 +108,7 @@ export default function SignIn() {
                   value={resetEmail}
                   onChange={e => setResetEmail(e.target.value)}
                   required
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-mint/50"
+                  className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-mint/50"
                 />
               </div>
 
@@ -142,7 +142,7 @@ export default function SignIn() {
     <div className="min-h-screen bg-white flex items-center justify-center px-6 relative">
       <button
         onClick={() => navigate('/')}
-        className="absolute top-6 right-6 text-sm text-gray-400 hover:text-gray-600 transition-colors"
+        className="absolute top-6 right-6 text-sm text-neutral-400 hover:text-neutral-600 transition-colors"
       >
         ← Back
       </button>
@@ -150,7 +150,7 @@ export default function SignIn() {
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold tracking-tight mb-2">Gazua</h1>
-          <p className="text-gray-600">Sign in to your account</p>
+          <p className="text-neutral-600">Sign in to your account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -163,7 +163,7 @@ export default function SignIn() {
               value={email}
               onChange={e => { setEmail(e.target.value); setAuthError(null); }}
               required
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-mint/50"
+              className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-mint/50"
             />
           </div>
 
@@ -173,7 +173,7 @@ export default function SignIn() {
               <button
                 type="button"
                 onClick={() => { setForgotMode(true); setResetEmail(email); }}
-                className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+                className="text-xs text-neutral-500 hover:text-neutral-700 transition-colors"
               >
                 Forgot password?
               </button>
@@ -185,7 +185,7 @@ export default function SignIn() {
               value={password}
               onChange={e => { setPassword(e.target.value); setAuthError(null); }}
               required
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-mint/50"
+              className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-mint/50"
             />
           </div>
 
@@ -197,10 +197,10 @@ export default function SignIn() {
           {/* Divider */}
           <div className="relative my-2">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200" />
+              <div className="w-full border-t border-neutral-200" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500">or</span>
+              <span className="px-4 bg-white text-neutral-500">or</span>
             </div>
           </div>
 
@@ -209,11 +209,11 @@ export default function SignIn() {
             type="button"
             onClick={handleGoogle}
             disabled={isGoogleLoading}
-            className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-4 py-3 border-2 border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isGoogleLoading ? (
               <>
-                <span className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+                <span className="w-5 h-5 border-2 border-neutral-300 border-t-gray-600 rounded-full animate-spin" />
                 <span className="font-medium">Connecting…</span>
               </>
             ) : (
@@ -246,7 +246,7 @@ export default function SignIn() {
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
+        <p className="text-center text-sm text-neutral-500 mt-6">
           Don't have an account?{' '}
           <button
             onClick={() => navigate('/onboarding/welcome')}
