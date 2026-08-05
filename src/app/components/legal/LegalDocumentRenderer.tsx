@@ -21,7 +21,7 @@ interface LegalDocumentRendererProps {
 // scroll-margin for anchor-linked headings under the sticky header.
 export default function LegalDocumentRenderer({ markdown }: LegalDocumentRendererProps) {
   return (
-    <div className="text-sm text-gray-700 leading-relaxed">
+    <div className="text-sm text-neutral-700 leading-relaxed">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
@@ -46,7 +46,7 @@ export default function LegalDocumentRenderer({ markdown }: LegalDocumentRendere
           ol: ({ children }) => <ol className="list-decimal list-inside space-y-2 ml-2 mb-3">{children}</ol>,
           li: ({ children }) => <li className="leading-relaxed">{children}</li>,
           strong: ({ children }) => <strong className="font-semibold text-black">{children}</strong>,
-          hr: () => <hr className="my-8 border-gray-200" />,
+          hr: () => <hr className="my-8 border-neutral-200" />,
           a: ({ href, children }) => {
             if (!href) return <>{children}</>;
             const isInternal = href.startsWith('/');
@@ -62,12 +62,12 @@ export default function LegalDocumentRenderer({ markdown }: LegalDocumentRendere
             </div>
           ),
           th: ({ children }) => (
-            <th className="border border-gray-200 px-3 py-2 text-left font-semibold text-black">
+            <th className="border border-neutral-200 px-3 py-2 text-left font-semibold text-black">
               {children}
             </th>
           ),
           td: ({ children }) => (
-            <td className="border border-gray-200 px-3 py-2 align-top">{children}</td>
+            <td className="border border-neutral-200 px-3 py-2 align-top">{children}</td>
           ),
         }}
       >

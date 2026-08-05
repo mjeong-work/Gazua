@@ -26,7 +26,7 @@ export default function LegalPage() {
         <div className="flex-1 flex items-center justify-center px-6 py-24 text-center">
           <div>
             <h1 className="text-2xl font-bold mb-2">Document not found</h1>
-            <p className="text-sm text-gray-500 mb-6">
+            <p className="text-sm text-neutral-500 mb-6">
               We couldn't find the legal document you're looking for.
             </p>
             <Link to="/legal/terms" className="text-brand hover:underline text-sm">
@@ -52,7 +52,7 @@ export default function LegalPage() {
 
           <div className="max-w-3xl">
             <h1 className="text-3xl font-bold mb-2">{doc.title}</h1>
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-gray-500 mb-10">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-neutral-500 mb-10">
               <span>Effective {doc.effectiveDate}</span>
               <span aria-hidden="true">·</span>
               <span>Version {doc.version}</span>
@@ -68,7 +68,7 @@ export default function LegalPage() {
                         params.set('version', e.target.value);
                         window.location.search = params.toString();
                       }}
-                      className="text-sm text-gray-500 bg-transparent border-none underline hover:text-black cursor-pointer"
+                      className="text-sm text-neutral-500 bg-transparent border-none underline hover:text-black cursor-pointer"
                     >
                       {versions.map((v) => (
                         <option key={v.version} value={v.version}>
