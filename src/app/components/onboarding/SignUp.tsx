@@ -109,10 +109,10 @@ export default function SignUp() {
             <CheckCircle className="w-16 h-16 text-brand" strokeWidth={1.5} />
           </div>
           <h2 className="text-2xl font-bold mb-3">Check your email</h2>
-          <p className="text-gray-600 mb-2">
+          <p className="text-neutral-600 mb-2">
             We sent a confirmation link to <strong>{confirmEmail}</strong>.
           </p>
-          <p className="text-sm text-gray-500 mb-8">
+          <p className="text-sm text-neutral-500 mb-8">
             Click the link to verify your account, then sign in.
           </p>
           <button
@@ -131,7 +131,7 @@ export default function SignUp() {
       {/* Skip link */}
       <button
         onClick={() => navigate('/main')}
-        className="absolute top-6 right-6 text-sm text-gray-400 hover:text-gray-600 transition-colors"
+        className="absolute top-6 right-6 text-sm text-neutral-400 hover:text-neutral-600 transition-colors"
       >
         Skip →
       </button>
@@ -140,16 +140,16 @@ export default function SignUp() {
         {/* Logo */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold tracking-tight mb-2">Gazua</h1>
-          <p className="text-gray-600">Create your account</p>
+          <p className="text-neutral-600">Create your account</p>
         </div>
 
         {/* Progress indicator */}
         <div className="mb-8">
-          <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+          <div className="flex items-center justify-between text-sm text-neutral-600 mb-2">
             <span>Step 1 of 4</span>
             <span>25%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-neutral-200 rounded-full h-2">
             <div className="bg-mint h-2 rounded-full transition-all" style={{ width: '25%' }}></div>
           </div>
         </div>
@@ -167,7 +167,7 @@ export default function SignUp() {
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-mint/50"
+              className="w-full px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-mint/50"
             />
           </div>
 
@@ -182,7 +182,7 @@ export default function SignUp() {
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               required
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-mint/50"
+              className="w-full px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-mint/50"
             />
           </div>
 
@@ -197,17 +197,17 @@ export default function SignUp() {
               value={formData.confirmPassword}
               onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
               required
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-mint/50"
+              className="w-full px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-mint/50"
             />
           </div>
 
           {/* OAuth Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200"></div>
+              <div className="w-full border-t border-neutral-200"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500">or</span>
+              <span className="px-4 bg-white text-neutral-500">or</span>
             </div>
           </div>
 
@@ -216,11 +216,11 @@ export default function SignUp() {
             type="button"
             onClick={handleGoogleAuth}
             disabled={isGoogleLoading}
-            className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-4 py-3 border-2 border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isGoogleLoading ? (
               <>
-                <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+                <div className="w-5 h-5 border-2 border-neutral-300 border-t-gray-600 rounded-full animate-spin"></div>
                 <span className="font-medium">Authenticating...</span>
               </>
             ) : (
@@ -278,7 +278,7 @@ export default function SignUp() {
         {/* Back link */}
         <button
           onClick={() => navigate('/onboarding/welcome')}
-          className="w-full text-center text-sm text-gray-500 hover:text-gray-700 mt-6"
+          className="w-full text-center text-sm text-neutral-500 hover:text-neutral-700 mt-6"
         >
           ← Back
         </button>

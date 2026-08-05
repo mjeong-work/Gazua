@@ -21,7 +21,7 @@ export default function PickLevel() {
       {/* Skip link */}
       <button
         onClick={() => { completeOnboarding(); navigate('/main'); }}
-        className="absolute top-6 right-6 text-sm text-gray-400 hover:text-gray-600 transition-colors"
+        className="absolute top-6 right-6 text-sm text-neutral-400 hover:text-neutral-600 transition-colors"
       >
         Skip →
       </button>
@@ -34,11 +34,11 @@ export default function PickLevel() {
 
         {/* Progress indicator */}
         <div className="mb-12">
-          <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+          <div className="flex items-center justify-between text-sm text-neutral-600 mb-2">
             <span>Step 2 of 4</span>
             <span>50%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-neutral-200 rounded-full h-2">
             <div className="bg-mint h-2 rounded-full transition-all" style={{ width: '50%' }}></div>
           </div>
         </div>
@@ -57,14 +57,14 @@ export default function PickLevel() {
               className={`w-full p-6 rounded-2xl border-2 transition-all text-left relative ${
                 selectedLevel === level.id
                   ? 'border-mint bg-mint/5 shadow-md'
-                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                  : 'border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50'
               }`}
             >
               <div className="flex items-center gap-4">
                 <span className="text-4xl">{level.emoji}</span>
                 <div className="flex-1">
                   <h3 className="text-xl font-bold mb-1">{level.title}</h3>
-                  <p className="text-gray-600">{level.description}</p>
+                  <p className="text-neutral-600">{level.description}</p>
                 </div>
                 {selectedLevel === level.id && (
                   <div className="w-8 h-8 bg-mint rounded-full flex items-center justify-center">
@@ -88,7 +88,7 @@ export default function PickLevel() {
         {/* Back link */}
         <button
           onClick={() => navigate('/onboarding/signup')}
-          className="w-full text-center text-sm text-gray-500 hover:text-gray-700 mt-6"
+          className="w-full text-center text-sm text-neutral-500 hover:text-neutral-700 mt-6"
         >
           ← Back
         </button>

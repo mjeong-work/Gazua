@@ -43,7 +43,7 @@ export default function Complete() {
           Welcome to Gazua, {levelConfig.label}!
         </h1>
 
-        <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+        <p className="text-xl text-neutral-600 mb-8 leading-relaxed">
           {levelConfig.tagline} Learn, engage, and rise through the community.
         </p>
 
@@ -51,24 +51,24 @@ export default function Complete() {
         <div className="inline-flex items-center gap-3 bg-gradient-to-r from-mint/10 to-green-500/10 px-8 py-4 rounded-2xl border-2 border-mint/30 mb-12">
           <span className="text-3xl">{levelConfig.emoji}</span>
           <div className="text-left">
-            <div className="text-xs text-gray-600 uppercase tracking-wide">Your Level</div>
+            <div className="text-xs text-neutral-600 uppercase tracking-wide">Your Level</div>
             <div className="text-2xl font-bold">{levelConfig.label}</div>
           </div>
         </div>
 
         {/* Features preview */}
         <div className="grid grid-cols-3 gap-4 mb-12 text-center">
-          <div className="p-4 rounded-xl bg-gray-50">
+          <div className="p-4 rounded-xl bg-neutral-50">
             <div className="text-2xl mb-2">📚</div>
-            <div className="text-sm font-medium text-gray-700">Learn</div>
+            <div className="text-sm font-medium text-neutral-700">Learn</div>
           </div>
-          <div className="p-4 rounded-xl bg-gray-50">
+          <div className="p-4 rounded-xl bg-neutral-50">
             <div className="text-2xl mb-2">💬</div>
-            <div className="text-sm font-medium text-gray-700">Engage</div>
+            <div className="text-sm font-medium text-neutral-700">Engage</div>
           </div>
-          <div className="p-4 rounded-xl bg-gray-50">
+          <div className="p-4 rounded-xl bg-neutral-50">
             <div className="text-2xl mb-2">📈</div>
-            <div className="text-sm font-medium text-gray-700">Grow</div>
+            <div className="text-sm font-medium text-neutral-700">Grow</div>
           </div>
         </div>
 
@@ -81,7 +81,7 @@ export default function Complete() {
         </button>
 
         {/* Disclaimer */}
-        <p className="text-xs text-gray-500 leading-relaxed">
+        <p className="text-xs text-neutral-500 leading-relaxed">
           All content on Gazua is for educational purposes only.
         </p>
       </div>

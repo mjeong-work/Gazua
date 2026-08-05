@@ -29,7 +29,7 @@ export default function PickInterests() {
       {/* Skip link */}
       <button
         onClick={() => { completeOnboarding(); navigate('/main'); }}
-        className="absolute top-6 right-6 text-sm text-gray-400 hover:text-gray-600 transition-colors"
+        className="absolute top-6 right-6 text-sm text-neutral-400 hover:text-neutral-600 transition-colors"
       >
         Skip →
       </button>
@@ -42,11 +42,11 @@ export default function PickInterests() {
 
         {/* Progress indicator */}
         <div className="mb-12">
-          <div className="flex items-center justify-between text-sm text-gray-600 mb-2">
+          <div className="flex items-center justify-between text-sm text-neutral-600 mb-2">
             <span>Step 3 of 4</span>
             <span>75%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-neutral-200 rounded-full h-2">
             <div className="bg-mint h-2 rounded-full transition-all" style={{ width: '75%' }}></div>
           </div>
         </div>
@@ -55,7 +55,7 @@ export default function PickInterests() {
         <h2 className="text-3xl font-bold text-center mb-4">
           What do you want to learn about?
         </h2>
-        <p className="text-center text-gray-600 mb-12">
+        <p className="text-center text-neutral-600 mb-12">
           Select at least 3
         </p>
 
@@ -68,7 +68,7 @@ export default function PickInterests() {
               className={`px-6 py-3 rounded-full border-2 transition-all font-medium ${
                 selectedInterests.includes(interest)
                   ? 'bg-mint border-mint text-black shadow-md'
-                  : 'border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                  : 'border-neutral-200 text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50'
               }`}
             >
               <span className="flex items-center gap-2">
@@ -83,7 +83,7 @@ export default function PickInterests() {
 
         {/* Counter */}
         {selectedInterests.length > 0 && (
-          <p className="text-center text-sm text-gray-600 mb-6">
+          <p className="text-center text-sm text-neutral-600 mb-6">
             {selectedInterests.length} selected
             {selectedInterests.length < 3 && ` • ${3 - selectedInterests.length} more needed`}
           </p>
@@ -101,7 +101,7 @@ export default function PickInterests() {
         {/* Back link */}
         <button
           onClick={() => navigate('/onboarding/level')}
-          className="w-full text-center text-sm text-gray-500 hover:text-gray-700 mt-6"
+          className="w-full text-center text-sm text-neutral-500 hover:text-neutral-700 mt-6"
         >
           ← Back
         </button>
