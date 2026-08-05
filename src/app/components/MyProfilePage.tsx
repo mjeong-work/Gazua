@@ -28,6 +28,10 @@ type Tab = 'investment' | 'videos' | 'posts' | 'saved' | 'watching' | 'about' | 
 
 const TAGS = ['📈 Portfolio Update', '💡 Investing Insight', '🏦 Macro Watch', '📊 Earnings', '🎓 Beginner Tips'];
 
+// Instagram-style bio length cap — kept as a constant so it's a one-line change if the product
+// ever wants a different limit.
+const MAX_BIO_LENGTH = 150;
+
 const INIT_POSTS = [
   { id: 1, time: '2h ago', content: "Just added to my NVDA position. AI infrastructure spending isn't slowing down — data center capex from the hyperscalers is still accelerating. This is a multi-year theme, not a trade.", likes: 1240, comments: 87, reposts: 203, tag: '📈 Portfolio Update', draft: false },
   { id: 2, time: '1d ago', content: "Reminder: volatility is not risk. Risk is permanent loss of capital. A 20% drawdown in a fundamentally strong company is an opportunity, not a reason to panic sell. Zoom out.", likes: 3421, comments: 142, reposts: 891, tag: '💡 Investing Insight', draft: false },
@@ -154,20 +158,19 @@ export default function MyProfilePage() {
   // pattern for the model to follow when that's done).
   const displayName = profile?.full_name || '';
   const displayHandle = profile?.handle ? `@${profile.handle}` : profile?.username ? `@${profile.username}` : '';
+  const bioText = profile?.bio?.trim() || '';
   const avatarGradient = 'from-blue-500 to-purple-600';
   const [avatarImageUrl, setAvatarImageUrl] = useState<string | null>(null);
   const displayAvatarUrl = avatarImageUrl ?? profile?.avatar_url ?? null;
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [editName, setEditName] = useState(displayName);
   const [editHandle, setEditHandle] = useState(displayHandle);
+  const [editBio, setEditBio] = useState(bioText);
   const [profileSaveError, setProfileSaveError] = useState<string | null>(null);
   const [savingProfile, setSavingProfile] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
 
   // About state
-  const [bio, setBio] = useState('Investment educator helping everyday people build wealth through smart investing. 15+ years experience in portfolio management. Sharing real strategies, not get-rich-quick schemes.');
-  const [editBio, setEditBio] = useState(bio);
-  const [isEditingAbout, setIsEditingAbout] = useState(false);
   const [experience, setExperience] = useState(INIT_EXPERIENCE);
   const [isEditingExperience, setIsEditingExperience] = useState(false);
   const [editExperience, setEditExperience] = useState(INIT_EXPERIENCE);
@@ -291,6 +294,7 @@ export default function MyProfilePage() {
     const { error } = await updateProfile(profile.id, {
       full_name: editName.trim(),
       handle: editHandle.trim().replace(/^@/, '') || null,
+      bio: editBio.trim() || null,
     });
 
     setSavingProfile(false);
@@ -473,7 +477,8 @@ export default function MyProfilePage() {
 
             {/* Bio */}
             <p className="text-sm leading-relaxed text-gray-600 mb-4 max-w-2xl">
-              {bio}<span className="text-gray-400"> · Not financial advice.</span>
+              {bioText || <span className="text-gray-400 italic">Tell people about yourself</span>}
+              <span className="text-gray-400"> · Not financial advice.</span>
             </p>
 
             {/* Private Stats Bar */}
@@ -494,7 +499,7 @@ export default function MyProfilePage() {
             {/* Action Buttons */}
             <div className="flex flex-wrap items-center gap-2 mb-8">
               <button
-                onClick={() => { setEditName(displayName); setEditHandle(displayHandle); setProfileSaveError(null); setShowEditProfile(true); }}
+                onClick={() => { setEditName(displayName); setEditHandle(displayHandle); setEditBio(bioText); setProfileSaveError(null); setShowEditProfile(true); }}
                 className="px-6 py-2 bg-black text-white font-medium text-sm rounded-full hover:bg-black/80 transition-colors flex items-center gap-2"
               >
                 <EditIcon sx={{ fontSize: 15 }} />
@@ -986,25 +991,21 @@ export default function MyProfilePage() {
             {activeTab === 'about' && (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 <div className="sm:col-span-2 space-y-5">
-                  {/* Bio */}
+                  {/* Bio — editing lives in the Edit Profile modal (single source of truth
+                      for profile.bio) rather than a second inline editor here. */}
                   <div className="p-5 bg-white border border-gray-200 rounded-xl">
                     <div className="flex items-center justify-between mb-3">
                       <h2 className="text-base font-semibold">About</h2>
-                      {isEditingAbout ? (
-                        <div className="flex items-center gap-2">
-                          <button onClick={() => { setBio(editBio); setIsEditingAbout(false); }} className="text-xs font-medium px-3 py-1.5 bg-black text-white rounded-full hover:bg-black/80 transition-colors">Save</button>
-                          <button onClick={() => setIsEditingAbout(false)} className="text-xs font-medium px-3 py-1.5 border border-gray-200 rounded-full hover:bg-gray-50 transition-colors">Cancel</button>
-                        </div>
-                      ) : (
-                        <button onClick={() => { setEditBio(bio); setIsEditingAbout(true); }} className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-black transition-colors">
-                          <EditIcon sx={{ fontSize: 13 }} />Edit
-                        </button>
-                      )}
+                      <button
+                        onClick={() => { setEditName(displayName); setEditHandle(displayHandle); setEditBio(bioText); setProfileSaveError(null); setShowEditProfile(true); }}
+                        className="flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-black transition-colors"
+                      >
+                        <EditIcon sx={{ fontSize: 13 }} />Edit
+                      </button>
                     </div>
-                    {isEditingAbout
-                      ? <textarea value={editBio} onChange={e => setEditBio(e.target.value)} className="w-full text-sm text-gray-700 leading-relaxed border border-gray-200 rounded-lg p-3 resize-none focus:outline-none focus:border-gray-400" rows={4} />
-                      : <p className="text-sm text-gray-700 leading-relaxed">{bio}</p>
-                    }
+                    <p className="text-sm text-gray-700 leading-relaxed">
+                      {bioText || <span className="text-gray-400 italic">Tell people about yourself</span>}
+                    </p>
                   </div>
 
                   {/* Experience */}
@@ -1430,6 +1431,22 @@ export default function MyProfilePage() {
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1.5">Handle</label>
                 <input value={editHandle} onChange={e => setEditHandle(e.target.value)} className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors" />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-medium text-gray-600">Bio</label>
+                  <span className={`text-xs ${editBio.length >= MAX_BIO_LENGTH ? 'text-red-500' : 'text-gray-400'}`}>
+                    {editBio.length}/{MAX_BIO_LENGTH}
+                  </span>
+                </div>
+                <textarea
+                  value={editBio}
+                  onChange={e => setEditBio(e.target.value.slice(0, MAX_BIO_LENGTH))}
+                  maxLength={MAX_BIO_LENGTH}
+                  placeholder="Tell people about yourself"
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none focus:outline-none focus:border-black transition-colors"
+                />
               </div>
             </div>
             {profileSaveError && <p className="text-sm text-red-500 mt-3">{profileSaveError}</p>}
