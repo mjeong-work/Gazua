@@ -183,9 +183,9 @@ export default function ModelHubPage() {
     });
   }, [dbModels, searchQuery, filters]);
 
-  const handleSave = (model: Model) => {
+  const handleSave = async (model: Model) => {
     if (!isSaved('model', model.db_id)) {
-      addToWatchlist({
+      const saved = await addToWatchlist({
         ticker: model.title,
         name: model.title,
         assetType: 'Strategy',
@@ -193,7 +193,9 @@ export default function ModelHubPage() {
         source_content_id: model.db_id,
         source: `Saved from model: ${model.title}`,
       });
-      triggerToast('Saved to Watchlist', 'Build your thesis in the Watchlist tab');
+      if (saved) {
+        triggerToast('Saved to Watchlist', 'Build your thesis in the Watchlist tab');
+      }
     } else {
       removeBySource('model', model.db_id);
       triggerToast('Removed from Watchlist');

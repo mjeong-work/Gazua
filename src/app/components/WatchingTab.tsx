@@ -45,9 +45,9 @@ export default function WatchingTab() {
     setEditingId(null);
   };
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!newTicker.trim()) return;
-    addToWatchlist({
+    await addToWatchlist({
       ticker: newTicker.trim().toUpperCase(),
       name: newName.trim() || newTicker.trim().toUpperCase(),
       assetType: newType,

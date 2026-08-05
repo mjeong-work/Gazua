@@ -58,10 +58,10 @@ export default function WatchlistPage() {
     triggerToast('Thesis updated');
   };
 
-  const handleAddAsset = () => {
+  const handleAddAsset = async () => {
     if (!newTicker.trim()) return;
     const ticker = newTicker.toUpperCase();
-    addToWatchlist({
+    const saved = await addToWatchlist({
       ticker,
       name: newName || ticker,
       assetType: newAssetType,
@@ -72,7 +72,9 @@ export default function WatchlistPage() {
     setNewName('');
     setNewAssetType('Stock');
     setShowAddModal(false);
-    triggerToast(`${ticker} added to Watchlist`);
+    if (saved) {
+      triggerToast(`${ticker} added to Watchlist`);
+    }
   };
 
   const getStatusColor = (status: string) => {
