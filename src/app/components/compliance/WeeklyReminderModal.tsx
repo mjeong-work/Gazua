@@ -52,20 +52,20 @@ export default function WeeklyReminderModal() {
           <h2 className="text-lg font-bold">Before You Continue</h2>
           <button
             onClick={dismiss}
-            className="icon-tap-target p-1.5 -mt-1 -mr-1 hover:bg-gray-100 rounded-full transition-colors"
+            className="icon-tap-target p-1.5 -mt-1 -mr-1 hover:bg-neutral-100 rounded-full transition-colors"
             aria-label="Dismiss reminder"
           >
             <CloseIcon sx={{ fontSize: 18 }} />
           </button>
         </div>
 
-        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
+        <p className="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-3">
           Remember
         </p>
         <ul className="space-y-2 mb-6">
           {REMINDERS.map((line) => (
-            <li key={line} className="flex items-start gap-2 text-sm text-gray-700 leading-snug">
-              <span className="mt-1.5 w-1 h-1 rounded-full bg-gray-400 flex-shrink-0" />
+            <li key={line} className="flex items-start gap-2 text-sm text-neutral-700 leading-snug">
+              <span className="mt-1.5 w-1 h-1 rounded-full bg-neutral-400 flex-shrink-0" />
               {line}
             </li>
           ))}

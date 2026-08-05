@@ -8,7 +8,7 @@ const DIFFICULTY_OPTIONS: Difficulty[] = ['Beginner', 'Intermediate', 'Advanced'
 
 const PILL_CLASS = (active: boolean) =>
   `px-5 py-2.5 rounded-full text-sm font-medium border transition-colors ${
-    active ? 'bg-black text-white border-black' : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'
+    active ? 'bg-black text-white border-black' : 'bg-white text-neutral-700 border-neutral-200 hover:border-neutral-300'
   }`;
 
 interface CreatorsFilterSheetProps {
@@ -69,19 +69,19 @@ export default function CreatorsFilterSheet({
           onPointerDown={(e) => dragControls.start(e)}
           className="flex justify-center pt-3 pb-2 flex-shrink-0 cursor-grab active:cursor-grabbing"
         >
-          <div className="w-10 h-1.5 bg-gray-300 rounded-full" />
+          <div className="w-10 h-1.5 bg-neutral-300 rounded-full" />
         </div>
 
-        <div className="flex items-center justify-between px-5 pb-4 border-b border-gray-100 flex-shrink-0">
+        <div className="flex items-center justify-between px-5 pb-4 border-b border-neutral-100 flex-shrink-0">
           <h2 id="creators-filter-title" className="text-base font-bold">Filter</h2>
-          <button onClick={onClose} aria-label="Close filters" className="p-1 hover:bg-gray-100 rounded-full transition-colors">
+          <button onClick={onClose} aria-label="Close filters" className="p-1 hover:bg-neutral-100 rounded-full transition-colors">
             <CloseIcon sx={{ fontSize: 18 }} />
           </button>
         </div>
 
         <div className="px-5 py-5 touch-auto overflow-y-auto space-y-6">
           <div>
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Level</h3>
+            <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-wide mb-3">Level</h3>
             <div className="flex flex-wrap gap-2">
               {DIFFICULTY_OPTIONS.map((level) => (
                 <button
@@ -95,11 +95,11 @@ export default function CreatorsFilterSheet({
                 </button>
               ))}
             </div>
-            <p className="text-xs text-gray-400 mt-2">Select one or more. Leave empty to show all levels.</p>
+            <p className="text-xs text-neutral-400 mt-2">Select one or more. Leave empty to show all levels.</p>
           </div>
 
           <div>
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Show</h3>
+            <h3 className="text-xs font-semibold text-neutral-500 uppercase tracking-wide mb-3">Show</h3>
             <button
               type="button"
               aria-pressed={myFollowingOnly}
@@ -112,13 +112,13 @@ export default function CreatorsFilterSheet({
         </div>
 
         <div
-          className="flex items-center gap-3 px-5 py-4 border-t border-gray-100 flex-shrink-0"
+          className="flex items-center gap-3 px-5 py-4 border-t border-neutral-100 flex-shrink-0"
           style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
         >
           <button
             onClick={onClear}
             disabled={!hasActiveFilters}
-            className="flex-1 px-4 py-3 rounded-full text-sm font-medium border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex-1 px-4 py-3 rounded-full text-sm font-medium border border-neutral-200 text-neutral-700 hover:bg-neutral-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             Clear all
           </button>

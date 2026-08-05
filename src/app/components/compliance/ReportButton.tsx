@@ -64,8 +64,8 @@ export default function ReportButton({
         className={
           className ||
           (label
-            ? 'w-full flex items-center gap-3 px-3 py-3 text-sm text-gray-700 hover:bg-gray-50 rounded-xl transition-colors'
-            : 'text-gray-400 hover:text-gray-600 transition-colors')
+            ? 'w-full flex items-center gap-3 px-3 py-3 text-sm text-neutral-700 hover:bg-neutral-50 rounded-xl transition-colors'
+            : 'text-neutral-400 hover:text-neutral-600 transition-colors')
         }
       >
         <FlagOutlinedIcon sx={{ fontSize: label ? 20 : 16 }} />
@@ -83,7 +83,7 @@ export default function ReportButton({
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-bold text-base">Report Content</h3>
-              <button onClick={close} className="p-1 hover:bg-gray-100 rounded-full transition-colors">
+              <button onClick={close} className="p-1 hover:bg-neutral-100 rounded-full transition-colors">
                 <CloseIcon sx={{ fontSize: 18 }} />
               </button>
             </div>
@@ -94,7 +94,7 @@ export default function ReportButton({
               </p>
             ) : (
               <>
-                <p className="text-sm text-gray-500 mb-4">
+                <p className="text-sm text-neutral-500 mb-4">
                   Why are you reporting this content?
                 </p>
 
@@ -110,7 +110,7 @@ export default function ReportButton({
                           onChange={() => setSelected(r.value)}
                           className="accent-black"
                         />
-                        <span className="text-sm text-gray-700">{r.label}</span>
+                        <span className="text-sm text-neutral-700">{r.label}</span>
                       </label>
                     </li>
                   ))}
@@ -122,19 +122,19 @@ export default function ReportButton({
                     placeholder="Briefly describe the issue..."
                     value={details}
                     onChange={e => setDetails(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none focus:outline-none focus:border-gray-400 mb-4"
+                    className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm resize-none focus:outline-none focus:border-neutral-400 mb-4"
                   />
                 )}
 
                 <button
                   onClick={handleSubmit}
                   disabled={!selected || submitting}
-                  className="w-full py-3 bg-black text-white rounded-full text-sm font-bold hover:bg-black/80 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  className="w-full py-3 bg-black text-white rounded-full text-sm font-bold hover:bg-black/80 transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed"
                 >
                   {submitting ? 'Submitting…' : 'Submit Report'}
                 </button>
 
-                <p className="text-[10px] text-gray-400 text-center mt-3">
+                <p className="text-[10px] text-neutral-400 text-center mt-3">
                   Reports are reviewed by the Gazua moderation team.
                 </p>
               </>

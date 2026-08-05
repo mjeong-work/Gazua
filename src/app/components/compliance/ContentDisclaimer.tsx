@@ -43,9 +43,9 @@ export default function ContentDisclaimer({
 }) {
   if (compact) {
     return (
-      <div className="mt-3 pt-3 border-t border-gray-100">
+      <div className="mt-3 pt-3 border-t border-neutral-100">
         {disclosures && <DisclosureBadges disclosures={disclosures} />}
-        <p className="text-[10px] text-gray-400 leading-tight">
+        <p className="text-[10px] text-neutral-400 leading-tight">
           User-generated content · Not investment advice · Gazua does not endorse or guarantee this content.
         </p>
       </div>
@@ -53,9 +53,9 @@ export default function ContentDisclaimer({
   }
 
   return (
-    <div className="mt-3 pt-3 border-t border-gray-100">
+    <div className="mt-3 pt-3 border-t border-neutral-100">
       {disclosures && <DisclosureBadges disclosures={disclosures} />}
-      <p className="text-[10px] text-gray-400 leading-snug">
+      <p className="text-[10px] text-neutral-400 leading-snug">
         <span className="font-medium">Disclaimer: </span>
         This content is user-generated and represents the author's personal opinion only.
         It is not investment advice and should not be relied upon as such.
