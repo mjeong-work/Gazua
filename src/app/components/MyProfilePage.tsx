@@ -8,6 +8,7 @@ import { updateProfile } from '../../lib/services/profiles.service';
 import { formatDurationSeconds, formatCount } from './reels/format';
 import UploadVideoModal from './UploadVideoModal';
 import { Button } from './ui/button';
+import { Card } from './ui/card';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ShareIcon from '@mui/icons-material/Share';
@@ -997,7 +998,7 @@ export default function MyProfilePage() {
                 <div className="sm:col-span-2 space-y-5">
                   {/* Bio — editing lives in the Edit Profile modal (single source of truth
                       for profile.bio) rather than a second inline editor here. */}
-                  <div className="p-5 bg-white border border-neutral-200 rounded-xl">
+                  <Card className="p-5 gap-0 bg-white">
                     <div className="flex items-center justify-between mb-3">
                       <h2 className="text-base font-semibold">About</h2>
                       <button
@@ -1010,7 +1011,7 @@ export default function MyProfilePage() {
                     <p className="text-sm text-neutral-700 leading-relaxed">
                       {bioText || <span className="text-neutral-400 italic">Tell people about yourself</span>}
                     </p>
-                  </div>
+                  </Card>
 
                   {/* Experience */}
                   <div className="p-5 bg-white border border-neutral-200 rounded-xl">
