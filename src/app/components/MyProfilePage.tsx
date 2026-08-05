@@ -1,11 +1,11 @@
 import { useState, useMemo, useRef, useEffect, type ChangeEvent, type ReactNode } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
+import { toast } from 'sonner';
 import { useAuth } from '../contexts/AuthContext';
-import { getVideosByCreator, createVideo } from '../../lib/services/reels.service';
+import { getVideosByCreator } from '../../lib/services/reels.service';
 import { updateProfile } from '../../lib/services/profiles.service';
 import { formatDurationSeconds, formatCount } from './reels/format';
-import { BUCKETS, buildOwnerPath, uploadToBucket } from '../../lib/storage';
-import { validateVideoFile, loadVideoMetadata, captureThumbnail, LONGFORM_LIMITS } from '../../lib/videoMedia';
+import UploadVideoModal from './UploadVideoModal';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ShareIcon from '@mui/icons-material/Share';
@@ -131,7 +131,7 @@ export default function MyProfilePage() {
   // Core UI state — ?tab=watching lands here directly (e.g. from the /watchlist redirect).
   const [activeTab, setActiveTab] = useState<Tab>(() => {
     const t = searchParams.get('tab');
-    return t === 'watching' ? 'watching' : 'investment';
+    return t === 'watching' || t === 'videos' ? t : 'investment';
   });
   const [timeRange, setTimeRange] = useState<'1W' | '1M' | '3M' | '1Y' | 'ALL'>('1M');
   const [simulatorMode, setSimulatorMode] = useState(true);
@@ -182,17 +182,8 @@ export default function MyProfilePage() {
   const [analyticsVideoId, setAnalyticsVideoId] = useState<string | null>(null);
   const [deleteVideoId, setDeleteVideoId] = useState<string | null>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
-  const [uploadTitle, setUploadTitle] = useState('');
-  const [uploadFileName, setUploadFileName] = useState<string | null>(null);
-  const [uploadFile, setUploadFile] = useState<File | null>(null);
-  const [uploadDuration, setUploadDuration] = useState<number | null>(null);
-  const [uploadThumbnailBlob, setUploadThumbnailBlob] = useState<Blob | null>(null);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  const [processingUpload, setProcessingUpload] = useState(false);
-  const [isDraggingVideo, setIsDraggingVideo] = useState(false);
-  const videoFileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
+  const refreshVideos = () => {
     if (!profile?.id) return;
     getVideosByCreator(profile.id).then(({ data }) => {
       if (!data) return;
@@ -205,7 +196,9 @@ export default function MyProfilePage() {
         uploadedAt: new Date(v.created_at).toLocaleDateString(),
       })));
     });
-  }, [profile?.id]);
+  };
+
+  useEffect(refreshVideos, [profile?.id]);
 
   // Post state
   const [posts, setPosts] = useState(INIT_POSTS);
@@ -346,91 +339,6 @@ export default function MyProfilePage() {
   const handleConfirmDeleteVideo = (id: string) => {
     setVideos(prev => prev.filter(v => v.id !== id));
     setDeleteVideoId(null);
-  };
-
-  const handleUploadVideo = async () => {
-    if (!uploadTitle.trim() || !uploadFile || !profile?.id) return;
-    setProcessingUpload(true);
-    setUploadError(null);
-
-    const ext = uploadFile.name.split('.').pop() || 'mp4';
-    const videoUpload = await uploadToBucket(BUCKETS.videos, buildOwnerPath(profile.id, ext), uploadFile);
-    if (videoUpload.error || !videoUpload.data) {
-      setUploadError(videoUpload.error ?? 'Failed to upload video. Please try again.');
-      setProcessingUpload(false);
-      return;
-    }
-
-    let thumbnailUrl: string | null = null;
-    if (uploadThumbnailBlob) {
-      const thumbUpload = await uploadToBucket(BUCKETS.thumbnails, buildOwnerPath(profile.id, 'jpg'), uploadThumbnailBlob);
-      if (thumbUpload.data) thumbnailUrl = thumbUpload.data.publicUrl;
-    }
-
-    const { data: newVideo, error } = await createVideo({
-      creator_id: profile.id,
-      title: uploadTitle.trim(),
-      storage_path: videoUpload.data.path,
-      thumbnail_url: thumbnailUrl,
-      duration_seconds: uploadDuration ? Math.round(uploadDuration) : null,
-    });
-
-    setProcessingUpload(false);
-
-    if (error || !newVideo) {
-      setUploadError(error ?? 'Failed to publish. Please try again.');
-      return;
-    }
-
-    setVideos(prev => [{
-      id: newVideo.id,
-      title: newVideo.title,
-      thumbnail: newVideo.thumbnail_url ?? VIDEO_FALLBACK_GRADIENTS[0],
-      duration: formatDurationSeconds(newVideo.duration_seconds ?? 0),
-      views: '0',
-      uploadedAt: 'Just now',
-    }, ...prev]);
-    handleCloseUploadModal();
-  };
-
-  const handleCloseUploadModal = () => {
-    setShowUploadModal(false);
-    setUploadTitle('');
-    setUploadFileName(null);
-    setUploadFile(null);
-    setUploadDuration(null);
-    setUploadThumbnailBlob(null);
-    setUploadError(null);
-  };
-
-  const handleVideoFileSelected = async (file: File | null | undefined) => {
-    if (!file) return;
-
-    const validationError = validateVideoFile(file, LONGFORM_LIMITS);
-    if (validationError) {
-      setUploadError(validationError);
-      return;
-    }
-
-    setUploadFileName(file.name);
-    if (!uploadTitle.trim()) {
-      setUploadTitle(file.name.replace(/\.[^/.]+$/, ''));
-    }
-
-    setProcessingUpload(true);
-    setUploadError(null);
-    try {
-      const { duration, objectUrl } = await loadVideoMetadata(file);
-      const thumbBlob = await captureThumbnail(objectUrl);
-      URL.revokeObjectURL(objectUrl);
-      setUploadFile(file);
-      setUploadDuration(duration);
-      setUploadThumbnailBlob(thumbBlob);
-    } catch (err) {
-      setUploadError(err instanceof Error ? err.message : 'Could not process this video.');
-    } finally {
-      setProcessingUpload(false);
-    }
   };
 
   // Post handlers
@@ -1537,51 +1445,10 @@ export default function MyProfilePage() {
 
       {/* ── Upload Video Modal ── */}
       {showUploadModal && (
-        <Overlay onClose={handleCloseUploadModal}>
-          <div className="bg-white rounded-2xl shadow-xl w-[min(520px,90vw)] p-6">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-bold">Upload Video</h2>
-              <button onClick={handleCloseUploadModal} className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"><CloseIcon sx={{ fontSize: 18 }} /></button>
-            </div>
-
-            {/* Upload zone */}
-            <input
-              ref={videoFileInputRef}
-              type="file"
-              accept="video/mp4,video/quicktime,video/webm"
-              className="hidden"
-              onChange={e => handleVideoFileSelected(e.target.files?.[0])}
-            />
-            <div
-              onClick={() => videoFileInputRef.current?.click()}
-              onDragOver={e => { e.preventDefault(); setIsDraggingVideo(true); }}
-              onDragLeave={() => setIsDraggingVideo(false)}
-              onDrop={e => { e.preventDefault(); setIsDraggingVideo(false); handleVideoFileSelected(e.dataTransfer.files?.[0]); }}
-              className={`border-2 border-dashed rounded-xl p-8 text-center mb-4 transition-colors cursor-pointer ${isDraggingVideo ? 'border-brand bg-green-50' : 'border-gray-200 hover:border-gray-300'}`}
-            >
-              <div className="text-3xl mb-2">🎬</div>
-              <p className="text-sm font-medium text-gray-700 mb-1">
-                {processingUpload ? 'Processing video…' : uploadFileName ? `Selected: ${uploadFileName}` : 'Drop your video here or click to browse'}
-              </p>
-              <p className="text-xs text-gray-400">MP4, MOV, or WEBM up to 4GB</p>
-            </div>
-            {uploadError && <p className="text-sm text-red-500 mb-4">{uploadError}</p>}
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1.5">Title <span className="text-red-400">*</span></label>
-                <input value={uploadTitle} onChange={e => setUploadTitle(e.target.value)} placeholder="Give your video a title..." className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors" />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 mt-6">
-              <button onClick={handleUploadVideo} disabled={!uploadTitle.trim() || !uploadFile || processingUpload} className="flex-1 py-2.5 bg-black text-white text-sm font-medium rounded-full hover:bg-black/80 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
-                {processingUpload ? 'Uploading…' : 'Upload'}
-              </button>
-              <button onClick={handleCloseUploadModal} className="flex-1 py-2.5 border border-gray-200 text-sm font-medium rounded-full hover:bg-gray-50 transition-colors">Cancel</button>
-            </div>
-          </div>
-        </Overlay>
+        <UploadVideoModal
+          onClose={() => setShowUploadModal(false)}
+          onSuccess={(msg) => { setShowUploadModal(false); refreshVideos(); toast.success(msg); }}
+        />
       )}
 
       {/* ── Post Composer Modal ── */}

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router';
+import { AnimatePresence } from 'motion/react';
+import { toast } from 'sonner';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import HomeIcon from '@mui/icons-material/Home';
@@ -16,6 +18,10 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import SearchModal from './SearchModal';
 import RiskBanner from './AppHeader/RiskBanner';
+import CreateOptionsSheet, { type CreateContentType } from './CreateOptionsSheet';
+import CreatePostModal from './CreatePostModal';
+import CreateReelModal from './CreateReelModal';
+import UploadVideoModal from './UploadVideoModal';
 import { useAuth } from '../contexts/AuthContext';
 import { getUnreadCount, subscribeToNotifications } from '../../lib/services/notifications.service';
 import { getUnreadMessageCount, subscribeToMessages } from '../../lib/services/messages.service';
@@ -29,6 +35,16 @@ export default function AppHeader() {
   const ticker = searchParams.get('ticker')?.toUpperCase() ?? null;
   const [unreadCount, setUnreadCount] = useState(0);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+
+  // Create bottom sheet + whichever composer it opens — self-contained here so every page
+  // gets the same "+" behavior without each page owning its own create modal/FAB.
+  const [showCreateSheet, setShowCreateSheet] = useState(false);
+  const [activeCreateModal, setActiveCreateModal] = useState<CreateContentType | null>(null);
+
+  const handleSelectCreateType = (type: CreateContentType) => {
+    setShowCreateSheet(false);
+    setActiveCreateModal(type);
+  };
 
   useEffect(() => {
     if (!user) {
@@ -224,10 +240,10 @@ export default function AppHeader() {
           </button>
 
           <button
-            onClick={() => navigate('/create')}
-            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${active(['/create']) ? 'text-brand' : 'text-gray-500'}`}
+            onClick={() => setShowCreateSheet(true)}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1 transition-colors ${showCreateSheet || activeCreateModal ? 'text-brand' : 'text-gray-500'}`}
           >
-            {active(['/create'])
+            {showCreateSheet || activeCreateModal
               ? <AddCircleIcon sx={{ fontSize: 24 }} />
               : <AddCircleOutlineIcon sx={{ fontSize: 24 }} />}
             <span className="text-[10px] font-medium">Create</span>
@@ -258,6 +274,34 @@ export default function AppHeader() {
       </nav>
 
       {showSearch && <SearchModal onClose={() => setShowSearch(false)} />}
+
+      <AnimatePresence>
+        {showCreateSheet && (
+          <CreateOptionsSheet
+            onClose={() => setShowCreateSheet(false)}
+            onSelect={handleSelectCreateType}
+          />
+        )}
+      </AnimatePresence>
+
+      {activeCreateModal === 'post' && (
+        <CreatePostModal
+          onClose={() => setActiveCreateModal(null)}
+          onSuccess={(msg) => { setActiveCreateModal(null); toast.success(msg); navigate('/main'); }}
+        />
+      )}
+      {activeCreateModal === 'reel' && (
+        <CreateReelModal
+          onClose={() => setActiveCreateModal(null)}
+          onSuccess={(msg) => { setActiveCreateModal(null); toast.success(msg); navigate('/main/reels'); }}
+        />
+      )}
+      {activeCreateModal === 'video' && (
+        <UploadVideoModal
+          onClose={() => setActiveCreateModal(null)}
+          onSuccess={(msg) => { setActiveCreateModal(null); toast.success(msg); navigate('/my-profile?tab=videos'); }}
+        />
+      )}
     </>
   );
 }
