@@ -3,9 +3,18 @@ import type { ServiceResult } from '../supabase'
 import type { Profile, ProfileUpdate, FeaturedCategory } from '../../types/database'
 
 // ── Creator snippet columns used in list views ───────────────────
+// credibility_level, portfolio_allocation, and creator_risk_style were missing here even
+// though CreatorProfileInvestment.tsx/CreatorProfileVideos.tsx (via getCreatorByUsername,
+// below) read all three off the result — Supabase silently omits unselected columns from the
+// response rather than erroring, so those pages' verified badge and portfolio/risk display
+// were reading undefined and always falling back to their "not set" branch, regardless of the
+// real DB value. getProfile()'s `select('*')` (used for the signed-in user's own profile via
+// AuthContext) never had this gap, which is how it went unnoticed — only the *public* view of
+// someone else's profile was affected.
 const CREATOR_LIST_COLUMNS = `
   id, username, handle, full_name, avatar_url, bio,
   focus, tagline, tags, is_verified, is_creator, featured_category,
+  credibility_level, portfolio_allocation, creator_risk_style,
   subscription_tier, onboarding_completed, created_at
 ` as const
 
