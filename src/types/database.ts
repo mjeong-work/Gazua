@@ -100,6 +100,11 @@ export interface Database {
           onboarding_level: OnboardingLevel | null
           onboarding_interests: string[]
           onboarding_risk_style: RiskStyle | null
+          // The creator's own self-reported investing style, shown on their public profile.
+          // Deliberately separate from onboarding_risk_style (a *viewer's* onboarding
+          // preference) — see 20260807000000_creator_risk_style.sql. Nullable with no default:
+          // "not yet selected" is expected and must never be synthesized as a fallback value.
+          creator_risk_style: RiskStyle | null
           onboarding_completed: boolean
           role: ProfileRole
           status: ProfileStatus
@@ -129,6 +134,7 @@ export interface Database {
           onboarding_level?: OnboardingLevel | null
           onboarding_interests?: string[]
           onboarding_risk_style?: RiskStyle | null
+          creator_risk_style?: RiskStyle | null
           onboarding_completed?: boolean
           role?: ProfileRole
           status?: ProfileStatus
@@ -158,6 +164,7 @@ export interface Database {
           onboarding_level?: OnboardingLevel | null
           onboarding_interests?: string[]
           onboarding_risk_style?: RiskStyle | null
+          creator_risk_style?: RiskStyle | null
           onboarding_completed?: boolean
           role?: ProfileRole
           status?: ProfileStatus
