@@ -66,7 +66,7 @@ export default function MessagesPage() {
                 return (
                   <button
                     key={conv.partnerId}
-                    onClick={() => handleSelect({ id: conv.partnerId, name: conv.partnerName, avatarUrl: conv.partnerAvatarUrl })}
+                    onClick={() => handleSelect({ id: conv.partnerId, name: conv.partnerName, username: conv.partnerUsername, avatarUrl: conv.partnerAvatarUrl })}
                     className={`w-full flex items-center gap-3 p-2.5 rounded-lg text-left transition-colors ${isSelected ? 'bg-neutral-100' : 'hover:bg-neutral-50'}`}
                   >
                     <Avatar name={conv.partnerName} avatarUrl={conv.partnerAvatarUrl} />
@@ -98,7 +98,7 @@ export default function MessagesPage() {
                   <ArrowBackIcon sx={{ fontSize: 20 }} />
                 </button>
                 <Avatar name={activeThread.partner.name} avatarUrl={activeThread.partner.avatarUrl} size="w-9 h-9" />
-                <button onClick={() => navigate(`/profile/${activeThread.partner.id}/investment`)} className="text-sm font-semibold hover:underline truncate">
+                <button onClick={() => navigate(`/profile/${activeThread.partner.username}/investment`)} className="text-sm font-semibold hover:underline truncate">
                   {activeThread.partner.name}
                 </button>
               </div>

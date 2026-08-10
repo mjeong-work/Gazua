@@ -48,7 +48,7 @@ export default function AppHeader() {
     setActiveCreateModal(type);
   };
 
-  const { data: unreadCountData } = useServiceQuery(
+  const { data: unreadCountData, refetch: refetchUnreadCount } = useServiceQuery(
     () => getUnreadCount(user!.id),
     [user?.id],
     { enabled: !!user, label: 'notifications' },
@@ -63,7 +63,7 @@ export default function AppHeader() {
     return () => { channel.unsubscribe(); };
   }, [user]);
 
-  const { data: unreadMessageCountData } = useServiceQuery(
+  const { data: unreadMessageCountData, refetch: refetchUnreadMessageCount } = useServiceQuery(
     () => getUnreadMessageCount(user!.id),
     [user?.id],
     { enabled: !!user, label: 'messages' },
@@ -77,6 +77,20 @@ export default function AppHeader() {
     }, 'badge');
     return () => { channel.unsubscribe(); };
   }, [user]);
+
+  // NotificationsPage/MessagesContext mark items read locally without this AppHeader instance
+  // (mounted fresh per page, not a shared layout) knowing about it — refetch on their signal
+  // instead of leaving the badge stale until the next real navigation.
+  useEffect(() => {
+    const onNotificationsRead = () => refetchUnreadCount();
+    const onMessagesRead = () => refetchUnreadMessageCount();
+    window.addEventListener('gazua:notifications-read', onNotificationsRead);
+    window.addEventListener('gazua:messages-read', onMessagesRead);
+    return () => {
+      window.removeEventListener('gazua:notifications-read', onNotificationsRead);
+      window.removeEventListener('gazua:messages-read', onMessagesRead);
+    };
+  }, [refetchUnreadCount, refetchUnreadMessageCount]);
 
 
   const active = (paths: string[]) =>

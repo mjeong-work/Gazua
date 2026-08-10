@@ -14,8 +14,8 @@ import AppHeader from './AppHeader';
 import { type Model, MOCK_MODELS } from '../data/models';
 import { useWatchlist } from '../contexts/WatchlistContext';
 import { useAuth } from '../contexts/AuthContext';
-import { getModels, createModel } from '../../lib/services/models.service';
-import { BUCKETS, buildOwnerPath, uploadToBucket } from '../../lib/storage';
+import { getModels, createModel, incrementDownloadCount } from '../../lib/services/models.service';
+import { BUCKETS, buildOwnerPath, uploadToBucket, getPublicUrl } from '../../lib/storage';
 import type { ModelWithCreator, ModelCategory, ModelDifficulty, ModelFileType } from '../../types/database';
 
 function normalizeDbModel(m: ModelWithCreator, index: number): Model {
@@ -23,6 +23,7 @@ function normalizeDbModel(m: ModelWithCreator, index: number): Model {
   return {
     id: index,
     db_id: m.id,
+    storagePath: m.storage_path ?? undefined,
     title: m.title,
     creator: m.creator?.full_name ?? 'Unknown',
     creator_id: m.creator?.username ?? '',
@@ -204,7 +205,13 @@ export default function ModelHubPage() {
 
   const handleDownload = (model: Model) => {
     if (model.access === 'Expert Only' && !isExpert) return;
-    triggerToast(`✓ Downloading: ${model.title}`, 'Your download will start shortly');
+    if (!model.db_id || !model.storagePath) {
+      triggerToast('Download not available for this preview item.');
+      return;
+    }
+    window.open(getPublicUrl(BUCKETS.models, model.storagePath), '_blank', 'noopener,noreferrer');
+    incrementDownloadCount(model.db_id).catch(() => {});
+    triggerToast(`Downloading: ${model.title}`);
   };
 
   const handlePreview = (model: Model) => {

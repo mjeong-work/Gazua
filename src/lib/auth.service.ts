@@ -42,14 +42,22 @@ export async function signInWithEmail(
 // ── signInWithGoogle ─────────────────────────────────────────────
 /**
  * Initiates the Google OAuth redirect flow.
- * Supabase redirects to /auth/callback after the user consents.
+ * Supabase redirects to /auth/callback (plus its own ?code= param) after the user consents.
+ *
+ * `intent: 'signup'` marks this as originating from the SignUp page, where the user has
+ * already checked the same legal-agreement checkboxes the email/password path requires
+ * (see SignUp.tsx's handleGoogleAuth, gated on allAgreed) — AuthCallback.tsx reads this back
+ * off the redirect URL to decide whether it's safe to record a legal acknowledgement for this
+ * session. Omit it (e.g. SignIn.tsx's Google button, used by returning users) when the terms
+ * were not presented before this OAuth attempt, so acceptance is never silently assumed.
  */
-export async function signInWithGoogle(): Promise<AuthResult> {
+export async function signInWithGoogle(options?: { intent?: 'signup' }): Promise<AuthResult> {
+  const redirectTo = options?.intent
+    ? `${window.location.origin}/auth/callback?intent=${options.intent}`
+    : `${window.location.origin}/auth/callback`
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: {
-      redirectTo: `${window.location.origin}/auth/callback`,
-    },
+    options: { redirectTo },
   })
   if (error) return { data: null, error: error.message }
   return { data: null, error: null }

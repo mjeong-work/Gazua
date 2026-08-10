@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, type ChangeEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
+import { toast } from 'sonner';
 import { useAuth } from '../contexts/AuthContext';
 import { useMyProfileVideos } from '../hooks/useMyProfileVideos';
 import EditIcon from '@mui/icons-material/Edit';
@@ -17,6 +18,8 @@ import AboutTab from './myProfile/AboutTab';
 import AnalyticsTab from './myProfile/AnalyticsTab';
 import EditProfileModal from './myProfile/EditProfileModal';
 import TabPanel from './myProfile/TabPanel';
+import VerifiedBadge from './VerifiedBadge';
+import { isCreatorVerified } from '../utils/creator';
 
 type Tab = 'investment' | 'videos' | 'posts' | 'saved' | 'watching' | 'about' | 'analytics';
 
@@ -60,9 +63,15 @@ export default function MyProfilePage() {
   const initials = useMemo(() => getInitials(displayName), [displayName]);
 
   const handleShare = () => {
-    navigator.clipboard?.writeText(window.location.origin + '/profile/investment');
-    setShareCopied(true);
-    setTimeout(() => setShareCopied(false), 2000);
+    if (!profile?.username) return;
+    navigator.clipboard?.writeText(`${window.location.origin}/profile/${profile.username}/investment`)
+      .then(() => {
+        setShareCopied(true);
+        setTimeout(() => setShareCopied(false), 2000);
+      })
+      .catch(() => {
+        toast.error('Could not copy link. Please try again.');
+      });
   };
 
   const handleAvatarClick = () => fileInputRef.current?.click();
@@ -108,11 +117,7 @@ export default function MyProfilePage() {
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">
                       <h1 className="text-2xl font-bold tracking-tight break-words">{displayName}</h1>
-                      {profile?.credibility_level === 'verified_pro' && (
-                        <svg className="w-5 h-5 text-brand flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      )}
+                      {isCreatorVerified(profile) && <VerifiedBadge size={20} />}
                     </div>
                     <p className="text-neutral-500 text-sm mb-3">{displayHandle}</p>
                     <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm">
@@ -144,20 +149,6 @@ export default function MyProfilePage() {
               <span className="text-neutral-400"> · Not financial advice.</span>
             </p>
 
-            {/* Private Stats Bar */}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-5 p-3 bg-neutral-50 rounded-xl border border-neutral-200">
-              <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-brand flex-shrink-0" />
-                <span className="text-xs text-neutral-500 whitespace-nowrap">Visible to you only</span>
-              </div>
-              <div className="h-3 w-px bg-neutral-300 hidden sm:block" />
-              <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs">
-                <div className="whitespace-nowrap"><span className="font-semibold text-black">$2,340</span><span className="text-neutral-500 ml-1">earned this month</span></div>
-                <div className="whitespace-nowrap"><span className="font-semibold text-black">1.2K</span><span className="text-neutral-500 ml-1">subscribers</span></div>
-                <div className="whitespace-nowrap"><span className="font-semibold text-black">8,432</span><span className="text-neutral-500 ml-1">profile views</span></div>
-                <div className="whitespace-nowrap"><span className="font-semibold text-black">4.8%</span><span className="text-neutral-500 ml-1">engagement rate</span></div>
-              </div>
-            </div>
 
             {/* Action Buttons */}
             <div className="flex flex-wrap items-center gap-2 mb-8">
@@ -168,12 +159,14 @@ export default function MyProfilePage() {
                 <EditIcon sx={{ fontSize: 15 }} />
                 Edit Profile
               </button>
-              <button
-                onClick={() => navigate('/profile/investment')}
-                className="px-6 py-2 bg-mint text-black font-medium text-sm rounded-full hover:bg-mint-hover transition-colors"
-              >
-                Preview Public Page
-              </button>
+              {profile?.username && (
+                <button
+                  onClick={() => navigate(`/profile/${profile.username}/investment`)}
+                  className="px-6 py-2 bg-mint text-black font-medium text-sm rounded-full hover:bg-mint-hover transition-colors"
+                >
+                  Preview Public Page
+                </button>
+              )}
             </div>
 
             {/* Tabs */}

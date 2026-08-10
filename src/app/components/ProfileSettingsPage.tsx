@@ -7,6 +7,7 @@ import { signOut } from '../../lib/auth.service';
 import { useAuth } from '../contexts/AuthContext';
 import { useOnboarding } from '../contexts/OnboardingContext';
 import { supabase } from '../../lib/supabase';
+import EditProfileModal from './myProfile/EditProfileModal';
 
 const TIER_CONFIG: Record<string, { label: string; badge: string; features: string[] }> = {
   free: {
@@ -61,6 +62,7 @@ export default function ProfileSettingsPage() {
   const [searchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
+  const [showEditProfile, setShowEditProfile] = useState(false);
   const { user, profile, refreshProfile } = useAuth();
   const { data: onboarding } = useOnboarding();
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -187,11 +189,14 @@ export default function ProfileSettingsPage() {
             </div>
           </div>
           <button
+            onClick={() => setShowEditProfile(true)}
             className="w-full py-2.5 border border-neutral-200 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors"
           >
             Edit Profile
           </button>
         </section>
+
+        {showEditProfile && <EditProfileModal onClose={() => setShowEditProfile(false)} />}
 
         {/* ── 2. Subscription ────────────────────────────────────── */}
         <section className="border border-neutral-200 rounded-2xl p-6">

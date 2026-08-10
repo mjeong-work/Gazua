@@ -7,7 +7,7 @@ import type { Post, PostInsert, PostWithCreator } from '../../types/database'
 const POST_WITH_CREATOR = `
   *,
   creator:profiles!creator_id (
-    id, username, handle, full_name, avatar_url, is_verified
+    id, username, handle, full_name, avatar_url, is_verified, credibility_level
   )
 ` as const
 

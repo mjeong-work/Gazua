@@ -4,10 +4,7 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import AgreementCheckboxGroup, { type AgreementKey } from './AgreementCheckboxGroup';
 import { signUpWithEmail, signInWithGoogle } from '../../../lib/auth.service';
-import { supabase } from '../../../lib/supabase';
-import { recordLegalAcceptance } from '../../../lib/services/legal.service';
-import { logAuditEvent } from '../../../lib/services/compliance.service';
-import { getLatestDocument } from '../../../lib/legal/registry';
+import { recordLegalAcknowledgement } from '../../../lib/services/legal.service';
 import { CheckCircle } from 'lucide-react';
 
 const INITIAL_AGREEMENTS: Record<AgreementKey, boolean> = {
@@ -36,26 +33,6 @@ export default function SignUp() {
 
   const allAgreed = Object.values(agreements).every(Boolean);
 
-  const recordAcknowledgements = (userId: string) => {
-    // Record when the user accepted the terms (kept for backward compat — other code reads this column).
-    supabase.from('profiles').update({ terms_accepted_at: new Date().toISOString() })
-      .eq('id', userId)
-      .then(() => {});
-
-    // Versioned acceptance records for the two documents that require them.
-    const terms = getLatestDocument('terms');
-    const privacy = getLatestDocument('privacy');
-    if (terms) recordLegalAcceptance({ documentSlug: 'terms', documentVersion: terms.version }).catch(() => {});
-    if (privacy) recordLegalAcceptance({ documentSlug: 'privacy', documentVersion: privacy.version }).catch(() => {});
-
-    // The other 5 checkboxes are a one-time acknowledgement event, not versioned documents —
-    // logged to the existing compliance_audit_logs table rather than a new one.
-    logAuditEvent({
-      eventType: 'onboarding_acknowledgement_accepted',
-      metadata: { checkboxes: Object.keys(agreements) },
-    }).catch(() => {});
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!allAgreed || formData.password !== formData.confirmPassword) return;
@@ -82,7 +59,9 @@ export default function SignUp() {
       return;
     }
 
-    recordAcknowledgements(data.session.user.id);
+    // The 7 checkboxes are a one-time acknowledgement event, not versioned documents —
+    // logged to the existing compliance_audit_logs table rather than a new one.
+    recordLegalAcknowledgement(data.session.user.id, { method: 'email_password', checkboxes: Object.keys(agreements) });
 
     navigate('/onboarding/level');
   };
@@ -95,7 +74,7 @@ export default function SignUp() {
     setAgreementError(false);
     setAuthError(null);
     setIsGoogleLoading(true);
-    const { error } = await signInWithGoogle();
+    const { error } = await signInWithGoogle({ intent: 'signup' });
     // On success Supabase redirects away — we only reach here on error.
     setIsGoogleLoading(false);
     if (error) setAuthError(error);

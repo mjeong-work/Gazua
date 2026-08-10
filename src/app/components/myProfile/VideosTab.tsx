@@ -8,6 +8,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { toast } from 'sonner';
 import UploadVideoModal from '../UploadVideoModal';
+import { deleteVideo } from '../../../lib/services/reels.service';
 import type { VideoListItem } from '../../hooks/useMyProfileVideos';
 
 const ANALYTICS_DATA = [
@@ -26,6 +27,7 @@ export default function VideosTab({ videos, setVideos, refreshVideos }: VideosTa
   const [editingVideoTitle, setEditingVideoTitle] = useState('');
   const [analyticsVideoId, setAnalyticsVideoId] = useState<string | null>(null);
   const [deleteVideoId, setDeleteVideoId] = useState<string | null>(null);
+  const [deletingVideoId, setDeletingVideoId] = useState<string | null>(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
 
   const handleStartEditVideo = (video: VideoListItem) => {
@@ -48,9 +50,28 @@ export default function VideosTab({ videos, setVideos, refreshVideos }: VideosTa
     setDeleteVideoId(null);
   };
 
-  const handleConfirmDeleteVideo = (id: string) => {
+  const handleConfirmDeleteVideo = async (id: string) => {
+    if (deletingVideoId) return;
+    const video = videos.find(v => v.id === id);
+    if (!video) return;
+
+    setDeletingVideoId(id);
+    const { data, error } = await deleteVideo(id, video.storagePath);
+    setDeletingVideoId(null);
+
+    if (error) {
+      toast.error(`Couldn't delete "${video.title}" — ${error}. Please try again.`);
+      return;
+    }
+    if (data?.storageError) {
+      // The video is already gone from every visible surface (DB row deleted); the raw
+      // Storage object failed to clean up. Non-fatal — log for ops, don't alarm the creator.
+      console.error('[VideosTab] Video deleted but Storage cleanup failed:', data.storageError);
+    }
+
     setVideos(prev => prev.filter(v => v.id !== id));
     setDeleteVideoId(null);
+    toast.success(`"${video.title}" deleted.`);
   };
 
   return (
@@ -70,8 +91,20 @@ export default function VideosTab({ videos, setVideos, refreshVideos }: VideosTa
               <div className="aspect-video rounded-xl bg-red-50 border border-red-200 flex flex-col items-center justify-center gap-3 mb-2.5 p-4">
                 <p className="text-sm font-medium text-red-700 text-center">Delete "{video.title}"?</p>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => handleConfirmDeleteVideo(video.id)} className="px-4 py-1.5 bg-red-600 text-white text-xs font-medium rounded-full hover:bg-red-700 transition-colors">Delete</button>
-                  <button onClick={() => setDeleteVideoId(null)} className="px-4 py-1.5 border border-neutral-300 text-xs font-medium rounded-full hover:bg-neutral-50 transition-colors">Cancel</button>
+                  <button
+                    onClick={() => handleConfirmDeleteVideo(video.id)}
+                    disabled={deletingVideoId === video.id}
+                    className="px-4 py-1.5 bg-red-600 text-white text-xs font-medium rounded-full hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {deletingVideoId === video.id ? 'Deleting…' : 'Delete'}
+                  </button>
+                  <button
+                    onClick={() => setDeleteVideoId(null)}
+                    disabled={deletingVideoId === video.id}
+                    className="px-4 py-1.5 border border-neutral-300 text-xs font-medium rounded-full hover:bg-neutral-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Cancel
+                  </button>
                 </div>
               </div>
             ) : (

@@ -11,11 +11,13 @@ import { reportServiceError } from '../hooks/useServiceQuery';
 import type { ReelWithCreator as DbReel } from '../../types/database';
 import { useFollow, isUUID } from '../contexts/FollowContext';
 import { useAuth } from '../contexts/AuthContext';
-import { MARKET_INDICES, TICKER_CHART_DATA } from '../data/marketData';
-import { getMarketIndices, getTickerInfo, getTickerChart, type LiveTickerInfo } from '../../lib/market.service';
+import { MARKET_INDICES } from '../data/marketData';
+import { getMarketIndices, getTickerInfo, getLiveTickerChart, type LiveTickerInfo } from '../../lib/market.service';
 import type { MarketIndex } from '../data/marketData';
 import { useWatchlist } from '../contexts/WatchlistContext';
 import { getCreator } from '../data/creators';
+import { isCreatorVerified } from '../utils/creator';
+import VerifiedBadge from './VerifiedBadge';
 import { useSwipePanel } from '../hooks/useSwipePanel';
 import { BUCKETS, getPublicUrl } from '../../lib/storage';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
@@ -42,7 +44,7 @@ function normalizeDbReel(r: DbReel, index: number): Reel {
     creator_db_id: r.creator.id,             // UUID — used for follow operations
     handle: r.creator.handle ? `@${r.creator.handle}` : `@${r.creator.username}`,
     avatar: (r.creator.full_name?.[0] ?? '?').toUpperCase(),
-    verified: r.creator.is_verified,
+    verified: isCreatorVerified(r.creator),
     caption: r.caption,
     // Raw thumbnail_url (or a CSS gradient fallback) — wrapped in url(...) only where used as a
     // CSS `background` value; used as-is for <video poster>.
@@ -114,7 +116,7 @@ export default function MainPageReels() {
 
   useEffect(() => {
     const target = ticker ?? 'SPY';
-    getTickerChart(target, activeTimeRange).then(data => {
+    getLiveTickerChart(target, activeTimeRange).then(data => {
       if (ticker) setLiveChartData(data);
       else setDefaultChartData(data);
     });
@@ -296,15 +298,8 @@ export default function MainPageReels() {
     }
   };
 
-  const chartData = useMemo(() => {
-    if (liveChartData) return liveChartData;
-    if (defaultChartData) return defaultChartData;
-    if (tickerInfo && 'chartData' in tickerInfo) return (tickerInfo as typeof TICKER_CHART_DATA[string]).chartData;
-    return Array.from({ length: 30 }, (_, i) => ({
-      time: `t${i}`,
-      value: 4800 + Math.random() * 400 + i * 10,
-    }));
-  }, [liveChartData, defaultChartData, tickerInfo]);
+  // null while genuinely unavailable — never fabricated (see MainPagePosting.tsx's mirrored chart).
+  const chartData = ticker ? liveChartData : defaultChartData;
 
   const timeRanges: TimeRange[] = ['1D', '1W', '1M', '3M', '1Y', 'ALL'];
 
@@ -355,20 +350,26 @@ export default function MainPageReels() {
             {/* Chart */}
             <div className="mb-6 bg-white rounded-xl w-full">
               <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height={256}>
-                  <LineChart data={chartData}>
-                    <XAxis dataKey="time" hide />
-                    <YAxis hide domain={['dataMin', 'dataMax']} />
-                    <Line
-                      type="monotone"
-                      dataKey="value"
-                      stroke={tickerInfo && !tickerInfo.positive ? '#ef4444' : 'var(--brand)'}
-                      strokeWidth={2}
-                      dot={false}
-                      isAnimationActive={false}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+                {chartData ? (
+                  <ResponsiveContainer width="100%" height={256}>
+                    <LineChart data={chartData}>
+                      <XAxis dataKey="time" hide />
+                      <YAxis hide domain={['dataMin', 'dataMax']} />
+                      <Line
+                        type="monotone"
+                        dataKey="value"
+                        stroke={tickerInfo && !tickerInfo.positive ? '#ef4444' : 'var(--brand)'}
+                        strokeWidth={2}
+                        dot={false}
+                        isAnimationActive={false}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center">
+                    <p className="text-sm text-neutral-400">Chart data unavailable right now.</p>
+                  </div>
+                )}
               </div>
               <div className="flex items-center justify-center gap-4 py-4 text-xs">
                 {timeRanges.map(range => (
@@ -415,7 +416,6 @@ export default function MainPageReels() {
             <div className="mt-6 p-4 bg-mint rounded-lg">
               <h3 className="font-bold mb-1">Get more out of Gazua</h3>
               <p className="text-sm mb-3">Options let you hedge, generate income, or trade based on your market outlook.</p>
-              <button className="text-sm font-medium underline">Learn More</button>
             </div>
           </div>
 
@@ -622,11 +622,7 @@ export default function MainPageReels() {
                                   {reel.creator}
                                 </button>
                                 {reel.verified && (
-                                  <span title="Portfolio allocation verified by Gazua" className="inline-flex">
-                                    <svg className="w-4 h-4 text-mint" viewBox="0 0 24 24" fill="currentColor">
-                                      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                  </span>
+                                  <VerifiedBadge title="Portfolio allocation verified by Gazua" className="text-mint" />
                                 )}
                               </div>
                               <button

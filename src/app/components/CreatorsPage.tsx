@@ -25,6 +25,8 @@ import {
   RETIREMENT_EXPERTS,
 } from '../data/creators';
 import { CREATOR_VIDEOS } from '../data/reels';
+import { isCreatorVerified } from '../utils/creator';
+import VerifiedBadge from './VerifiedBadge';
 import { useFollow, isUUID } from '../contexts/FollowContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
@@ -223,7 +225,7 @@ export default function CreatorsPage() {
     focus: p.focus ?? '',
     followers: formatCount(followerCounts[p.id] ?? 0),
     tags: p.tags,
-    verified: p.is_verified,
+    verified: isCreatorVerified(p),
   });
 
   // Real UUID when this card is DB-backed (so Follow persists to Supabase via FollowContext's
@@ -347,7 +349,7 @@ export default function CreatorsPage() {
         creator: v.creator.full_name,
         creatorRouteSlug: v.creator.username,
         creatorAvatar: v.creator.avatar_url ?? '👤',
-        creatorVerified: v.creator.is_verified,
+        creatorVerified: isCreatorVerified(v.creator),
         hasProfile: true,
         thumbnail: v.thumbnail_url ?? FEATURED_REEL_FALLBACK_GRADIENTS[i % FEATURED_REEL_FALLBACK_GRADIENTS.length],
         duration: formatDurationSeconds(v.duration_seconds ?? 0),
@@ -578,11 +580,7 @@ export default function CreatorsPage() {
               >
                 {creator.name}
               </h3>
-              {creator.verified && (
-                <svg className="w-5 h-5 text-brand flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              )}
+              {creator.verified && <VerifiedBadge size={20} />}
             </div>
             <p className="text-sm text-neutral-600 mb-2 line-clamp-2">{creator.tagline}</p>
             <div className="flex items-center gap-2 text-xs text-neutral-500">
@@ -710,11 +708,7 @@ export default function CreatorsPage() {
               >
                 {video.creator}
               </p>
-              {video.creatorVerified && (
-                <svg className="w-3 h-3 text-neutral-600" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              )}
+              {video.creatorVerified && <VerifiedBadge size={12} className="text-neutral-600" />}
             </div>
             <p className="text-xs text-neutral-600">
               {video.views} views • {video.uploadedAt}

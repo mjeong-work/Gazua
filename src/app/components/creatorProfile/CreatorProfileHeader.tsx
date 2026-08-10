@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 import ShareIcon from '@mui/icons-material/Share';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import SubscriptionModal from '../SubscriptionModal';
 import CreatorChatWidget from '../CreatorChatWidget';
 import VerifiedBadge from '../VerifiedBadge';
+import ReportButton from '../compliance/ReportButton';
 import { Button } from '../ui/button';
 import { useFollow } from '../../contexts/FollowContext';
 import { SUBSCRIBE_ENABLED } from '../../featureFlags';
@@ -34,9 +34,6 @@ export default function CreatorProfileHeader({
   followingCount,
   postCount,
 }: CreatorProfileHeaderProps) {
-  const [notificationsOn, setNotificationsOn] = useState(() => {
-    try { return localStorage.getItem(`gazua:notif:${creatorId}`) === 'true'; } catch { return false; }
-  });
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
   const [showChat, setShowChat] = useState(false);
   const [showMoreMenu, setShowMoreMenu] = useState(false);
@@ -100,19 +97,11 @@ export default function CreatorProfileHeader({
             {/* Action icons */}
             <div className="flex items-center gap-2">
               <button
-                onClick={() => {
-                  const next = !notificationsOn;
-                  setNotificationsOn(next);
-                  try { localStorage.setItem(`gazua:notif:${creatorId}`, String(next)); } catch {}
-                  triggerToast(next ? 'Notifications enabled for this creator' : 'Notifications turned off');
-                }}
-                className="icon-tap-target p-2 hover:bg-neutral-100 rounded-full transition-colors"
-                title="Toggle notifications"
+                disabled
+                className="icon-tap-target p-2 rounded-full opacity-40 cursor-not-allowed"
+                title="Notification preferences aren't available during beta"
               >
-                {notificationsOn
-                  ? <NotificationsActiveIcon sx={{ fontSize: 20, color: 'var(--brand)' }} />
-                  : <NotificationsIcon sx={{ fontSize: 20 }} />
-                }
+                <NotificationsIcon sx={{ fontSize: 20 }} />
               </button>
               <button onClick={handleShare} className="icon-tap-target p-2 hover:bg-neutral-100 rounded-full transition-colors" title="Share profile">
                 <ShareIcon sx={{ fontSize: 20 }} />
@@ -121,10 +110,13 @@ export default function CreatorProfileHeader({
                 <button onClick={() => setShowMoreMenu(v => !v)} className="icon-tap-target p-2 hover:bg-neutral-100 rounded-full transition-colors">
                   <MoreHorizIcon sx={{ fontSize: 20 }} />
                 </button>
-                {showMoreMenu && (
+                {showMoreMenu && dbProfile && (
                   <div className="absolute right-0 top-full mt-1 bg-white border border-neutral-200 rounded-xl shadow-lg py-2 w-44 z-10" onMouseLeave={() => setShowMoreMenu(false)}>
-                    <button className="w-full text-left px-4 py-2 text-sm hover:bg-neutral-50" onClick={() => { triggerToast('Report submitted'); setShowMoreMenu(false); }}>Report creator</button>
-                    <button className="w-full text-left px-4 py-2 text-sm hover:bg-neutral-50" onClick={() => { triggerToast('Creator muted'); setShowMoreMenu(false); }}>Mute creator</button>
+                    <ReportButton
+                      contentType="creator_profile"
+                      contentId={dbProfile.id}
+                      label="Report creator"
+                    />
                   </div>
                 )}
               </div>
@@ -181,6 +173,7 @@ export default function CreatorProfileHeader({
           key={dbProfile.id}
           creatorId={dbProfile.id}
           creatorName={creator.name}
+          creatorUsername={dbProfile.username}
           creatorAvatarUrl={dbProfile.avatar_url}
           onClose={() => setShowChat(false)}
         />

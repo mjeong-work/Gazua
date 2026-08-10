@@ -30,16 +30,29 @@ export function validateVideoFile(file: File, limits: VideoLimits): string | nul
 }
 
 /** Loads a video file's metadata (duration) via an offscreen <video>. Caller owns the returned
- * objectUrl and must revoke it (URL.revokeObjectURL) once done with preview/thumbnail capture. */
-export function loadVideoMetadata(file: File): Promise<{ duration: number; objectUrl: string }> {
+ * objectUrl and must revoke it (URL.revokeObjectURL) once done with preview/thumbnail capture.
+ * Neither `loadedmetadata` nor `error` is guaranteed to fire for every browser/codec/file
+ * combination — without a timeout an unsupported file left the upload modal stuck on
+ * "Processing video…" forever with no way to recover except abandoning the upload. */
+export function loadVideoMetadata(file: File, timeoutMs = 20_000): Promise<{ duration: number; objectUrl: string }> {
   return new Promise((resolve, reject) => {
     const objectUrl = URL.createObjectURL(file)
     const video = document.createElement('video')
     video.muted = true
     video.playsInline = true
     video.preload = 'metadata'
-    video.onloadedmetadata = () => resolve({ duration: video.duration, objectUrl })
+
+    const timeout = setTimeout(() => {
+      URL.revokeObjectURL(objectUrl)
+      reject(new Error('This video is taking too long to process — it may not be supported by your browser. Please try a different file.'))
+    }, timeoutMs)
+
+    video.onloadedmetadata = () => {
+      clearTimeout(timeout)
+      resolve({ duration: video.duration, objectUrl })
+    }
     video.onerror = () => {
+      clearTimeout(timeout)
       URL.revokeObjectURL(objectUrl)
       reject(new Error('Could not read this video file.'))
     }

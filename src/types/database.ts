@@ -1017,7 +1017,7 @@ export type UserLegalAcceptanceInsert = Tables<'user_legal_acceptances'>['Insert
 /** Creator info embedded via JOIN on creator_id → profiles */
 export type CreatorSnippet = Pick<
   Profile,
-  'id' | 'username' | 'handle' | 'full_name' | 'avatar_url' | 'is_verified'
+  'id' | 'username' | 'handle' | 'full_name' | 'avatar_url' | 'is_verified' | 'credibility_level'
 >
 
 export type PostWithCreator = Post & {
@@ -1031,7 +1031,7 @@ export type ReelWithCreator = Reel & {
 }
 
 export type VideoWithCreator = Video & {
-  creator: Pick<Profile, 'id' | 'username' | 'full_name' | 'avatar_url' | 'is_verified'>
+  creator: Pick<Profile, 'id' | 'username' | 'full_name' | 'avatar_url' | 'is_verified' | 'credibility_level'>
 }
 
 export type ModelWithCreator = Model & {

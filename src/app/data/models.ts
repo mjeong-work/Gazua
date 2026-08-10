@@ -1,6 +1,7 @@
 export interface Model {
   id: number;
   db_id?: string; // real Supabase UUID, when backed by a live record
+  storagePath?: string; // real Supabase Storage path, when backed by a live record — resolve via getPublicUrl(BUCKETS.models, storagePath) to download
   title: string;
   creator: string;
   creator_id: string;

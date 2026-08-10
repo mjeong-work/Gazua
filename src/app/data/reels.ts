@@ -94,6 +94,7 @@ export const MOCK_REELS: Reel[] = [
 
 export interface Video {
   id: number;
+  db_id?: string; // real Supabase UUID, when backed by a live record — use this (not id, a synthetic index) to navigate to /watch/:videoId
   creator_id: string;
   title: string;
   thumbnail: string;

@@ -41,3 +41,11 @@ export async function uploadToBucket(
 export function getPublicUrl(bucket: string, path: string): string {
   return supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl
 }
+
+// ── removeFromBucket ─────────────────────────────────────────────
+/** Removes a single object from a bucket. RLS scopes this to the uploader (see buildOwnerPath). */
+export async function removeFromBucket(bucket: string, path: string): Promise<ServiceResult<void>> {
+  const { error } = await supabase.storage.from(bucket).remove([path])
+  if (error) return { data: null, error: error.message }
+  return { data: null, error: null }
+}

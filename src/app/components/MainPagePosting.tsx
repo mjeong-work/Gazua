@@ -15,11 +15,13 @@ import { getPosts, getPostsByCreatorIds, likePost, unlikePost, getUserLikedPostI
 import type { PostWithCreator as DbPost } from '../../types/database';
 import { useFollow, isUUID } from '../contexts/FollowContext';
 import { useAuth } from '../contexts/AuthContext';
-import { MARKET_INDICES, TICKER_CHART_DATA } from '../data/marketData';
-import { getMarketIndices, getTickerInfo, getTickerChart, type LiveTickerInfo } from '../../lib/market.service';
+import { MARKET_INDICES } from '../data/marketData';
+import { getMarketIndices, getTickerInfo, getLiveTickerChart, type LiveTickerInfo } from '../../lib/market.service';
 import type { MarketIndex } from '../data/marketData';
 import { useWatchlist, categoryToAssetType } from '../contexts/WatchlistContext';
 import { getCreator } from '../data/creators';
+import { isCreatorVerified } from '../utils/creator';
+import VerifiedBadge from './VerifiedBadge';
 import { useSwipePanel } from '../hooks/useSwipePanel';
 import ReportButton from './compliance/ReportButton';
 import { AlgorithmicLabel, derivePostLabel } from './compliance/AlgorithmicLabel';
@@ -50,7 +52,7 @@ function normalizeDbPost(p: DbPost, index: number): Post {
     creator: p.creator.full_name,
     creator_id: p.creator.username,
     avatar: initial,
-    verified: p.creator.is_verified,
+    verified: isCreatorVerified(p.creator),
     asset: p.asset,
     category: p.category,
     created_at: formatRelativeTime(p.created_at),
@@ -344,7 +346,7 @@ export default function MainPagePosting() {
 
   useEffect(() => {
     const target = ticker ?? 'SPY';
-    getTickerChart(target, activeTimeRange).then(data => {
+    getLiveTickerChart(target, activeTimeRange).then(data => {
       if (ticker) setLiveChartData(data);
       else setDefaultChartData(data);
     });
@@ -466,15 +468,10 @@ export default function MainPagePosting() {
     }
   };
 
-  const chartData = useMemo(() => {
-    if (liveChartData) return liveChartData;
-    if (defaultChartData) return defaultChartData;
-    if (tickerInfo && 'chartData' in tickerInfo) return (tickerInfo as typeof TICKER_CHART_DATA[string]).chartData;
-    return Array.from({ length: 30 }, (_, i) => ({
-      time: `t${i}`,
-      value: 4800 + Math.random() * 400 + i * 10,
-    }));
-  }, [liveChartData, defaultChartData, tickerInfo]);
+  // null while genuinely unavailable (no live market data configured, or the fetch failed) —
+  // never fabricated, since this chart sits right next to a real price and would otherwise be
+  // indistinguishable from it.
+  const chartData = ticker ? liveChartData : defaultChartData;
 
   const posts = useMemo((): Post[] => {
     // Supabase returned real data — use it directly (filtering was done at the DB level).
@@ -555,21 +552,27 @@ export default function MainPagePosting() {
             {/* Chart */}
             <div className="mb-4 bg-white rounded-xl w-full">
               <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height={256}>
-                  <LineChart data={chartData}>
-                    <XAxis dataKey="time" hide />
-                    <YAxis hide domain={['dataMin', 'dataMax']} />
-                    <Tooltip contentStyle={CHART_TOOLTIP_STYLE} formatter={chartCurrencyFormatter('Value')} labelFormatter={showChartLabel} />
-                    <Line
-                      type="monotone"
-                      dataKey="value"
-                      stroke={tickerInfo && !tickerInfo.positive ? '#ef4444' : 'var(--brand)'}
-                      strokeWidth={2}
-                      dot={false}
-                      isAnimationActive={false}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+                {chartData ? (
+                  <ResponsiveContainer width="100%" height={256}>
+                    <LineChart data={chartData}>
+                      <XAxis dataKey="time" hide />
+                      <YAxis hide domain={['dataMin', 'dataMax']} />
+                      <Tooltip contentStyle={CHART_TOOLTIP_STYLE} formatter={chartCurrencyFormatter('Value')} labelFormatter={showChartLabel} />
+                      <Line
+                        type="monotone"
+                        dataKey="value"
+                        stroke={tickerInfo && !tickerInfo.positive ? '#ef4444' : 'var(--brand)'}
+                        strokeWidth={2}
+                        dot={false}
+                        isAnimationActive={false}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="h-full w-full flex items-center justify-center">
+                    <p className="text-sm text-neutral-400">Chart data unavailable right now.</p>
+                  </div>
+                )}
               </div>
               <div className="flex items-center justify-center gap-4 py-4 text-xs">
                 {timeRanges.map(range => (
@@ -630,7 +633,6 @@ export default function MainPagePosting() {
                     : 'Learn about speculative investments and advanced trading techniques.'
                   : 'Options let you hedge, generate income, or trade based on your market outlook.'}
               </p>
-              <button className="text-sm font-medium underline">Learn More</button>
             </div>
           </div>
 
@@ -834,11 +836,7 @@ export default function MainPagePosting() {
                                   {post.creator}
                                 </button>
                                 {post.verified && (
-                                  <span title="Portfolio allocation verified by Gazua" className="inline-flex">
-                                    <svg className="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="currentColor">
-                                      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                  </span>
+                                  <VerifiedBadge title="Portfolio allocation verified by Gazua" />
                                 )}
                                 <span className="text-xs text-neutral-500">• {post.created_at}</span>
                               </div>

@@ -1,12 +1,6 @@
 import type { MockCreator } from '../../data/creators';
 import type { Profile } from '../../../types/database';
-
-const RISK_STYLE_LABELS: Record<NonNullable<Profile['creator_risk_style']>, string> = {
-  conservative: 'Conservative',
-  balanced: 'Balanced',
-  aggressive: 'Aggressive',
-  speculative: 'Speculative',
-};
+import { RISK_STYLE_LABELS } from '../../utils/creator';
 
 interface CreatorAboutTabProps {
   creator: MockCreator;

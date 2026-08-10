@@ -1,3 +1,5 @@
+import { cn } from './ui/utils';
+
 interface VerifiedBadgeProps {
   /** Icon size in pixels — matches whatever fixed width/height the call site previously hardcoded. */
   size?: number;
@@ -13,7 +15,7 @@ interface VerifiedBadgeProps {
 export default function VerifiedBadge({ size = 16, title, className = '' }: VerifiedBadgeProps) {
   const icon = (
     <svg
-      className={`text-brand flex-shrink-0 ${className}`}
+      className={cn('text-brand flex-shrink-0', className)}
       style={{ width: size, height: size }}
       viewBox="0 0 24 24"
       fill="currentColor"

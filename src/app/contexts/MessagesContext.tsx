@@ -17,6 +17,9 @@ export type { ConversationSummary };
 export interface ConversationPartner {
   id: string;
   name: string;
+  /** Real profile username — needed to link to /profile/:username/investment (that route
+   * resolves by username, not id; see the openThreadWith doc comment below). */
+  username: string;
   avatarUrl: string | null;
 }
 
@@ -129,7 +132,7 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
         setConversations(prev => {
           const idx = prev.findIndex(c => c.partnerId === partner.id);
           if (idx === -1) {
-            return [{ partnerId: partner.id, partnerName: partner.name, partnerUsername: partner.name, partnerAvatarUrl: partner.avatarUrl, lastMessage: data, unreadCount: 0 }, ...prev];
+            return [{ partnerId: partner.id, partnerName: partner.name, partnerUsername: partner.username, partnerAvatarUrl: partner.avatarUrl, lastMessage: data, unreadCount: 0 }, ...prev];
           }
           const updated = [...prev];
           const [entry] = updated.splice(idx, 1);
@@ -146,6 +149,8 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
     if (!uid) return;
     setConversations(prev => prev.map(c => (c.partnerId === partnerId ? { ...c, unreadCount: 0 } : c)));
     markThreadRead(uid, partnerId).catch(() => {});
+    // Same AppHeader-badge staleness concern as NotificationsPage — nudge it to refetch.
+    window.dispatchEvent(new Event('gazua:messages-read'));
   }, []);
 
   return (

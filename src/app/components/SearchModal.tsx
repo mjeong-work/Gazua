@@ -15,7 +15,10 @@ import {
   RETIREMENT_EXPERTS,
 } from '../data/creators';
 import { searchCreators as rankMockCreators } from '../utils/creatorSearch';
+import { isCreatorVerified } from '../utils/creator';
+import VerifiedBadge from './VerifiedBadge';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
+import { searchTickers, type TickerSearchResult } from '../../lib/market.service';
 
 interface SearchModalProps {
   onClose: () => void;
@@ -24,7 +27,7 @@ interface SearchModalProps {
 const CREATORS_SEARCH_PREFIX = '/creators';
 
 interface CreatorResult {
-  type: 'creator';
+  kind: 'creator';
   name: string;
   handle: string;
   avatar: string;
@@ -32,25 +35,21 @@ interface CreatorResult {
   route: string;
 }
 
-interface AssetResult {
-  type: 'stock' | 'crypto';
-  name: string;
-  description: string;
-  route: string;
+// Real-provider search result (see market.service.ts's searchTickers) — the whole active US
+// stock/ETF universe, not a static handful of demo tickers. `kind: 'asset'` distinguishes from
+// CreatorResult in the combined result list below — deliberately not named `type` since
+// TickerSearchResult already has its own `type` field (Polygon's asset-class code, e.g. 'CS').
+interface AssetResult extends TickerSearchResult {
+  kind: 'asset';
 }
 
 type SearchResult = CreatorResult | AssetResult;
 
-// Static — every ticker the app actually supports live data/charts for (see marketData.ts /
-// market.service.ts), so unlike creators this list isn't an incomplete subset of a larger table.
-const ASSET_RESULTS: AssetResult[] = [
-  { type: 'stock', name: 'NVDA', description: 'Nvidia Corporation', route: '/main?ticker=NVDA' },
-  { type: 'stock', name: 'TSLA', description: 'Tesla Inc.', route: '/main?ticker=TSLA' },
-  { type: 'stock', name: 'SPY', description: 'S&P 500 ETF', route: '/main?ticker=SPY' },
-  { type: 'stock', name: 'QQQ', description: 'Nasdaq 100 ETF', route: '/main?ticker=QQQ' },
-  { type: 'crypto', name: 'BTC', description: 'Bitcoin', route: '/main?ticker=BTC' },
-  { type: 'crypto', name: 'ETH', description: 'Ethereum', route: '/main?ticker=ETH' },
-];
+const ASSET_TYPE_LABELS: Record<string, string> = {
+  CS: 'Stock', ETF: 'ETF', ETN: 'ETN', ETS: 'ETF',
+  ADRC: 'Stock', ADRP: 'Stock', ADRR: 'Stock',
+  UNIT: 'Unit', PFD: 'Preferred', RIGHT: 'Right', WARRANT: 'Warrant',
+};
 
 // Full mock creator catalog (same source CreatorsPage uses) — fallback only for when Supabase
 // is unreachable/unconfigured, so search still covers every creator instead of a hardcoded 7.
@@ -112,18 +111,18 @@ export default function SearchModal({ onClose }: SearchModalProps) {
   const creatorResults: CreatorResult[] = useMemo(() => {
     if (dbCreators !== null) {
       return dbCreators.map((p): CreatorResult => ({
-        type: 'creator',
+        kind: 'creator',
         name: p.full_name,
         handle: `@${p.handle ?? p.username}`,
         avatar: p.avatar_url || '👤',
-        verified: p.is_verified,
+        verified: isCreatorVerified(p),
         route: `/profile/${p.username}/investment`,
       }));
     }
     const trimmed = query.trim();
     const ranked = trimmed ? rankMockCreators(ALL_MOCK_CREATORS, trimmed) : ALL_MOCK_CREATORS;
     return ranked.slice(0, 8).map((c): CreatorResult => ({
-      type: 'creator',
+      kind: 'creator',
       name: c.name,
       handle: `@${nameToCreatorId(c.name).replace(/-/g, '')}`,
       avatar: c.avatar,
@@ -132,12 +131,42 @@ export default function SearchModal({ onClose }: SearchModalProps) {
     }));
   }, [dbCreators, query]);
 
-  const assetResults: AssetResult[] = query.trim()
-    ? ASSET_RESULTS.filter(result =>
-        result.name.toLowerCase().includes(query.toLowerCase()) ||
-        result.description.toLowerCase().includes(query.toLowerCase())
-      )
-    : ASSET_RESULTS;
+  // Real stock/ETF search (Polygon reference tickers — the full active US universe, not a
+  // static list). Only fires once the query is at least 2 characters, to keep request volume
+  // reasonable against the provider's free-tier rate limit; the module-level cache in
+  // market.service.ts also dedupes identical repeat queries within its TTL.
+  const [rawAssetResults, setRawAssetResults] = useState<TickerSearchResult[]>([]);
+  const [isSearchingAssets, setIsSearchingAssets] = useState(false);
+  const [assetSearchFailed, setAssetSearchFailed] = useState(false);
+
+  useEffect(() => {
+    const trimmed = debouncedQuery.trim();
+    if (trimmed.length < 2) {
+      setRawAssetResults([]);
+      setAssetSearchFailed(false);
+      setIsSearchingAssets(false);
+      return;
+    }
+    let cancelled = false;
+    setIsSearchingAssets(true);
+    setAssetSearchFailed(false);
+    searchTickers(trimmed, 6).then((results) => {
+      if (cancelled) return;
+      setIsSearchingAssets(false);
+      if (results === null) {
+        setAssetSearchFailed(true);
+        setRawAssetResults([]);
+        return;
+      }
+      setRawAssetResults(results);
+    });
+    return () => { cancelled = true; };
+  }, [debouncedQuery]);
+
+  const assetResults: AssetResult[] = useMemo(
+    () => rawAssetResults.map((r): AssetResult => ({ ...r, kind: 'asset' })),
+    [rawAssetResults],
+  );
 
   const filteredResults: SearchResult[] = [...creatorResults, ...assetResults];
 
@@ -163,12 +192,11 @@ export default function SearchModal({ onClose }: SearchModalProps) {
 
   const handleResultClick = (result: SearchResult) => {
     if (isOnCreatorsPage) {
-      applyCreatorsPageFilter(result.name);
+      applyCreatorsPageFilter(result.kind === 'asset' ? result.ticker : result.name);
       return;
     }
-    if (result.type === 'stock' || result.type === 'crypto') {
-      const base = pathname.startsWith('/main') ? pathname.split('?')[0] : '/main';
-      navigate(`${base}?ticker=${result.name}`);
+    if (result.kind === 'asset') {
+      navigate(`/asset/${result.ticker}`);
     } else {
       navigate(result.route);
     }
@@ -223,7 +251,7 @@ export default function SearchModal({ onClose }: SearchModalProps) {
                   onClick={() => handleResultClick(result)}
                   className="w-full p-3 flex items-center gap-3 hover:bg-neutral-50 rounded-lg transition-colors text-left"
                 >
-                  {result.type === 'creator' ? (
+                  {result.kind === 'creator' ? (
                     <>
                       <div className="w-10 h-10 rounded-full bg-neutral-200 flex items-center justify-center text-xl flex-shrink-0">
                         {result.avatar}
@@ -231,11 +259,7 @@ export default function SearchModal({ onClose }: SearchModalProps) {
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-sm">{result.name}</span>
-                          {result.verified && (
-                            <svg className="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                          )}
+                          {result.verified && <VerifiedBadge />}
                         </div>
                         <span className="text-xs text-neutral-500">{result.handle}</span>
                       </div>
@@ -244,21 +268,19 @@ export default function SearchModal({ onClose }: SearchModalProps) {
                   ) : (
                     <>
                       <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                        <span className="text-sm font-bold text-blue-700">
-                          {result.type === 'stock' ? '📊' : result.type === 'crypto' ? '₿' : '📚'}
-                        </span>
+                        <span className="text-sm font-bold text-blue-700">📊</span>
                       </div>
-                      <div className="flex-1">
-                        <span className="font-bold text-sm block">{result.name}</span>
-                        <span className="text-xs text-neutral-500">{result.description}</span>
+                      <div className="flex-1 min-w-0">
+                        <span className="font-bold text-sm block">{result.ticker}</span>
+                        <span className="text-xs text-neutral-500 truncate block">{result.name}</span>
                       </div>
-                      <span className="text-xs text-neutral-400 capitalize">{result.type}</span>
+                      <span className="text-xs text-neutral-400 flex-shrink-0">{ASSET_TYPE_LABELS[result.type] ?? result.type ?? 'Stock'}</span>
                     </>
                   )}
                 </button>
               ))}
             </div>
-          ) : isSearchingCreators ? (
+          ) : isSearchingCreators || isSearchingAssets ? (
             <div className="p-12 text-center text-neutral-500">
               <p>Searching...</p>
             </div>
@@ -266,6 +288,11 @@ export default function SearchModal({ onClose }: SearchModalProps) {
             <div className="p-12 text-center text-neutral-500">
               <SearchIcon sx={{ fontSize: 48, color: '#d1d5db' }} />
               <p className="mt-4">No results found for "{query}"</p>
+            </div>
+          )}
+          {assetSearchFailed && debouncedQuery.trim().length >= 2 && (
+            <div className="px-4 py-2 text-xs text-neutral-400 text-center border-t border-neutral-100">
+              Stock search is temporarily unavailable.
             </div>
           )}
         </div>

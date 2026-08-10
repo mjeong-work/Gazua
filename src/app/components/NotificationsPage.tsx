@@ -46,13 +46,18 @@ export default function NotificationsPage() {
   const handleMarkRead = (id: string) => {
     if (!user) return;
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
-    markAsRead(id, user.id);
+    markAsRead(id, user.id).catch(() => {});
+    // AppHeader owns its own independent unread-count state (it's remounted fresh on real
+    // navigation, but not when marking read without leaving this page) — nudge it to refetch
+    // rather than going stale until the next route change.
+    window.dispatchEvent(new Event('gazua:notifications-read'));
   };
 
   const handleMarkAllRead = () => {
     if (!user) return;
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-    markAllAsRead(user.id);
+    markAllAsRead(user.id).catch(() => {});
+    window.dispatchEvent(new Event('gazua:notifications-read'));
   };
 
   return (

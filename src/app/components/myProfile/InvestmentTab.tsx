@@ -4,8 +4,14 @@ import AddIcon from '@mui/icons-material/Add';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { CHART_TOOLTIP_STYLE, chartCurrencyFormatter, hideChartLabel } from '../../utils/chartTooltip';
 import { ACTUAL_PORTFOLIO_ENABLED } from '../../featureFlags';
+import { useAuth } from '../../contexts/AuthContext';
+import { parseAllocation } from '../../utils/creator';
 import { Button } from '../ui/button';
 import Overlay from './Overlay';
+
+// Same 4-color default palette CreatorProfileInvestment.tsx uses for the public view, extended
+// for portfolios with more than 4 real slices.
+const ALLOCATION_COLORS = ['var(--brand)', 'var(--mint)', '#f43f5e', '#e5e7eb', '#60a5fa', '#a78bfa'];
 
 interface SimHolding { symbol: string; amount: number; }
 interface Simulation {
@@ -34,13 +40,6 @@ const INIT_SIMULATIONS: Simulation[] = [
   },
 ];
 
-const ALLOCATION_DATA = [
-  { name: 'Stocks', value: 45, color: 'var(--brand)' },
-  { name: 'ETFs', value: 30, color: 'var(--mint)' },
-  { name: 'Crypto', value: 15, color: '#f43f5e' },
-  { name: 'Cash', value: 10, color: '#e5e7eb' },
-];
-
 // Local (not UTC) YYYY-MM-DD, suitable for a date input's min attribute.
 function getTodayISODate() {
   const d = new Date();
@@ -50,6 +49,7 @@ function getTodayISODate() {
 // Fully self-contained tab — the simulator/actual-portfolio toggle, all simulation state, and
 // the New Simulation modal live entirely here since nothing outside this tab needs any of it.
 export default function InvestmentTab() {
+  const { profile } = useAuth();
   const [timeRange, setTimeRange] = useState<'1W' | '1M' | '3M' | '1Y' | 'ALL'>('1M');
   const [simulatorMode, setSimulatorMode] = useState(true);
   const [simulationExpanded, setSimulationExpanded] = useState(false);
@@ -73,6 +73,16 @@ export default function InvestmentTab() {
       return { time: `t${i}`, value: Math.max(val, base * 0.85) };
     });
   }, [timeRange]);
+
+  // Reads the real profiles.portfolio_allocation Json column via the shared parseAllocation
+  // helper (same one the public Creator Profile Investment view and the About tab editor use).
+  // A creator who hasn't set one gets an explicit empty state (rendered below) — never
+  // synthesizes a fake default breakdown.
+  const allocationData = useMemo(() => {
+    const slices = parseAllocation(profile?.portfolio_allocation);
+    if (slices.length === 0) return null;
+    return slices.map((s, i) => ({ ...s, color: ALLOCATION_COLORS[i % ALLOCATION_COLORS.length] }));
+  }, [profile]);
 
   const selectedSimulation = simulations.find(s => s.id === selectedSimulationId) ?? simulations[0];
   const selectedSimCash = Math.max(selectedSimulation.capital - selectedSimulation.holdings.reduce((sum, h) => sum + h.amount, 0), 0);
@@ -348,28 +358,34 @@ export default function InvestmentTab() {
 
           <div>
             <h2 className="text-base font-semibold mb-3">Portfolio Allocation</h2>
-            <div className="flex items-center gap-8">
-              <div className="w-44 h-44 flex-shrink-0">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie data={ALLOCATION_DATA} cx="50%" cy="50%" innerRadius={46} outerRadius={84} paddingAngle={2} dataKey="value" isAnimationActive={false} key="my-profile-pie">
-                      {ALLOCATION_DATA.map((entry, idx) => <Cell key={`my-profile-cell-${entry.name}-${idx}`} fill={entry.color} />)}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="flex-1 space-y-3">
-                {ALLOCATION_DATA.map((item) => (
-                  <div key={item.name} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                      <span className="text-sm font-medium">{item.name}</span>
+            {allocationData ? (
+              <div className="flex items-center gap-8">
+                <div className="w-44 h-44 flex-shrink-0">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie data={allocationData} cx="50%" cy="50%" innerRadius={46} outerRadius={84} paddingAngle={2} dataKey="value" isAnimationActive={false} key="my-profile-pie">
+                        {allocationData.map((entry, idx) => <Cell key={`my-profile-cell-${entry.name}-${idx}`} fill={entry.color} />)}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="flex-1 space-y-3">
+                  {allocationData.map((item) => (
+                    <div key={item.name} className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
+                        <span className="text-sm font-medium">{item.name}</span>
+                      </div>
+                      <span className="text-lg font-bold">{item.value}%</span>
                     </div>
-                    <span className="text-lg font-bold">{item.value}%</span>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="p-6 bg-neutral-50 rounded-lg border border-neutral-200 text-center">
+                <p className="text-sm text-neutral-500">Portfolio allocation not disclosed yet.</p>
+              </div>
+            )}
           </div>
         </div>
       )}

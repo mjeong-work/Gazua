@@ -17,6 +17,7 @@ export interface VideoListItem {
   duration: string;
   views: string;
   uploadedAt: string;
+  storagePath: string | null;
 }
 
 // Shared by MyProfilePage (needs videos.length for the header/About stats) and VideosTab (needs
@@ -40,6 +41,7 @@ export function useMyProfileVideos(profileId: string | undefined) {
       duration: formatDurationSeconds(v.duration_seconds ?? 0),
       views: formatCount(v.view_count),
       uploadedAt: new Date(v.created_at).toLocaleDateString(),
+      storagePath: v.storage_path ?? null,
     })));
   }, [videoRows]);
 

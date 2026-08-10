@@ -125,13 +125,17 @@ function PersonalityCard({ personality }: { personality: InvestmentInsights['per
 }
 
 function TrendingCard({ asset }: { asset: InvestmentInsights['trendingAssets'][number] }) {
+  const navigate = useNavigate();
   return (
-    <div className="border border-neutral-200 rounded-xl p-5 hover:border-neutral-300 transition-colors">
+    <button
+      onClick={() => navigate(`/asset/${asset.ticker}`)}
+      className="w-full text-left border border-neutral-200 rounded-xl p-5 hover:border-neutral-300 transition-colors"
+    >
       <div className="flex items-center gap-3 mb-2">
         <span className="text-lg font-bold font-mono">{asset.ticker}</span>
       </div>
       <p className="text-sm text-neutral-600 leading-relaxed">{asset.context}</p>
-    </div>
+    </button>
   );
 }
 

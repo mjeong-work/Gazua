@@ -41,6 +41,7 @@ const MainPageReels = lazy(() => import('./components/MainPageReels'));
 const CreatorProfileInvestment = lazy(() => import('./components/CreatorProfileInvestment'));
 const CreatorProfileVideos = lazy(() => import('./components/CreatorProfileVideos'));
 const VideoWatchPage = lazy(() => import('./components/VideoWatchPage'));
+const AssetPage = lazy(() => import('./components/AssetPage'));
 const Welcome = lazy(() => import('./components/onboarding/Welcome'));
 const SignUp = lazy(() => import('./components/onboarding/SignUp'));
 const PickLevel = lazy(() => import('./components/onboarding/PickLevel'));
@@ -144,6 +145,7 @@ export default function App() {
                   <Route path="/profile/:creatorId/videos"     element={<CreatorProfileVideos />} />
                   <Route path="/profile/:creatorId/models"     element={<ModelsRedirect />} />
                   <Route path="/watch/:videoId"                element={<VideoWatchPage />} />
+                  <Route path="/asset/:symbol"                 element={<AssetPage />} />
 
                   {/* ── Legacy redirects ── */}
                   <Route path="/profile/investment"    element={<Navigate to="/profile/alex-rodriguez/investment" replace />} />

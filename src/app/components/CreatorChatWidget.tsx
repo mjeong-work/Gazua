@@ -8,6 +8,7 @@ import { useMessages } from '../contexts/MessagesContext';
 interface CreatorChatWidgetProps {
   creatorId: string;
   creatorName: string;
+  creatorUsername: string;
   creatorAvatarUrl: string | null;
   onClose: () => void;
 }
@@ -18,7 +19,7 @@ interface CreatorChatWidgetProps {
  * when a real (DB-backed) profile is available, since there's nothing real to message
  * for a mock/demo creator.
  */
-export default function CreatorChatWidget({ creatorId, creatorName, creatorAvatarUrl, onClose }: CreatorChatWidgetProps) {
+export default function CreatorChatWidget({ creatorId, creatorName, creatorUsername, creatorAvatarUrl, onClose }: CreatorChatWidgetProps) {
   const { user } = useAuth();
   const { activeThread, openThreadWith, sendMessage, markRead } = useMessages();
   const [isMinimized, setIsMinimized] = useState(false);
@@ -30,10 +31,10 @@ export default function CreatorChatWidget({ creatorId, creatorName, creatorAvata
 
   // Opens (or resumes) this creator's thread the first time the widget is shown.
   useEffect(() => {
-    openThreadWith({ id: creatorId, name: creatorName, avatarUrl: creatorAvatarUrl });
+    openThreadWith({ id: creatorId, name: creatorName, username: creatorUsername, avatarUrl: creatorAvatarUrl });
     markRead(creatorId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [creatorId, creatorName, creatorAvatarUrl]);
+  }, [creatorId, creatorName, creatorUsername, creatorAvatarUrl]);
 
   // Mount-then-animate so the enter transition actually plays (starting at the "open" state
   // would skip straight past it — the transition needs a frame at the "closed" state first).

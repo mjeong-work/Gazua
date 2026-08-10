@@ -29,7 +29,7 @@ export default function UploadVideoModal({ onClose, onSuccess }: UploadVideoModa
   const [isDragging, setIsDragging] = useState(false);
 
   const handleFileSelected = async (selected: File | null | undefined) => {
-    if (!selected) return;
+    if (!selected || processing || uploading) return;
 
     const validationError = validateVideoFile(selected, LONGFORM_LIMITS);
     if (validationError) {
@@ -117,14 +117,15 @@ export default function UploadVideoModal({ onClose, onSuccess }: UploadVideoModa
           type="file"
           accept="video/mp4,video/quicktime,video/webm"
           className="hidden"
+          disabled={processing || uploading}
           onChange={(e) => handleFileSelected(e.target.files?.[0])}
         />
         <div
-          onClick={() => fileInputRef.current?.click()}
-          onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+          onClick={() => { if (!processing && !uploading) fileInputRef.current?.click(); }}
+          onDragOver={(e) => { e.preventDefault(); if (!processing && !uploading) setIsDragging(true); }}
           onDragLeave={() => setIsDragging(false)}
           onDrop={(e) => { e.preventDefault(); setIsDragging(false); handleFileSelected(e.dataTransfer.files?.[0]); }}
-          className={`border-2 border-dashed rounded-xl p-8 text-center mb-4 transition-colors cursor-pointer ${isDragging ? 'border-brand bg-green-50' : 'border-neutral-200 hover:border-neutral-300'}`}
+          className={`border-2 border-dashed rounded-xl p-8 text-center mb-4 transition-colors ${processing || uploading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'} ${isDragging ? 'border-brand bg-green-50' : 'border-neutral-200 hover:border-neutral-300'}`}
         >
           <div className="text-3xl mb-2">🎬</div>
           <p className="text-sm font-medium text-neutral-700 mb-1">

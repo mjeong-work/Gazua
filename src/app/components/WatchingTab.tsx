@@ -129,7 +129,12 @@ export default function WatchingTab() {
             <div className="flex items-start justify-between mb-3">
               <div>
                 <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                  <span className="text-lg font-bold text-neutral-900">{item.ticker}</span>
+                  <button
+                    onClick={() => navigate(`/asset/${item.ticker}`, { state: { assetName: item.name, assetType: item.asset_type } })}
+                    className="text-lg font-bold text-neutral-900 hover:underline"
+                  >
+                    {item.ticker}
+                  </button>
                   <span className="text-xs px-2 py-0.5 bg-neutral-100 text-neutral-600 rounded-full font-medium">
                     {item.asset_type}
                   </span>

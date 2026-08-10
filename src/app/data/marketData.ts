@@ -14,19 +14,6 @@ export const MARKET_INDICES: MarketIndex[] = [
   { id: 'gold', name: 'Gold', value: '$2,387', change: '-0.34%', changePercent: -0.34, positive: false },
 ];
 
-export interface AllocationEntry {
-  name: string;
-  value: number;
-  color: string;
-}
-
-export const DEFAULT_PORTFOLIO_ALLOCATION: AllocationEntry[] = [
-  { name: 'Stocks', value: 45, color: '#00a86b' },
-  { name: 'ETFs', value: 30, color: 'var(--mint)' },
-  { name: 'Crypto', value: 15, color: '#f43f5e' },
-  { name: 'Cash', value: 10, color: '#e5e7eb' },
-];
-
 export interface TickerInfo {
   price: string;
   changeAmt: string;

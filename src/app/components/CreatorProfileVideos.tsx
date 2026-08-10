@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import CloseIcon from '@mui/icons-material/Close';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import AppHeader from './AppHeader';
 import CreatorProfileHeader from './creatorProfile/CreatorProfileHeader';
@@ -35,6 +34,7 @@ function normalizeDbVideo(v: VideoWithCreator, i: number): Video {
   const uploaded = days === 0 ? 'today' : days === 1 ? '1 day ago' : `${days} days ago`;
   return {
     id: i,
+    db_id: v.id,
     creator_id: v.creator.username,
     title: v.title,
     thumbnail: v.thumbnail_url ?? FALLBACK_GRADIENTS[i % FALLBACK_GRADIENTS.length],
@@ -74,7 +74,6 @@ export default function CreatorProfileVideos() {
     setActiveTab(tab);
     if (tab === 'investment') navigate(`/profile/${creatorId}/investment`);
   };
-  const [previewVideo, setPreviewVideo] = useState<Video | null>(null);
 
   // ── Loading skeleton ───────────────────────────────────────────────
   if (profileLoading) {
@@ -172,7 +171,7 @@ export default function CreatorProfileVideos() {
                   <div
                     key={video.id}
                     className="group cursor-pointer"
-                    onClick={() => (dbVideos === null ? navigate(`/watch/${video.id}`) : setPreviewVideo(video))}
+                    onClick={() => navigate(`/watch/${video.db_id ?? video.id}`)}
                   >
                     <div className="relative aspect-video rounded-xl overflow-hidden mb-3">
                       <div className="absolute inset-0" style={{ background: video.thumbnail }} />
@@ -208,37 +207,6 @@ export default function CreatorProfileVideos() {
 
         </div>
       </div>
-
-      {/* ── Video Preview Modal ── */}
-      {previewVideo && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setPreviewVideo(null)}>
-          <div className="bg-white rounded-2xl max-w-2xl w-full overflow-hidden" onClick={e => e.stopPropagation()}>
-            <div className="relative aspect-video" style={{ background: previewVideo.thumbnail }}>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-24 h-24 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                  <VideoLibraryIcon sx={{ fontSize: 48, color: '#ffffff' }} />
-                </div>
-              </div>
-              <button
-                onClick={() => setPreviewVideo(null)}
-                className="icon-tap-target absolute top-4 right-4 w-10 h-10 bg-black/50 rounded-full flex items-center justify-center hover:bg-black/70 transition-colors"
-              >
-                <CloseIcon sx={{ fontSize: 20, color: '#ffffff' }} />
-              </button>
-              <div className="absolute bottom-4 right-4 bg-black/80 text-white text-sm font-medium px-3 py-1 rounded">
-                {previewVideo.duration}
-              </div>
-            </div>
-            <div className="p-6">
-              <h3 className="text-xl font-bold mb-2">{previewVideo.title}</h3>
-              <p className="text-sm text-neutral-600 mb-4">{creator.name} • {previewVideo.views} views • {previewVideo.uploaded_at}</p>
-              <div className="p-4 bg-neutral-50 rounded-lg text-center text-sm text-neutral-600">
-                🎬 Full video playback coming soon.
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

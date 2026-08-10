@@ -9,6 +9,8 @@ import ReelMetadata from './reels/ReelMetadata';
 import { seedFromId, formatCount, formatDurationSeconds } from './reels/format';
 import { CREATOR_VIDEOS, getVideosByCreator as getMockVideosByCreator } from '../data/reels';
 import { getCreator } from '../data/creators';
+import { isCreatorVerified } from '../utils/creator';
+import VerifiedBadge from './VerifiedBadge';
 import { getVideoById, getVideosByCreator as getDbVideosByCreator } from '../../lib/services/reels.service';
 import { getFollowerCount } from '../../lib/services/follows.service';
 import { useFollow, isUUID } from '../contexts/FollowContext';
@@ -102,7 +104,7 @@ export default function VideoWatchPage() {
           creatorFollowId: dbVideo.creator.id,
           creatorName: dbVideo.creator.full_name,
           creatorAvatar: dbVideo.creator.avatar_url ?? '👤',
-          creatorVerified: dbVideo.creator.is_verified,
+          creatorVerified: isCreatorVerified(dbVideo.creator),
           creatorFollowers: formatCount(followerRes.data ?? 0),
           moreVideos: (moreRes.data ?? [])
             .filter(v => v.id !== dbVideo.id)
@@ -274,11 +276,7 @@ export default function VideoWatchPage() {
               <div>
                 <div className="flex items-center gap-1.5">
                   <span className="font-semibold text-sm">{video.creatorName}</span>
-                  {video.creatorVerified && (
-                    <svg className="w-4 h-4 text-brand" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  )}
+                  {video.creatorVerified && <VerifiedBadge />}
                 </div>
                 {video.creatorFollowers && <p className="text-xs text-neutral-500">{video.creatorFollowers} followers</p>}
               </div>

@@ -10,10 +10,20 @@
  *   /v2/aggs/ticker/{symbol}/prev
  *     → NOT used (only returns 1 bar — can't derive % change from it alone)
  *
+ *   /v3/reference/tickers?search=...&market=stocks
+ *     → symbol + company-name search across the full active US stock/ETF universe (not a
+ *       hardcoded list) — confirmed working on this project's free-tier key (see
+ *       searchTickers below). Used by SearchModal for stock search and by AssetPage to fetch
+ *       canonical name/type/exchange for any symbol, independent of navigation state.
+ *
+ *   /v3/reference/tickers/{symbol}
+ *     → single-ticker canonical metadata (name, type, exchange, active status).
+ *
  * Snapshot endpoints (/v2/snapshot/...) require Starter plan — intentionally avoided.
  *
- * Crypto tickers use the X: prefix (e.g. X:BTCUSD) with the same endpoints.
- * 15-minute in-memory cache per ticker/range to stay within the free rate limit.
+ * Crypto tickers use the X: prefix (e.g. X:BTCUSD) with the same aggs endpoints.
+ * 15-minute in-memory cache per ticker/range/query to stay within the free rate limit
+ * (Polygon's free "Basic" plan is 5 requests/minute account-wide, across every endpoint below).
  */
 
 import { MARKET_INDICES, TICKER_CHART_DATA } from '../app/data/marketData'
@@ -24,6 +34,16 @@ const BASE = 'https://api.polygon.io'
 const TTL = 15 * 60 * 1000
 
 // ── Types ────────────────────────────────────────────────────────────────────
+
+/**
+ * True if a Polygon API key is configured — gates whether real (non-demo) market data can be
+ * fetched at all. Callers that must never present demo/fallback data as if it were real (e.g.
+ * a dedicated single-asset page) should check this before calling getTickerChart(), since that
+ * function silently returns a static demo series when no key is configured.
+ */
+export function hasLiveMarketData(): boolean {
+  return !!API_KEY
+}
 
 export interface LiveTickerInfo {
   price: string
@@ -187,13 +207,36 @@ export async function getTickerChart(
   const fallback = TICKER_CHART_DATA[ticker]?.chartData ?? []
   if (!API_KEY) return fallback
 
+  const data = await fetchLiveChart(ticker, range)
+  return data ?? fallback
+}
+
+/**
+ * Same fetch as getTickerChart, but never falls back to the static demo series — returns null
+ * whenever live data genuinely isn't available (no key, or the fetch failed/returned nothing).
+ * getTickerChart's demo fallback exists for small in-app chart chips where a placeholder shape
+ * is harmless; a dedicated single-asset page must never show that data as if it were real, so
+ * it should call this instead and render its own explicit "unavailable" state on null.
+ */
+export async function getLiveTickerChart(
+  ticker: string,
+  range: TimeRange,
+): Promise<{ time: string; value: number }[] | null> {
+  if (!API_KEY) return null
+  return fetchLiveChart(ticker, range)
+}
+
+async function fetchLiveChart(
+  ticker: string,
+  range: TimeRange,
+): Promise<{ time: string; value: number }[] | null> {
   const key = `${ticker}:${range}`
   const cached = chartCache.get(key)
   if (fresh(cached)) return cached.data
 
   const { mult, span, from } = rangeParams(range)
   const bars = await fetchBars(toSymbol(ticker), mult, span, from, fmtDate(new Date()))
-  if (!bars?.length) return fallback
+  if (!bars?.length) return null
 
   const data = bars.map(b => ({ time: fmtLabel(b.t, span), value: b.c }))
   chartCache.set(key, { data, ts: Date.now() })
@@ -249,4 +292,108 @@ export async function getWatchlistPrices(tickers: string[]): Promise<Map<string,
     }),
   )
   return map
+}
+
+// ── Public: stock universe search + metadata ───────────────────────────────────
+//
+// Backed by Polygon's /v3/reference/tickers, which covers the full active US stock/ETF
+// universe (thousands of symbols) — not a static list. This is metadata only (symbol, name,
+// type, exchange) — never price/chart data, so a search result never implies a live quote is
+// available; AssetPage fetches price/chart separately, only for the symbol actually opened.
+
+export interface TickerSearchResult {
+  ticker: string
+  name: string
+  type: string
+  exchange: string | null
+  active: boolean
+}
+
+const searchCache = new Map<string, CacheEntry<TickerSearchResult[]>>()
+const metadataCache = new Map<string, CacheEntry<TickerSearchResult | null>>()
+
+function normalizeTickerResult(r: {
+  ticker?: string; name?: string; type?: string; primary_exchange?: string; active?: boolean
+}): TickerSearchResult {
+  return {
+    ticker: r.ticker ?? '',
+    name: r.name ?? r.ticker ?? '',
+    type: r.type ?? '',
+    exchange: r.primary_exchange ?? null,
+    active: r.active ?? true,
+  }
+}
+
+/**
+ * Symbol + company-name search across the real US stock/ETF universe. Returns null when
+ * genuinely unavailable (no key, rate-limited, or the request failed) — callers must render an
+ * explicit unavailable state, never a fake/static result list, on null.
+ */
+function rankSearchResults(results: TickerSearchResult[], query: string): TickerSearchResult[] {
+  const q = query.trim().toUpperCase()
+  const score = (r: TickerSearchResult): number => {
+    if (r.ticker.toUpperCase() === q) return 0
+    if (r.ticker.toUpperCase().startsWith(q)) return 1
+    if (r.name.toUpperCase().startsWith(q)) return 2
+    return 3
+  }
+  return [...results].sort((a, b) => score(a) - score(b))
+}
+
+export async function searchTickers(query: string, limit = 8): Promise<TickerSearchResult[] | null> {
+  const trimmed = query.trim()
+  if (!trimmed) return []
+  if (!API_KEY) return null
+
+  const key = `${trimmed.toLowerCase()}:${limit}`
+  const cached = searchCache.get(key)
+  if (fresh(cached)) return cached.data
+
+  // Polygon's `search` param has no relevance-ranking option — over-fetch and re-rank
+  // client-side (exact ticker match first, then ticker-prefix, then name-prefix) so the
+  // company you actually typed shows up before loosely-related tickers/ETFs.
+  const fetchLimit = Math.min(limit * 4, 40)
+  const url = `${BASE}/v3/reference/tickers?search=${encodeURIComponent(trimmed)}&market=stocks&active=true&limit=${fetchLimit}&apiKey=${API_KEY}`
+  try {
+    const res = await fetch(url)
+    if (res.status === 429) return null
+    if (!res.ok) return null
+    const json = await res.json()
+    const raw: TickerSearchResult[] = (json.results ?? []).map(normalizeTickerResult)
+    const results = rankSearchResults(raw, trimmed).slice(0, limit)
+    searchCache.set(key, { data: results, ts: Date.now() })
+    return results
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Canonical name/type/exchange for a single symbol, independent of how the caller navigated
+ * here — used by AssetPage so a direct URL or refresh still shows the real company name rather
+ * than depending on router state. null when unavailable (no key, unknown symbol, rate-limited,
+ * or request failure) — render an explicit "unavailable" state, never a guessed name.
+ */
+export async function getTickerMetadata(ticker: string): Promise<TickerSearchResult | null> {
+  const symbol = ticker.trim().toUpperCase()
+  if (!symbol || !API_KEY) return null
+
+  const cached = metadataCache.get(symbol)
+  if (fresh(cached)) return cached.data
+
+  const url = `${BASE}/v3/reference/tickers/${encodeURIComponent(symbol)}?apiKey=${API_KEY}`
+  try {
+    const res = await fetch(url)
+    if (res.status === 429) return null
+    if (!res.ok) {
+      metadataCache.set(symbol, { data: null, ts: Date.now() })
+      return null
+    }
+    const json = await res.json()
+    const result = json.results ? normalizeTickerResult(json.results) : null
+    metadataCache.set(symbol, { data: result, ts: Date.now() })
+    return result
+  } catch {
+    return null
+  }
 }

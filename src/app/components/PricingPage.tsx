@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
 import Footer from './Footer';
+import { PAID_CHECKOUT_ENABLED } from '../featureFlags';
 
 type StripeTier = 'analyst' | 'educator'
 
@@ -82,6 +83,11 @@ export default function PricingPage() {
 
     if (!user) {
       navigate('/signin', { state: { from: '/pricing' } });
+      return;
+    }
+
+    if (!PAID_CHECKOUT_ENABLED) {
+      toast.info('Beta testing — free plans are currently available. Paid plans will unlock in a future release.');
       return;
     }
 

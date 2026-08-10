@@ -9,6 +9,7 @@ import CreatorPostsTab from './creatorProfile/CreatorPostsTab';
 import CreatorAboutTab from './creatorProfile/CreatorAboutTab';
 import { CHART_TOOLTIP_STYLE, chartCurrencyFormatter, hideChartLabel } from '../utils/chartTooltip';
 import { useCreatorProfileData } from '../hooks/useCreatorProfileData';
+import { parseAllocation } from '../utils/creator';
 import { ACTUAL_PORTFOLIO_ENABLED } from '../featureFlags';
 import type { Simulation } from '../data/simulations';
 import { MOCK_SIMULATIONS, filterChartData } from '../data/simulations';
@@ -63,21 +64,15 @@ export default function CreatorProfileInvestment() {
     setSimulationExpanded(false);
   };
 
-  // Reads the real profiles.portfolio_allocation Json column (shape: {name, value}[], colors
-  // assigned by the frontend). A creator who hasn't set one gets an explicit empty state
-  // (rendered below) — this must never synthesize a fake default breakdown, since that would
-  // be indistinguishable from a real, intentionally-set allocation (audit finding).
+  // Reads the real profiles.portfolio_allocation Json column via the shared parseAllocation
+  // helper (also used by My Profile's About/Investment tabs), colors assigned by the frontend.
+  // A creator who hasn't set one gets an explicit empty state (rendered below) — this must
+  // never synthesize a fake default breakdown, since that would be indistinguishable from a
+  // real, intentionally-set allocation (audit finding).
   const allocationData = useMemo(() => {
-    const raw = dbProfile?.portfolio_allocation;
-    if (!Array.isArray(raw) || raw.length === 0) return null;
-    return raw.map((slice, i) => {
-      const s = slice as { name?: unknown; value?: unknown };
-      return {
-        name: String(s.name ?? 'Other'),
-        value: Number(s.value ?? 0),
-        color: ALLOCATION_COLORS[i % ALLOCATION_COLORS.length],
-      };
-    });
+    const slices = parseAllocation(dbProfile?.portfolio_allocation);
+    if (slices.length === 0) return null;
+    return slices.map((s, i) => ({ ...s, color: ALLOCATION_COLORS[i % ALLOCATION_COLORS.length] }));
   }, [dbProfile]);
 
   // ── Loading skeleton ───────────────────────────────────────────────
