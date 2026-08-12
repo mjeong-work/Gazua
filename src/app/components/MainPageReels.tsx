@@ -348,7 +348,7 @@ export default function MainPageReels() {
             </div>
 
             {/* Chart */}
-            <div className="mb-6 bg-white rounded-xl w-full">
+            <div className="mb-6 bg-white rounded-md w-full">
               <div className="h-64 w-full">
                 {chartData ? (
                   <ResponsiveContainer width="100%" height={256}>
@@ -392,7 +392,7 @@ export default function MainPageReels() {
             <div className="space-y-3">
               {indicesLoading
                 ? [1, 2, 3, 4].map(n => (
-                    <div key={n} className="p-4 bg-neutral-50 rounded-lg animate-pulse">
+                    <div key={n} className="p-4 bg-neutral-50 rounded-md animate-pulse">
                       <div className="flex items-center justify-between mb-2">
                         <div className="h-3 bg-neutral-200 rounded w-20" />
                         <div className="h-3 bg-neutral-200 rounded w-12" />
@@ -401,7 +401,7 @@ export default function MainPageReels() {
                     </div>
                   ))
                 : liveIndices.map(index => (
-                    <div key={index.id} className="p-4 bg-neutral-50 rounded-lg">
+                    <div key={index.id} className="p-4 bg-neutral-50 rounded-md">
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-neutral-600">{index.name}</span>
                         <span className={`text-xs font-medium ${index.positive ? 'text-brand' : 'text-red-500'}`}>{index.change}</span>
@@ -413,7 +413,7 @@ export default function MainPageReels() {
             </div>
 
             {/* Ad Banner */}
-            <div className="mt-6 p-4 bg-mint rounded-lg">
+            <div className="mt-6 p-4 bg-mint rounded-md">
               <h3 className="font-bold mb-1">Get more out of Gazua</h3>
               <p className="text-sm mb-3">Options let you hedge, generate income, or trade based on your market outlook.</p>
             </div>
@@ -471,7 +471,7 @@ export default function MainPageReels() {
                 <p className="text-white/60 text-sm mb-6 max-w-xs">When you follow creators, their reels will appear here.</p>
                 <button
                   onClick={() => setActiveTab('reels')}
-                  className="px-6 py-2.5 bg-white text-black font-bold text-sm rounded-full hover:bg-white/90 transition-colors"
+                  className="px-6 py-2.5 bg-white text-black font-bold text-sm rounded-sm hover:bg-white/90 transition-colors"
                 >
                   Explore All Reels
                 </button>
@@ -494,7 +494,7 @@ export default function MainPageReels() {
                 <p className="text-white/60 text-sm mb-6 max-w-xs">The creators you follow haven't posted any reels yet. Check back soon!</p>
                 <button
                   onClick={() => setActiveTab('reels')}
-                  className="px-6 py-2.5 bg-white text-black font-bold text-sm rounded-full hover:bg-white/90 transition-colors"
+                  className="px-6 py-2.5 bg-white text-black font-bold text-sm rounded-sm hover:bg-white/90 transition-colors"
                 >
                   Explore All Reels
                 </button>
@@ -634,7 +634,7 @@ export default function MainPageReels() {
                             </div>
                             <button
                               onClick={() => followId && toggleFollow(followId)}
-                              className={`px-6 py-2 font-bold text-sm rounded-full transition-colors ${
+                              className={`px-6 py-2 font-bold text-sm rounded-sm transition-colors ${
                                 isReelCreatorFollowed
                                   ? 'bg-white/20 text-white border border-white/40 hover:bg-white/30'
                                   : 'bg-white text-black hover:bg-white/90'
@@ -691,7 +691,7 @@ export default function MainPageReels() {
 
       {/* Toast */}
       {showToast && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 lg:bottom-8 bg-brand text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3 z-50 animate-slide-up pointer-events-none">
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 lg:bottom-8 bg-brand text-white px-6 py-4 rounded-md shadow-lg flex items-center gap-3 z-50 animate-slide-up pointer-events-none">
           <div>
             <p className="font-bold">{toastMessage}</p>
             {toastSubtitle && <p className="text-sm opacity-90">{toastSubtitle}</p>}

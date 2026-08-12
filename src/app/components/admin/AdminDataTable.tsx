@@ -21,7 +21,7 @@ interface AdminDataTableProps<T> {
 }
 
 // Generic sortable table shell used by Users/Reports/Content/AuditLog — plain Tailwind
-// (rounded-xl bordered card, gray-50 header, hover:bg-neutral-50 rows), not ui/table.tsx.
+// (rounded-md bordered card, gray-50 header, hover:bg-neutral-50 rows), not ui/table.tsx.
 export default function AdminDataTable<T>({
   columns,
   rows,
@@ -32,7 +32,7 @@ export default function AdminDataTable<T>({
   onRowClick,
 }: AdminDataTableProps<T>) {
   return (
-    <div className="border border-neutral-200 rounded-xl overflow-hidden overflow-x-auto">
+    <div className="border border-neutral-200 rounded-md overflow-hidden overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
           <tr className="bg-neutral-50 border-b border-neutral-200">

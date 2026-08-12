@@ -27,7 +27,7 @@ export default function CreatorPostsTab({ creator, posts }: CreatorPostsTabProps
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {posts.map((post) => (
-        <div key={post.id} className="p-4 bg-white border border-neutral-200 rounded-xl hover:border-neutral-300 transition-colors">
+        <div key={post.id} className="p-4 bg-white border border-neutral-200 rounded-md hover:border-neutral-300 transition-colors">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-sm flex-shrink-0">{creator.avatar}</div>
             <div className="flex-1 min-w-0">
@@ -39,7 +39,7 @@ export default function CreatorPostsTab({ creator, posts }: CreatorPostsTabProps
                 <span>{creator.handle}</span><span>·</span><span>{post.time}</span>
               </div>
             </div>
-            <Badge variant="outline" className="border-transparent px-2 py-1 rounded-full bg-neutral-100 text-neutral-600 font-medium flex-shrink-0">
+            <Badge variant="outline" className="border-transparent px-2 py-1 rounded-sm bg-neutral-100 text-neutral-600 font-medium flex-shrink-0">
               {post.tag}
             </Badge>
           </div>

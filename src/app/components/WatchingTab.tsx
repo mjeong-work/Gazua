@@ -63,7 +63,7 @@ export default function WatchingTab() {
     return (
       <div className="space-y-4 animate-pulse">
         {[1, 2, 3].map(n => (
-          <div key={n} className="border border-neutral-200 rounded-2xl p-5 h-40" />
+          <div key={n} className="border border-neutral-200 rounded-md p-5 h-40" />
         ))}
       </div>
     );
@@ -84,7 +84,7 @@ export default function WatchingTab() {
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-1.5 px-4 py-2 bg-black text-white text-sm font-medium rounded-full hover:bg-black/80 transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2 bg-black text-white text-sm font-medium rounded-sm hover:bg-black/80 transition-colors"
         >
           <AddIcon sx={{ fontSize: 16 }} />
           Add Asset
@@ -93,7 +93,7 @@ export default function WatchingTab() {
 
       {/* Empty state */}
       {watchlistItems.length === 0 && (
-        <div className="border border-neutral-200 rounded-2xl p-12 text-center">
+        <div className="border border-neutral-200 rounded-md p-12 text-center">
           <div className="w-14 h-14 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
             📌
           </div>
@@ -104,13 +104,13 @@ export default function WatchingTab() {
           <div className="flex items-center gap-3 justify-center">
             <button
               onClick={() => setShowAddModal(true)}
-              className="px-5 py-2 bg-black text-white text-sm font-medium rounded-full hover:bg-black/80 transition-colors"
+              className="px-5 py-2 bg-black text-white text-sm font-medium rounded-sm hover:bg-black/80 transition-colors"
             >
               Add Asset
             </button>
             <button
               onClick={() => navigate('/main')}
-              className="px-5 py-2 border border-neutral-200 text-sm font-medium rounded-full hover:bg-neutral-50 transition-colors"
+              className="px-5 py-2 border border-neutral-200 text-sm font-medium rounded-sm hover:bg-neutral-50 transition-colors"
             >
               Browse Content
             </button>
@@ -124,7 +124,7 @@ export default function WatchingTab() {
         const isEditing = editingId === item.id;
 
         return (
-          <div key={item.id} className="border border-neutral-200 rounded-2xl p-5 hover:border-neutral-300 transition-colors">
+          <div key={item.id} className="border border-neutral-200 rounded-md p-5 hover:border-neutral-300 transition-colors">
             {/* Item header */}
             <div className="flex items-start justify-between mb-3">
               <div>
@@ -135,11 +135,11 @@ export default function WatchingTab() {
                   >
                     {item.ticker}
                   </button>
-                  <span className="text-xs px-2 py-0.5 bg-neutral-100 text-neutral-600 rounded-full font-medium">
+                  <span className="text-xs px-2 py-0.5 bg-neutral-100 text-neutral-600 rounded-sm font-medium">
                     {item.asset_type}
                   </span>
                   {item.time_horizon && (
-                    <span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full font-medium">
+                    <span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded-sm font-medium">
                       {item.time_horizon}
                     </span>
                   )}
@@ -179,18 +179,18 @@ export default function WatchingTab() {
                     autoFocus
                     rows={3}
                     placeholder="Write a short note about why you're watching this..."
-                    className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200 resize-none"
+                    className="w-full border border-neutral-200 rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200 resize-none"
                   />
                   <div className="flex gap-2 mt-2">
                     <button
                       onClick={saveEdit}
-                      className="px-3 py-1 bg-black text-white text-xs font-medium rounded-lg hover:bg-black/80 transition-colors"
+                      className="px-3 py-1 bg-black text-white text-xs font-medium rounded-sm hover:bg-black/80 transition-colors"
                     >
                       Save
                     </button>
                     <button
                       onClick={() => setEditingId(null)}
-                      className="px-3 py-1 border border-neutral-200 text-xs font-medium rounded-lg hover:bg-neutral-50 transition-colors"
+                      className="px-3 py-1 border border-neutral-200 text-xs font-medium rounded-sm hover:bg-neutral-50 transition-colors"
                     >
                       Cancel
                     </button>
@@ -199,7 +199,7 @@ export default function WatchingTab() {
               ) : (
                 <p
                   onClick={() => startEdit(item)}
-                  className={`text-sm cursor-text rounded-lg px-3 py-2 border border-dashed transition-colors hover:border-neutral-300 hover:bg-neutral-50 ${
+                  className={`text-sm cursor-text rounded-sm px-3 py-2 border border-dashed transition-colors hover:border-neutral-300 hover:bg-neutral-50 ${
                     item.thesis ? 'text-neutral-700 border-transparent' : 'text-neutral-400 border-neutral-200'
                   }`}
                 >
@@ -227,7 +227,7 @@ export default function WatchingTab() {
                           <span className="text-xs font-semibold text-neutral-700 group-hover:text-black transition-colors">
                             {post.creator}
                           </span>
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${sentimentStyle(post.sentiment)}`}>
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded-sm font-medium ${sentimentStyle(post.sentiment)}`}>
                             {post.sentiment}
                           </span>
                         </div>
@@ -253,7 +253,7 @@ export default function WatchingTab() {
           onClick={() => setShowAddModal(false)}
         >
           <div
-            className="bg-white rounded-2xl w-full max-w-sm p-6"
+            className="bg-white rounded-md w-full max-w-sm p-6"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-5">
@@ -270,7 +270,7 @@ export default function WatchingTab() {
                   placeholder="e.g. AAPL, BTC, SPY"
                   value={newTicker}
                   onChange={e => setNewTicker(e.target.value.toUpperCase())}
-                  className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200 font-mono"
+                  className="w-full border border-neutral-200 rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200 font-mono"
                   autoFocus
                 />
               </div>
@@ -281,7 +281,7 @@ export default function WatchingTab() {
                   placeholder="e.g. Apple Inc."
                   value={newName}
                   onChange={e => setNewName(e.target.value)}
-                  className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200"
+                  className="w-full border border-neutral-200 rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200"
                 />
               </div>
               <div>
@@ -289,7 +289,7 @@ export default function WatchingTab() {
                 <select
                   value={newType}
                   onChange={e => setNewType(e.target.value as WatchlistItem['asset_type'])}
-                  className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200"
+                  className="w-full border border-neutral-200 rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200"
                 >
                   <option value="Stock">Stock</option>
                   <option value="ETF">ETF</option>
@@ -301,7 +301,7 @@ export default function WatchingTab() {
               <button
                 onClick={handleAdd}
                 disabled={!newTicker.trim()}
-                className="w-full py-2.5 bg-black text-white text-sm font-medium rounded-full hover:bg-black/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="w-full py-2.5 bg-black text-white text-sm font-medium rounded-sm hover:bg-black/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Add to Watching
               </button>

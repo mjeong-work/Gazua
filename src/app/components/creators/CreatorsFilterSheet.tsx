@@ -7,7 +7,7 @@ export type Difficulty = 'Beginner' | 'Intermediate' | 'Advanced';
 const DIFFICULTY_OPTIONS: Difficulty[] = ['Beginner', 'Intermediate', 'Advanced'];
 
 const PILL_CLASS = (active: boolean) =>
-  `px-5 py-2.5 rounded-full text-sm font-medium border transition-colors ${
+  `px-5 py-2.5 rounded-sm text-sm font-medium border transition-colors ${
     active ? 'bg-black text-white border-black' : 'bg-white text-neutral-700 border-neutral-200 hover:border-neutral-300'
   }`;
 
@@ -21,7 +21,7 @@ interface CreatorsFilterSheetProps {
 }
 
 // Mobile-only bottom sheet for the /creators Difficulty filter — same drag-to-dismiss sheet
-// convention as ReelInlineCommentsSheet (rounded-t-2xl, drag handle, spring slide-up), just
+// convention as ReelInlineCommentsSheet (rounded-t-md, drag handle, spring slide-up), just
 // fixed to the viewport instead of scoped to a reel card since this is a page-level control.
 export default function CreatorsFilterSheet({
   difficultyFilters,
@@ -62,7 +62,7 @@ export default function CreatorsFilterSheet({
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
         transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', damping: 32, stiffness: 320 }}
-        className="absolute inset-x-0 bottom-0 max-h-[80vh] rounded-t-2xl bg-white shadow-2xl flex flex-col touch-none"
+        className="absolute inset-x-0 bottom-0 max-h-[80vh] rounded-t-md bg-white shadow-2xl flex flex-col touch-none"
         onClick={(e) => e.stopPropagation()}
       >
         <div
@@ -118,13 +118,13 @@ export default function CreatorsFilterSheet({
           <button
             onClick={onClear}
             disabled={!hasActiveFilters}
-            className="flex-1 px-4 py-3 rounded-full text-sm font-medium border border-neutral-200 text-neutral-700 hover:bg-neutral-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex-1 px-4 py-3 rounded-sm text-sm font-medium border border-neutral-200 text-neutral-700 hover:bg-neutral-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             Clear all
           </button>
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-3 rounded-full text-sm font-medium bg-black text-white hover:bg-black/90 transition-colors"
+            className="flex-1 px-4 py-3 rounded-sm text-sm font-medium bg-black text-white hover:bg-black/90 transition-colors"
           >
             Show results
           </button>

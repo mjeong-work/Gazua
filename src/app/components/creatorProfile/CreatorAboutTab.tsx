@@ -17,13 +17,13 @@ export default function CreatorAboutTab({ creator, dbProfile, followerCount, sec
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-2 space-y-5">
-        <div className="p-5 bg-white border border-neutral-200 rounded-xl">
+        <div className="p-5 bg-white border border-neutral-200 rounded-md">
           <h2 className="text-base font-semibold mb-3">About {creator.name}</h2>
           <p className="text-sm text-neutral-700 leading-relaxed">
             {creator.bio || <span className="text-neutral-400 italic">This creator hasn't added a bio yet.</span>}
           </p>
         </div>
-        <div className="p-4 border border-amber-200 bg-amber-50 rounded-xl">
+        <div className="p-4 border border-amber-200 bg-amber-50 rounded-md">
           <p className="text-xs text-amber-800 leading-relaxed">
             <strong>Disclaimer:</strong> Content shared is for educational purposes only and not financial advice. Always do your own research and consult a licensed advisor before making investment decisions.
           </p>
@@ -31,11 +31,11 @@ export default function CreatorAboutTab({ creator, dbProfile, followerCount, sec
       </div>
       <div className="space-y-4">
         {(dbProfile?.tags?.length || creator.focus) && (
-          <div className="p-5 bg-white border border-neutral-200 rounded-xl">
+          <div className="p-5 bg-white border border-neutral-200 rounded-md">
             <h3 className="text-base font-semibold mb-3">Focus Areas</h3>
             <div className="flex flex-wrap gap-2">
               {(dbProfile?.tags?.length ? dbProfile.tags : [creator.focus]).map(tag => (
-                <span key={tag} className="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-xs font-medium">{tag}</span>
+                <span key={tag} className="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-sm text-xs font-medium">{tag}</span>
               ))}
             </div>
           </div>
@@ -45,10 +45,10 @@ export default function CreatorAboutTab({ creator, dbProfile, followerCount, sec
             defaults to a guessed value: "not shared yet" is the correct state for most
             creators today, not an error to hide. */}
         {dbProfile && (
-          <div className="p-5 bg-white border border-neutral-200 rounded-xl">
+          <div className="p-5 bg-white border border-neutral-200 rounded-md">
             <h3 className="text-base font-semibold mb-3">Investing Style</h3>
             {dbProfile.creator_risk_style ? (
-              <span className="inline-flex px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-xs font-medium">
+              <span className="inline-flex px-3 py-1 bg-neutral-100 text-neutral-700 rounded-sm text-xs font-medium">
                 {RISK_STYLE_LABELS[dbProfile.creator_risk_style]}
               </span>
             ) : (
@@ -56,7 +56,7 @@ export default function CreatorAboutTab({ creator, dbProfile, followerCount, sec
             )}
           </div>
         )}
-        <div className="p-5 bg-white border border-neutral-200 rounded-xl space-y-3">
+        <div className="p-5 bg-white border border-neutral-200 rounded-md space-y-3">
           <h3 className="text-base font-semibold">By the numbers</h3>
           {[
             { label: 'Followers', value: followerCount !== null ? followerCount.toLocaleString() : creator.followers },

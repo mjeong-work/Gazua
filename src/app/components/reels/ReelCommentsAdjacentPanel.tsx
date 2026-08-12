@@ -34,7 +34,7 @@ export default function ReelCommentsAdjacentPanel({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 12 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
-      className={`flex flex-col rounded-2xl border overflow-hidden ${
+      className={`flex flex-col rounded-md border overflow-hidden ${
         dark ? 'bg-neutral-900/95 backdrop-blur-md border-white/10 text-white' : 'bg-white border-neutral-200'
       } ${className}`}
       role="region"

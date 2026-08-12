@@ -156,7 +156,7 @@ export default function CommentPanel({
         onDragEnd={handleDragEnd}
         animate={{ y: show ? 0 : '100%' }}
         transition={{ type: 'spring', damping: 32, stiffness: 300 }}
-        className="absolute inset-x-0 bottom-0 h-[75vh] bg-white rounded-t-2xl shadow-2xl flex flex-col touch-none"
+        className="absolute inset-x-0 bottom-0 h-[75vh] bg-white rounded-t-md shadow-2xl flex flex-col touch-none"
         onClick={e => e.stopPropagation()}
       >
         {/* Drag handle */}
@@ -244,7 +244,7 @@ export default function CommentPanel({
                   onChange={e => setText(e.target.value.slice(0, 500))}
                   onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }}
                   disabled={submitting}
-                  className="flex-1 px-3 py-1.5 border border-neutral-200 rounded-full text-sm focus:outline-none focus:border-brand transition-colors disabled:opacity-50 bg-neutral-50"
+                  className="flex-1 px-3 py-1.5 border border-neutral-200 rounded-sm text-sm focus:outline-none focus:border-brand transition-colors disabled:opacity-50 bg-neutral-50"
                 />
                 <button
                   onClick={handleSubmit}

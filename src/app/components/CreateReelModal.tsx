@@ -153,7 +153,7 @@ export default function CreateReelModal({ onClose, onSuccess }: CreateReelModalP
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col lg:items-center lg:justify-center lg:bg-black/50 lg:p-6">
-      <div className="flex-1 min-h-0 flex flex-col bg-white lg:flex-none lg:w-full lg:max-w-4xl lg:max-h-[85vh] lg:rounded-2xl lg:shadow-2xl lg:overflow-hidden">
+      <div className="flex-1 min-h-0 flex flex-col bg-white lg:flex-none lg:w-full lg:max-w-4xl lg:max-h-[85vh] lg:rounded-md lg:shadow-2xl lg:overflow-hidden">
         {/* Top bar */}
         <div className="flex-shrink-0 flex items-center justify-between px-4 py-3">
           <button
@@ -194,7 +194,7 @@ export default function CreateReelModal({ onClose, onSuccess }: CreateReelModalP
               onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
               onDragLeave={() => setIsDragging(false)}
               onDrop={(e) => { e.preventDefault(); setIsDragging(false); handleFileSelected(e.dataTransfer.files?.[0]); }}
-              className={`relative aspect-[4/5] h-[36vh] max-h-72 mx-auto lg:h-[60vh] lg:max-h-[520px] lg:mx-0 rounded-2xl cursor-pointer overflow-hidden transition-colors ${
+              className={`relative aspect-[4/5] h-[36vh] max-h-72 mx-auto lg:h-[60vh] lg:max-h-[520px] lg:mx-0 rounded-md cursor-pointer overflow-hidden transition-colors ${
                 thumbnailPreviewUrl
                   ? ''
                   : `flex flex-col items-center justify-center px-4 border border-dashed ${isDragging ? 'border-brand bg-green-50' : 'border-neutral-200 hover:border-neutral-300'}`
@@ -238,7 +238,7 @@ export default function CreateReelModal({ onClose, onSuccess }: CreateReelModalP
                   placeholder="NVDA, Bitcoin, Market Update"
                   value={ticker}
                   onChange={(e) => setTicker(e.target.value)}
-                  className="w-full pl-8 pr-4 py-2.5 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                  className="w-full pl-8 pr-4 py-2.5 border border-neutral-200 rounded-sm text-sm focus:outline-none focus:border-brand"
                 />
               </div>
             </div>

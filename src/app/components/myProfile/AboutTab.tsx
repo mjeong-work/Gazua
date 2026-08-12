@@ -187,13 +187,13 @@ export default function AboutTab({ bioText, onEditProfile, videosCount, postsCou
 
         {/* Experience — local-only preview: there's no profiles column for this yet, so
             edits here don't persist across sessions or reach the public profile. */}
-        <div className="p-5 bg-white border border-neutral-200 rounded-xl">
+        <div className="p-5 bg-white border border-neutral-200 rounded-md">
           <div className="flex items-center justify-between mb-1">
             <h3 className="text-base font-semibold">Experience</h3>
             {isEditingExperience ? (
               <div className="flex items-center gap-2">
-                <button onClick={handleSaveExperience} className="text-xs font-medium px-3 py-1.5 bg-black text-white rounded-full hover:bg-black/80 transition-colors">Save</button>
-                <button onClick={() => setIsEditingExperience(false)} className="text-xs font-medium px-3 py-1.5 border border-neutral-200 rounded-full hover:bg-neutral-50 transition-colors">Cancel</button>
+                <button onClick={handleSaveExperience} className="text-xs font-medium px-3 py-1.5 bg-black text-white rounded-sm hover:bg-black/80 transition-colors">Save</button>
+                <button onClick={() => setIsEditingExperience(false)} className="text-xs font-medium px-3 py-1.5 border border-neutral-200 rounded-sm hover:bg-neutral-50 transition-colors">Cancel</button>
               </div>
             ) : (
               <button onClick={handleStartEditExperience} className="flex items-center gap-1.5 text-xs font-medium text-neutral-500 hover:text-black transition-colors">
@@ -225,7 +225,7 @@ export default function AboutTab({ bioText, onEditProfile, videosCount, postsCou
           </div>
         </div>
 
-        <div className="p-4 border border-amber-200 bg-amber-50 rounded-xl">
+        <div className="p-4 border border-amber-200 bg-amber-50 rounded-md">
           <p className="text-xs text-amber-800 leading-relaxed">
             <strong>Disclaimer:</strong> Content is for educational purposes only and not financial advice. Always do your own research and consult a licensed advisor before making investment decisions.
           </p>
@@ -234,15 +234,15 @@ export default function AboutTab({ bioText, onEditProfile, videosCount, postsCou
 
       <div className="space-y-4">
         {/* Focus Areas */}
-        <div className="p-5 bg-white border border-neutral-200 rounded-xl">
+        <div className="p-5 bg-white border border-neutral-200 rounded-md">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-base font-semibold">Focus Areas</h3>
             {isEditingFocusAreas ? (
               <div className="flex items-center gap-2">
-                <button onClick={handleSaveFocusAreas} disabled={savingFocusAreas} className="text-xs font-medium px-3 py-1.5 bg-black text-white rounded-full hover:bg-black/80 transition-colors disabled:opacity-50">
+                <button onClick={handleSaveFocusAreas} disabled={savingFocusAreas} className="text-xs font-medium px-3 py-1.5 bg-black text-white rounded-sm hover:bg-black/80 transition-colors disabled:opacity-50">
                   {savingFocusAreas ? 'Saving…' : 'Save'}
                 </button>
-                <button onClick={() => setIsEditingFocusAreas(false)} className="text-xs font-medium px-3 py-1.5 border border-neutral-200 rounded-full hover:bg-neutral-50 transition-colors">Cancel</button>
+                <button onClick={() => setIsEditingFocusAreas(false)} className="text-xs font-medium px-3 py-1.5 border border-neutral-200 rounded-sm hover:bg-neutral-50 transition-colors">Cancel</button>
               </div>
             ) : (
               <button onClick={handleStartEditFocusAreas} className="flex items-center gap-1.5 text-xs font-medium text-neutral-500 hover:text-black transition-colors">
@@ -252,7 +252,7 @@ export default function AboutTab({ bioText, onEditProfile, videosCount, postsCou
           </div>
           <div className="flex flex-wrap gap-2">
             {(isEditingFocusAreas ? editFocusAreas : focusAreas).map((tag) => (
-              <span key={tag} className="inline-flex items-center gap-1 px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-xs font-medium">
+              <span key={tag} className="inline-flex items-center gap-1 px-3 py-1 bg-neutral-100 text-neutral-700 rounded-sm text-xs font-medium">
                 {tag}
                 {isEditingFocusAreas && (
                   <button onClick={() => handleRemoveFocusArea(tag)} className="text-neutral-400 hover:text-red-500 transition-colors ml-0.5">
@@ -272,7 +272,7 @@ export default function AboutTab({ bioText, onEditProfile, videosCount, postsCou
                 onChange={e => setNewFocusArea(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter') handleAddFocusArea(); }}
                 placeholder="Add area..."
-                className="flex-1 text-xs border border-neutral-200 rounded-full px-3 py-1.5 focus:outline-none focus:border-black"
+                className="flex-1 text-xs border border-neutral-200 rounded-sm px-3 py-1.5 focus:outline-none focus:border-black"
               />
               <button onClick={handleAddFocusArea} className="icon-tap-target p-1.5 bg-black text-white rounded-full hover:bg-black/80 transition-colors">
                 <AddIcon sx={{ fontSize: 14 }} />
@@ -283,15 +283,15 @@ export default function AboutTab({ bioText, onEditProfile, videosCount, postsCou
         </div>
 
         {/* Investing Style */}
-        <div className="p-5 bg-white border border-neutral-200 rounded-xl">
+        <div className="p-5 bg-white border border-neutral-200 rounded-md">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-base font-semibold">Investing Style</h3>
             {isEditingRiskStyle ? (
               <div className="flex items-center gap-2">
-                <button onClick={handleSaveRiskStyle} disabled={savingRiskStyle} className="text-xs font-medium px-3 py-1.5 bg-black text-white rounded-full hover:bg-black/80 transition-colors disabled:opacity-50">
+                <button onClick={handleSaveRiskStyle} disabled={savingRiskStyle} className="text-xs font-medium px-3 py-1.5 bg-black text-white rounded-sm hover:bg-black/80 transition-colors disabled:opacity-50">
                   {savingRiskStyle ? 'Saving…' : 'Save'}
                 </button>
-                <button onClick={() => setIsEditingRiskStyle(false)} className="text-xs font-medium px-3 py-1.5 border border-neutral-200 rounded-full hover:bg-neutral-50 transition-colors">Cancel</button>
+                <button onClick={() => setIsEditingRiskStyle(false)} className="text-xs font-medium px-3 py-1.5 border border-neutral-200 rounded-sm hover:bg-neutral-50 transition-colors">Cancel</button>
               </div>
             ) : (
               <button onClick={handleStartEditRiskStyle} className="flex items-center gap-1.5 text-xs font-medium text-neutral-500 hover:text-black transition-colors">
@@ -306,7 +306,7 @@ export default function AboutTab({ bioText, onEditProfile, videosCount, postsCou
                   <button
                     key={style}
                     onClick={() => setEditRiskStyle(style)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                    className={`px-3 py-1.5 rounded-sm text-xs font-medium border transition-colors ${
                       editRiskStyle === style ? 'bg-black text-white border-black' : 'bg-white text-neutral-600 border-neutral-200 hover:border-neutral-300'
                     }`}
                   >
@@ -322,7 +322,7 @@ export default function AboutTab({ bioText, onEditProfile, videosCount, postsCou
               {riskStyleError && <p className="text-xs text-red-500">{riskStyleError}</p>}
             </div>
           ) : profile?.creator_risk_style ? (
-            <span className="inline-flex px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-xs font-medium">
+            <span className="inline-flex px-3 py-1 bg-neutral-100 text-neutral-700 rounded-sm text-xs font-medium">
               {RISK_STYLE_LABELS[profile.creator_risk_style]}
             </span>
           ) : (
@@ -331,15 +331,15 @@ export default function AboutTab({ bioText, onEditProfile, videosCount, postsCou
         </div>
 
         {/* Portfolio Allocation */}
-        <div className="p-5 bg-white border border-neutral-200 rounded-xl">
+        <div className="p-5 bg-white border border-neutral-200 rounded-md">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-base font-semibold">Portfolio Allocation</h3>
             {isEditingAllocation ? (
               <div className="flex items-center gap-2">
-                <button onClick={handleSaveAllocation} disabled={savingAllocation || !canSaveAllocation} className="text-xs font-medium px-3 py-1.5 bg-black text-white rounded-full hover:bg-black/80 transition-colors disabled:opacity-40">
+                <button onClick={handleSaveAllocation} disabled={savingAllocation || !canSaveAllocation} className="text-xs font-medium px-3 py-1.5 bg-black text-white rounded-sm hover:bg-black/80 transition-colors disabled:opacity-40">
                   {savingAllocation ? 'Saving…' : 'Save'}
                 </button>
-                <button onClick={() => setIsEditingAllocation(false)} className="text-xs font-medium px-3 py-1.5 border border-neutral-200 rounded-full hover:bg-neutral-50 transition-colors">Cancel</button>
+                <button onClick={() => setIsEditingAllocation(false)} className="text-xs font-medium px-3 py-1.5 border border-neutral-200 rounded-sm hover:bg-neutral-50 transition-colors">Cancel</button>
               </div>
             ) : (
               <button onClick={handleStartEditAllocation} className="flex items-center gap-1.5 text-xs font-medium text-neutral-500 hover:text-black transition-colors">
@@ -397,7 +397,7 @@ export default function AboutTab({ bioText, onEditProfile, videosCount, postsCou
         </div>
 
         {/* Stats */}
-        <div className="p-5 bg-white border border-neutral-200 rounded-xl space-y-3">
+        <div className="p-5 bg-white border border-neutral-200 rounded-md space-y-3">
           <h3 className="text-base font-semibold">By the numbers</h3>
           {[
             { label: 'Followers', value: '127K' },

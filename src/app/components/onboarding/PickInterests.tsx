@@ -65,7 +65,7 @@ export default function PickInterests() {
             <button
               key={interest}
               onClick={() => toggleInterest(interest)}
-              className={`px-6 py-3 rounded-full border-2 transition-all font-medium ${
+              className={`px-6 py-3 rounded-sm border-2 transition-all font-medium ${
                 selectedInterests.includes(interest)
                   ? 'bg-mint border-mint text-black shadow-md'
                   : 'border-neutral-200 text-neutral-700 hover:border-neutral-300 hover:bg-neutral-50'
@@ -93,7 +93,7 @@ export default function PickInterests() {
         <button
           onClick={handleContinue}
           disabled={selectedInterests.length < 3}
-          className="w-full px-8 py-4 bg-black text-white rounded-full hover:bg-black/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full px-8 py-4 bg-black text-white rounded-sm hover:bg-black/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Continue
         </button>

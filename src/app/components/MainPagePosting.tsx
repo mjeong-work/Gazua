@@ -6,6 +6,7 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import ShareIcon from '@mui/icons-material/Share';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import CloseIcon from '@mui/icons-material/Close';
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { useOnboarding } from '../contexts/OnboardingContext';
 import { CHART_TOOLTIP_STYLE, chartCurrencyFormatter, showChartLabel } from '../utils/chartTooltip';
@@ -205,7 +206,7 @@ function InlineComments({
               onChange={e => setText(e.target.value.slice(0, 500))}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }}
               disabled={submitting}
-              className="flex-1 px-3 py-1.5 border border-neutral-200 rounded-full text-xs focus:outline-none focus:border-brand transition-colors disabled:opacity-50 bg-neutral-50"
+              className="flex-1 px-3 py-1.5 border border-neutral-200 rounded-sm text-xs focus:outline-none focus:border-brand transition-colors disabled:opacity-50 bg-neutral-50"
             />
             <button
               onClick={handleSubmit}
@@ -232,6 +233,15 @@ export default function MainPagePosting() {
   const [activeTab, setActiveTab] = useState<'posting' | 'reels' | 'following'>('posting');
   const [contentFilter, setContentFilter] = useState<'All' | 'Stocks' | 'ETFs' | 'Crypto' | 'Retirement' | 'Options' | 'News' | 'Beginner'>('All');
   const { addToWatchlist, removeBySource, isSaved } = useWatchlist();
+
+  // Onboarding welcome banner — dismissible, persisted so it stays hidden after reload.
+  const [welcomeBannerDismissed, setWelcomeBannerDismissed] = useState(() => {
+    try { return localStorage.getItem('gazua:welcome_banner_dismissed') === '1'; } catch { return false; }
+  });
+  const dismissWelcomeBanner = () => {
+    setWelcomeBannerDismissed(true);
+    try { localStorage.setItem('gazua:welcome_banner_dismissed', '1'); } catch { /* ignore */ }
+  };
 
   // Like state — keyed by db_id (UUID) for DB posts, or 'local-{id}' for mock posts.
   const [likedPosts, setLikedPosts] = useState<Set<string>>(() => {
@@ -550,7 +560,7 @@ export default function MainPagePosting() {
             </div>
 
             {/* Chart */}
-            <div className="mb-4 bg-white rounded-xl w-full">
+            <div className="mb-4 bg-white rounded-md w-full">
               <div className="h-64 w-full">
                 {chartData ? (
                   <ResponsiveContainer width="100%" height={256}>
@@ -595,7 +605,7 @@ export default function MainPagePosting() {
             <div className="space-y-3">
               {indicesLoading
                 ? [1, 2, 3, 4].map(n => (
-                    <div key={n} className="p-4 bg-neutral-50 rounded-lg animate-pulse">
+                    <div key={n} className="p-4 bg-neutral-50 rounded-md animate-pulse">
                       <div className="flex items-center justify-between mb-2">
                         <div className="h-3 bg-neutral-200 rounded w-20" />
                         <div className="h-3 bg-neutral-200 rounded w-12" />
@@ -604,7 +614,7 @@ export default function MainPagePosting() {
                     </div>
                   ))
                 : liveIndices.map(index => (
-                    <div key={index.id} className="p-4 bg-neutral-50 rounded-lg">
+                    <div key={index.id} className="p-4 bg-neutral-50 rounded-md">
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-neutral-600">{index.name}</span>
                         <span className={`text-xs font-medium ${index.positive ? 'text-brand' : 'text-red-500'}`}>{index.change}</span>
@@ -616,7 +626,7 @@ export default function MainPagePosting() {
             </div>
 
             {/* Personalized Banner */}
-            <div className="mt-4 p-4 bg-mint rounded-lg">
+            <div className="mt-4 p-4 bg-mint rounded-md">
               <h3 className="font-bold mb-1">
                 {isOnboarded && onboardingData.riskStyle
                   ? `${onboardingData.riskStyle === 'conservative' ? 'Safe & Steady' : onboardingData.riskStyle === 'balanced' ? 'Balanced Growth' : onboardingData.riskStyle === 'aggressive' ? 'High Growth' : 'High Risk, High Reward'} Resources`
@@ -680,7 +690,7 @@ export default function MainPagePosting() {
                     <button
                       key={filter}
                       onClick={() => setContentFilter(filter)}
-                      className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${contentFilter === filter ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'}`}
+                      className={`px-4 py-1.5 rounded-sm text-xs font-medium whitespace-nowrap transition-colors ${contentFilter === filter ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'}`}
                     >
                       {filter}
                     </button>
@@ -711,18 +721,25 @@ export default function MainPagePosting() {
                         </div>
                         <h3 className="text-xl font-bold mb-2">Follow Creators to See Their Content</h3>
                         <p className="text-neutral-600 mb-6 max-w-sm">When you follow creators, their posts will appear here. Discover and follow investors who share your interests.</p>
-                        <button onClick={() => setActiveTab('posting')} className="px-6 py-3 bg-black text-white rounded-full hover:bg-black/90 transition-colors">
+                        <button onClick={() => setActiveTab('posting')} className="px-6 py-3 bg-black text-white rounded-sm hover:bg-black/90 transition-colors">
                           Explore All Posts
                         </button>
                       </div>
                     )}
 
                     {/* ── Posting tab: personalised onboarding banner ───────── */}
-                    {!isFollowingTab && isOnboarded && onboardingData.level && activeTab === 'posting' && !ticker && (
-                      <div className="bg-gradient-to-r from-mint/10 to-emerald-500/10 border border-mint/30 rounded-xl p-5 mb-6">
+                    {!isFollowingTab && isOnboarded && onboardingData.level && activeTab === 'posting' && !ticker && !welcomeBannerDismissed && (
+                      <div className="relative bg-gradient-to-r from-mint/10 to-emerald-500/10 border border-mint/30 rounded-md p-5 mb-6">
+                        <button
+                          onClick={dismissWelcomeBanner}
+                          className="icon-tap-target absolute top-2 right-2 p-1.5 hover:bg-black/5 rounded-full transition-colors"
+                          aria-label="Dismiss"
+                        >
+                          <CloseIcon sx={{ fontSize: 18 }} />
+                        </button>
                         <div className="flex items-start justify-between mb-3">
                           <div>
-                            <h3 className="text-lg font-bold mb-1">
+                            <h3 className="text-lg font-bold mb-1 pr-6">
                               Welcome, {onboardingData.level === 'beginner' ? 'Explorer' : onboardingData.level === 'experienced' ? 'Analyst' : 'Expert'}! 🎉
                             </h3>
                             <p className="text-sm text-neutral-600">
@@ -736,7 +753,7 @@ export default function MainPagePosting() {
                           <div className="flex flex-wrap gap-2 mb-2">
                             <span className="text-xs text-neutral-600">Your interests:</span>
                             {onboardingData.interests.map(interest => (
-                              <span key={interest} className="px-2 py-1 bg-mint/20 text-brand text-xs font-medium rounded-full border border-mint/30">
+                              <span key={interest} className="px-2 py-1 bg-mint/20 text-brand text-xs font-medium rounded-sm border border-mint/30">
                                 {interest}
                               </span>
                             ))}
@@ -755,7 +772,7 @@ export default function MainPagePosting() {
                     {activePostsLoading && (
                       <div className="space-y-4">
                         {[1, 2, 3].map(n => (
-                          <div key={n} className="bg-white border border-neutral-200 rounded-xl p-5 animate-pulse">
+                          <div key={n} className="bg-white border border-neutral-200 rounded-md p-5 animate-pulse">
                             <div className="flex items-start gap-3 mb-3">
                               <div className="w-10 h-10 rounded-full bg-neutral-200 flex-shrink-0" />
                               <div className="flex-1 space-y-2">
@@ -822,7 +839,7 @@ export default function MainPagePosting() {
                       const isPostSaved = isSaved('post', post.db_id);
                       const algoLabel = derivePostLabel(post.likes, post.shares, post.verified, post.category);
                       return (
-                        <div key={post.id} className="bg-white border border-neutral-200 rounded-xl p-5 hover:border-neutral-300 transition-colors">
+                        <div key={post.id} className="bg-white border border-neutral-200 rounded-md p-5 hover:border-neutral-300 transition-colors">
                           <div className="flex items-start gap-3 mb-3">
                             <button
                               onClick={() => navigate(`/profile/${post.creator_id}/investment`)}
@@ -945,7 +962,7 @@ export default function MainPagePosting() {
 
       {/* Toast */}
       {showToast && (
-        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 lg:bottom-8 bg-brand text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3 z-50 animate-slide-up pointer-events-none">
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 lg:bottom-8 bg-brand text-white px-6 py-4 rounded-md shadow-lg flex items-center gap-3 z-50 animate-slide-up pointer-events-none">
           <div>
             <p className="font-bold">{toastMessage}</p>
             {toastSubtitle && <p className="text-sm opacity-90">{toastSubtitle}</p>}

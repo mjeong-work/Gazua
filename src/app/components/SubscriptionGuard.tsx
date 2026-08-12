@@ -25,7 +25,7 @@ function DefaultUpgradePrompt({ requiredTier }: { requiredTier: SubscriptionTier
       </p>
       <button
         onClick={() => navigate('/pricing')}
-        className="mt-2 px-5 py-2 bg-black text-white text-sm rounded-full hover:bg-black/80 transition-colors"
+        className="mt-2 px-5 py-2 bg-black text-white text-sm rounded-sm hover:bg-black/80 transition-colors"
       >
         View plans
       </button>

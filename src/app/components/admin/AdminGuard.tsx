@@ -32,7 +32,7 @@ export default function AdminGuard({ children }: { children: ReactNode }) {
           </p>
           <button
             onClick={() => navigate('/main')}
-            className="px-6 py-2.5 bg-black text-white font-medium text-sm rounded-full hover:bg-black/80 transition-colors"
+            className="px-6 py-2.5 bg-black text-white font-medium text-sm rounded-sm hover:bg-black/80 transition-colors"
           >
             Back to Gazua
           </button>

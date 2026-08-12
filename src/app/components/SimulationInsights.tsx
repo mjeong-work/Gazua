@@ -4,7 +4,7 @@ interface Props {
 
 export default function SimulationInsights({ insights }: Props) {
   return (
-    <div className="rounded-2xl border border-yellow-200 bg-yellow-50 p-5">
+    <div className="rounded-md border border-yellow-200 bg-yellow-50 p-5">
       <div className="flex items-center gap-2 mb-4">
         <svg className="w-4 h-4 text-yellow-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
           <path

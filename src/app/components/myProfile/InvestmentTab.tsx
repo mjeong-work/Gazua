@@ -143,7 +143,7 @@ export default function InvestmentTab() {
     <div className="space-y-4">
 
       {/* Simulator Toggle */}
-      <div className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg border border-neutral-200">
+      <div className="flex items-center justify-between p-3 bg-neutral-50 rounded-md border border-neutral-200">
         <div>
           <h3 className="font-medium text-sm mb-0.5">Portfolio Simulator</h3>
           <p className="text-xs text-neutral-500">Test hypothetical investment scenarios</p>
@@ -168,7 +168,7 @@ export default function InvestmentTab() {
                 <button
                   key={sim.id}
                   onClick={() => { setSelectedSimulationId(sim.id); setSimulationExpanded(false); }}
-                  className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
+                  className={`flex-shrink-0 px-3 py-1.5 rounded-sm text-xs font-medium transition-colors whitespace-nowrap ${
                     sim.id === selectedSimulationId ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
                   }`}
                 >
@@ -178,7 +178,7 @@ export default function InvestmentTab() {
             </div>
             <button
               onClick={() => setShowNewSimulationForm(true)}
-              className="flex-shrink-0 flex items-center gap-1 px-3 py-1.5 bg-black text-white rounded-full text-xs font-medium hover:bg-black/80 transition-colors"
+              className="flex-shrink-0 flex items-center gap-1 px-3 py-1.5 bg-black text-white rounded-sm text-xs font-medium hover:bg-black/80 transition-colors"
             >
               <AddIcon sx={{ fontSize: 14 }} />
               New
@@ -186,7 +186,7 @@ export default function InvestmentTab() {
           </div>
 
           {/* Simulation Setup */}
-          <div onClick={() => setSimulationExpanded(!simulationExpanded)} className="p-4 bg-white rounded-lg border border-neutral-200 cursor-pointer hover:border-neutral-300 transition-colors">
+          <div onClick={() => setSimulationExpanded(!simulationExpanded)} className="p-4 bg-white rounded-md border border-neutral-200 cursor-pointer hover:border-neutral-300 transition-colors">
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-base font-semibold">{selectedSimulation.name}</h2>
               <svg className={`w-4 h-4 text-neutral-500 transition-transform flex-shrink-0 ${simulationExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -245,30 +245,30 @@ export default function InvestmentTab() {
           <div>
             <h2 className="text-base font-semibold mb-3">Hypothesis vs Actual Performance</h2>
             {!hasSimPerformance ? (
-              <div className="p-6 bg-neutral-50 rounded-lg border border-neutral-200 text-center">
+              <div className="p-6 bg-neutral-50 rounded-md border border-neutral-200 text-center">
                 <p className="text-sm font-medium text-neutral-700 mb-1">This simulation just started</p>
                 <p className="text-xs text-neutral-500">Performance data will appear here once enough time has passed to compare your hypothesis against the market.</p>
               </div>
             ) : (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-                  <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                  <div className="p-3 bg-purple-50 rounded-md border border-purple-200">
                     <p className="text-xs text-neutral-600 mb-1">Your Hypothesis</p>
                     <p className="text-xl font-bold text-purple-700 mb-0.5">{selectedSimulation.hypothesisPercent! >= 0 ? '+' : ''}{selectedSimulation.hypothesisPercent!.toFixed(1)}%</p>
                     <p className="text-xs text-neutral-500">${simHypothesisValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
                   </div>
-                  <div className="p-3 bg-green-50 rounded-lg border border-green-200">
+                  <div className="p-3 bg-green-50 rounded-md border border-green-200">
                     <p className="text-xs text-neutral-600 mb-1">Actual Performance</p>
                     <p className="text-xl font-bold text-brand mb-0.5">{selectedSimulation.actualPercent! >= 0 ? '+' : ''}{selectedSimulation.actualPercent!.toFixed(1)}%</p>
                     <p className="text-xs text-neutral-500">${simActualValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
                   </div>
-                  <div className={`p-3 rounded-lg border ${simDiffPercent >= 0 ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+                  <div className={`p-3 rounded-md border ${simDiffPercent >= 0 ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
                     <p className="text-xs text-neutral-600 mb-1">Difference</p>
                     <p className={`text-xl font-bold mb-0.5 ${simDiffPercent >= 0 ? 'text-brand' : 'text-red-700'}`}>{simDiffPercent >= 0 ? '+' : ''}{simDiffPercent.toFixed(1)}%</p>
                     <p className="text-xs text-neutral-500">{simDiffValue >= 0 ? '+' : '-'}${Math.abs(simDiffValue).toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
                   </div>
                 </div>
-                <div className="bg-neutral-50 rounded-lg p-4">
+                <div className="bg-neutral-50 rounded-md p-4">
                   <div className="h-48 w-full">
                     <ResponsiveContainer width="100%" height={192}>
                       <LineChart key="sim-chart">
@@ -290,13 +290,13 @@ export default function InvestmentTab() {
           </div>
 
           {/* Past Simulations */}
-          <button onClick={() => setShowSimulationList(!showSimulationList)} className="w-full p-3 bg-white rounded-lg border border-neutral-200 hover:border-neutral-300 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-neutral-600">
+          <button onClick={() => setShowSimulationList(!showSimulationList)} className="w-full p-3 bg-white rounded-md border border-neutral-200 hover:border-neutral-300 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-neutral-600">
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
             {showSimulationList ? 'Hide Past Simulations' : 'View Past Simulations'}
           </button>
 
           {showSimulationList && (
-            <div className="p-4 bg-white rounded-lg border border-neutral-200 space-y-2.5">
+            <div className="p-4 bg-white rounded-md border border-neutral-200 space-y-2.5">
               <h3 className="font-semibold text-sm mb-3">Past Simulations</h3>
               {[
                 { name: 'Tech Growth Portfolio', date: 'Dec 1, 2025 – Mar 1, 2026', holdings: '3 Holdings', capital: '$75,000', hypo: '+22.0%', actual: '+18.5%', diff: '-3.5%', diffPos: false },
@@ -325,7 +325,7 @@ export default function InvestmentTab() {
         /* ── Real Portfolio View ── */
         <div className="space-y-5">
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand/10 text-brand text-xs font-semibold rounded-full border border-brand/20">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand/10 text-brand text-xs font-semibold rounded-sm border border-brand/20">
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               Actual Portfolio
             </span>
@@ -337,7 +337,7 @@ export default function InvestmentTab() {
               <h2 className="text-base font-semibold">Performance Chart</h2>
               <p className="text-base font-medium text-brand">+2.66%</p>
             </div>
-            <div className="bg-neutral-50 rounded-xl p-4">
+            <div className="bg-neutral-50 rounded-md p-4">
               <div className="h-48 w-full">
                 <ResponsiveContainer width="100%" height={192}>
                   <LineChart data={portfolioData} key="my-profile-line-chart">
@@ -382,7 +382,7 @@ export default function InvestmentTab() {
                 </div>
               </div>
             ) : (
-              <div className="p-6 bg-neutral-50 rounded-lg border border-neutral-200 text-center">
+              <div className="p-6 bg-neutral-50 rounded-md border border-neutral-200 text-center">
                 <p className="text-sm text-neutral-500">Portfolio allocation not disclosed yet.</p>
               </div>
             )}
@@ -398,7 +398,7 @@ export default function InvestmentTab() {
 
         return (
           <Overlay onClose={handleCloseNewSimForm}>
-            <div className="bg-white rounded-2xl shadow-xl w-[min(520px,90vw)] max-h-[85vh] overflow-y-auto p-6">
+            <div className="bg-white rounded-md shadow-xl w-[min(520px,90vw)] max-h-[85vh] overflow-y-auto p-6">
               <div className="flex items-center justify-between mb-5">
                 <h2 className="text-lg font-bold">New Simulation</h2>
                 <button onClick={handleCloseNewSimForm} className="icon-tap-target p-1.5 hover:bg-neutral-100 rounded-full transition-colors"><CloseIcon sx={{ fontSize: 18 }} /></button>
@@ -411,7 +411,7 @@ export default function InvestmentTab() {
                     value={newSimName}
                     onChange={e => setNewSimName(e.target.value)}
                     placeholder="e.g. AI Growth Thesis"
-                    className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors"
+                    className="w-full px-3 py-2 border border-neutral-200 rounded-sm text-sm focus:outline-none focus:border-black transition-colors"
                   />
                 </div>
 
@@ -423,7 +423,7 @@ export default function InvestmentTab() {
                       value={newSimStartDate}
                       min={getTodayISODate()}
                       onChange={e => setNewSimStartDate(e.target.value)}
-                      className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors"
+                      className="w-full px-3 py-2 border border-neutral-200 rounded-sm text-sm focus:outline-none focus:border-black transition-colors"
                     />
                   </div>
                   <div>
@@ -434,7 +434,7 @@ export default function InvestmentTab() {
                       value={newSimCapital}
                       onChange={e => setNewSimCapital(e.target.value)}
                       placeholder="50000"
-                      className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors"
+                      className="w-full px-3 py-2 border border-neutral-200 rounded-sm text-sm focus:outline-none focus:border-black transition-colors"
                     />
                   </div>
                 </div>
@@ -448,7 +448,7 @@ export default function InvestmentTab() {
                           value={holding.symbol}
                           onChange={e => handleHoldingChange(i, 'symbol', e.target.value.toUpperCase())}
                           placeholder="Symbol (e.g. NVDA)"
-                          className="flex-1 px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors"
+                          className="flex-1 px-3 py-2 border border-neutral-200 rounded-sm text-sm focus:outline-none focus:border-black transition-colors"
                         />
                         <input
                           type="number"
@@ -456,7 +456,7 @@ export default function InvestmentTab() {
                           value={holding.amount}
                           onChange={e => handleHoldingChange(i, 'amount', e.target.value)}
                           placeholder="$ Amount"
-                          className="w-32 px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors"
+                          className="w-32 px-3 py-2 border border-neutral-200 rounded-sm text-sm focus:outline-none focus:border-black transition-colors"
                         />
                         {newSimHoldings.length > 1 && (
                           <button onClick={() => handleRemoveHoldingRow(i)} className="p-2 text-neutral-400 hover:text-red-500 transition-colors">
@@ -486,7 +486,7 @@ export default function InvestmentTab() {
                     onChange={e => setNewSimRationale(e.target.value)}
                     rows={3}
                     placeholder="Why are you testing this scenario?"
-                    className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors resize-none"
+                    className="w-full px-3 py-2 border border-neutral-200 rounded-sm text-sm focus:outline-none focus:border-black transition-colors resize-none"
                   />
                 </div>
               </div>

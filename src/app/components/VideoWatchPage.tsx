@@ -198,7 +198,7 @@ export default function VideoWatchPage() {
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-2">Video not found</h2>
             <p className="text-neutral-600 mb-4">This video doesn't exist or may have been removed.</p>
-            <button onClick={() => navigate('/creators')} className="px-6 py-3 bg-black text-white rounded-full hover:bg-black/80">
+            <button onClick={() => navigate('/creators')} className="px-6 py-3 bg-black text-white rounded-sm hover:bg-black/80">
               Browse Creators
             </button>
           </div>
@@ -222,7 +222,7 @@ export default function VideoWatchPage() {
           </button>
 
           {/* ── Player ── */}
-          <div className="relative aspect-video rounded-xl overflow-hidden mb-4 bg-black">
+          <div className="relative aspect-video rounded-md overflow-hidden mb-4 bg-black">
             {video.storagePath ? (
               <video
                 controls
@@ -284,7 +284,7 @@ export default function VideoWatchPage() {
 
             <button
               onClick={() => toggleFollow(video.creatorFollowId)}
-              className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
+              className={`px-5 py-2 rounded-sm text-sm font-medium transition-colors ${
                 isFollowingCreator ? 'bg-neutral-200 text-black hover:bg-neutral-300' : 'bg-black text-white hover:bg-black/80'
               }`}
             >
@@ -317,7 +317,7 @@ export default function VideoWatchPage() {
               <div className="flex gap-4 overflow-x-auto pb-2">
                 {video.moreVideos.map(v => (
                   <div key={v.id} onClick={() => navigate(`/watch/${v.id}`)} className="flex-shrink-0 w-64 group cursor-pointer">
-                    <div className="relative aspect-video rounded-xl overflow-hidden mb-2">
+                    <div className="relative aspect-video rounded-md overflow-hidden mb-2">
                       <div className="absolute inset-0" style={{ background: v.thumbnail }} />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity flex items-center justify-center">
                         <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center">

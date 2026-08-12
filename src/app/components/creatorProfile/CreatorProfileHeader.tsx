@@ -111,7 +111,7 @@ export default function CreatorProfileHeader({
                   <MoreHorizIcon sx={{ fontSize: 20 }} />
                 </button>
                 {showMoreMenu && dbProfile && (
-                  <div className="absolute right-0 top-full mt-1 bg-white border border-neutral-200 rounded-xl shadow-lg py-2 w-44 z-10" onMouseLeave={() => setShowMoreMenu(false)}>
+                  <div className="absolute right-0 top-full mt-1 bg-white border border-neutral-200 rounded-md shadow-lg py-2 w-44 z-10" onMouseLeave={() => setShowMoreMenu(false)}>
                     <ReportButton
                       contentType="creator_profile"
                       contentId={dbProfile.id}
@@ -180,7 +180,7 @@ export default function CreatorProfileHeader({
       )}
 
       {showToast && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-brand text-white px-6 py-4 rounded-xl shadow-lg z-50 animate-slide-up pointer-events-none">
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-brand text-white px-6 py-4 rounded-md shadow-lg z-50 animate-slide-up pointer-events-none">
           <p className="font-bold">{toastMessage}</p>
         </div>
       )}

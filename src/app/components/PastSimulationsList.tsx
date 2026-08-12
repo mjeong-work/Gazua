@@ -14,7 +14,7 @@ export default function PastSimulationsList({ simulations, selectedId, onSelect 
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div className="border border-neutral-200 rounded-2xl overflow-hidden">
+    <div className="border border-neutral-200 rounded-md overflow-hidden">
       <button
         onClick={() => setCollapsed(v => !v)}
         className="w-full flex items-center justify-between px-5 py-4 hover:bg-neutral-50 transition-colors"

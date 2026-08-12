@@ -55,8 +55,8 @@ export default function CreatorChatWidget({ creatorId, creatorName, creatorUsern
 
   return (
     <div
-      className={`fixed inset-x-0 bottom-0 z-50 w-full rounded-t-2xl border-t border-neutral-200 bg-white shadow-xl flex flex-col overflow-hidden transition-all duration-300
-        lg:inset-x-auto lg:bottom-6 lg:right-6 lg:w-80 lg:rounded-2xl lg:border
+      className={`fixed inset-x-0 bottom-0 z-50 w-full rounded-t-md border-t border-neutral-200 bg-white shadow-xl flex flex-col overflow-hidden transition-all duration-300
+        lg:inset-x-auto lg:bottom-6 lg:right-6 lg:w-80 lg:rounded-md lg:border
         ${isMinimized ? 'h-auto' : 'h-[60vh] lg:h-[380px]'}
         ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
     >
@@ -93,7 +93,7 @@ export default function CreatorChatWidget({ creatorId, creatorName, creatorUsern
               const isMine = m.sender_id === user?.id;
               return (
                 <div key={m.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm ${isMine ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-800'}`}>
+                  <div className={`max-w-[80%] px-3 py-2 rounded-sm text-sm ${isMine ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-800'}`}>
                     {m.content}
                   </div>
                 </div>
@@ -109,7 +109,7 @@ export default function CreatorChatWidget({ creatorId, creatorName, creatorUsern
               onChange={e => setInputValue(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter') handleSend(); }}
               placeholder="Type a message..."
-              className="flex-1 px-4 py-2 border border-neutral-200 rounded-full text-sm focus:outline-none focus:border-black transition-colors"
+              className="flex-1 px-4 py-2 border border-neutral-200 rounded-sm text-sm focus:outline-none focus:border-black transition-colors"
             />
             <button
               onClick={handleSend}

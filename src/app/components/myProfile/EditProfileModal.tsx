@@ -52,7 +52,7 @@ export default function EditProfileModal({ onClose }: EditProfileModalProps) {
 
   return (
     <Overlay onClose={onClose}>
-      <div className="bg-white rounded-2xl shadow-xl w-[min(480px,90vw)] p-6">
+      <div className="bg-white rounded-md shadow-xl w-[min(480px,90vw)] p-6">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-bold">Edit Profile</h2>
           <button onClick={onClose} className="icon-tap-target p-1.5 hover:bg-neutral-100 rounded-full transition-colors"><CloseIcon sx={{ fontSize: 18 }} /></button>
@@ -60,11 +60,11 @@ export default function EditProfileModal({ onClose }: EditProfileModalProps) {
         <div className="space-y-4">
           <div>
             <label className="block text-xs font-medium text-neutral-600 mb-1.5">Display Name</label>
-            <input value={editName} onChange={e => setEditName(e.target.value)} className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors" />
+            <input value={editName} onChange={e => setEditName(e.target.value)} className="w-full px-3 py-2 border border-neutral-200 rounded-sm text-sm focus:outline-none focus:border-black transition-colors" />
           </div>
           <div>
             <label className="block text-xs font-medium text-neutral-600 mb-1.5">Handle</label>
-            <input value={editHandle} onChange={e => setEditHandle(e.target.value)} className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors" />
+            <input value={editHandle} onChange={e => setEditHandle(e.target.value)} className="w-full px-3 py-2 border border-neutral-200 rounded-sm text-sm focus:outline-none focus:border-black transition-colors" />
           </div>
           <div>
             <div className="flex items-center justify-between mb-1.5">
@@ -79,7 +79,7 @@ export default function EditProfileModal({ onClose }: EditProfileModalProps) {
               maxLength={MAX_BIO_LENGTH}
               placeholder="Tell people about yourself"
               rows={3}
-              className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm resize-none focus:outline-none focus:border-black transition-colors"
+              className="w-full px-3 py-2 border border-neutral-200 rounded-sm text-sm resize-none focus:outline-none focus:border-black transition-colors"
             />
           </div>
         </div>

@@ -29,7 +29,7 @@ export default function AdminStatusBadge({ status, className = '' }: AdminStatus
   return (
     <Badge
       variant="outline"
-      className={`px-2 py-0.5 rounded-full border-transparent font-medium capitalize ${COLORS[status] ?? 'bg-neutral-100 text-neutral-500'} ${className}`}
+      className={`px-2 py-0.5 rounded-sm border-transparent font-medium capitalize ${COLORS[status] ?? 'bg-neutral-100 text-neutral-500'} ${className}`}
     >
       {status}
     </Badge>

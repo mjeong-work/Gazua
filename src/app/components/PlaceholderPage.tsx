@@ -43,13 +43,13 @@ export default function PlaceholderPage({ title, description, icon }: Placeholde
           <div className="flex gap-3 justify-center">
             <button
               onClick={() => navigate('/main')}
-              className="px-6 py-3 bg-black text-white rounded-full hover:bg-black/90 transition-colors"
+              className="px-6 py-3 bg-black text-white rounded-sm hover:bg-black/90 transition-colors"
             >
               Go to Feed
             </button>
             <button
               onClick={() => navigate(-1)}
-              className="px-6 py-3 border-2 border-neutral-200 rounded-full hover:border-neutral-300 hover:bg-neutral-50 transition-colors"
+              className="px-6 py-3 border-2 border-neutral-200 rounded-sm hover:border-neutral-300 hover:bg-neutral-50 transition-colors"
             >
               Go Back
             </button>

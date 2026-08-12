@@ -72,7 +72,7 @@ export default function AdminSidebar({ isMobileOpen, onMobileClose }: AdminSideb
                 key={item.to}
                 onClick={() => { navigate(item.to); onMobileClose(); }}
                 title={!isExpanded ? item.label : undefined}
-                className={`w-full flex items-center gap-2.5 py-2.5 rounded-full text-left transition-colors ${
+                className={`w-full flex items-center gap-2.5 py-2.5 rounded-sm text-left transition-colors ${
                   isExpanded ? 'px-3' : 'px-3 lg:px-0 lg:justify-center'
                 } ${active ? 'bg-brand/10 text-brand' : 'text-neutral-600 hover:bg-neutral-100'}`}
               >

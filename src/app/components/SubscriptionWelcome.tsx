@@ -63,7 +63,7 @@ export default function SubscriptionWelcome() {
         }`}
       >
         {/* Plan badge */}
-        <div className="inline-flex items-center bg-mint/20 border border-mint/50 px-4 py-1.5 rounded-full text-xs font-medium text-brand mb-4">
+        <div className="inline-flex items-center bg-mint/20 border border-mint/50 px-4 py-1.5 rounded-sm text-xs font-medium text-brand mb-4">
           {config.name} Plan activated
         </div>
 
@@ -81,7 +81,7 @@ export default function SubscriptionWelcome() {
         </p>
 
         {/* Feature list */}
-        <div className="bg-neutral-50 rounded-2xl px-6 py-5 mb-8 text-left">
+        <div className="bg-neutral-50 rounded-md px-6 py-5 mb-8 text-left">
           <p className="text-xs text-neutral-400 font-medium uppercase tracking-widest mb-4">
             What you now have access to
           </p>
@@ -97,10 +97,10 @@ export default function SubscriptionWelcome() {
           </ul>
         </div>
 
-        {/* CTA — black rounded-full, matches Complete.tsx */}
+        {/* CTA — black rounded-sm, matches Complete.tsx */}
         <button
           onClick={() => navigate('/main')}
-          className="w-full px-8 py-4 bg-black text-white rounded-full hover:bg-black/90 transition-colors mb-5"
+          className="w-full px-8 py-4 bg-black text-white rounded-sm hover:bg-black/90 transition-colors mb-5"
         >
           Explore the Feed
         </button>

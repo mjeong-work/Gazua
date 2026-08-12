@@ -564,7 +564,7 @@ export default function CreatorsPage() {
     const hasProfile = dbProfiles !== null ? true : !!getCreator(creatorSlug);
 
     return (
-      <div key={creator.id} className={`${opts.fullWidth ? 'w-full' : 'flex-shrink-0 w-[min(78vw,300px)] sm:w-80'} border border-neutral-200 rounded-xl p-6 hover:border-neutral-300 transition-colors bg-white`}>
+      <div key={creator.id} className={`${opts.fullWidth ? 'w-full' : 'flex-shrink-0 w-[min(78vw,300px)] sm:w-80'} border border-neutral-200 rounded-md p-6 hover:border-neutral-300 transition-colors bg-white`}>
         <div className="flex items-start gap-4 mb-4">
           <div
             onClick={hasProfile ? () => navigate(`/profile/${creatorSlug}/investment`) : undefined}
@@ -592,7 +592,7 @@ export default function CreatorsPage() {
 
         <div className="flex items-center gap-2 mb-4 flex-wrap">
           {creator.tags.slice(0, 3).map((tag) => (
-            <span key={tag} className="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-xs font-medium">
+            <span key={tag} className="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-sm text-xs font-medium">
               {tag}
             </span>
           ))}
@@ -601,7 +601,7 @@ export default function CreatorsPage() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => toggleFollow(followId)}
-            className={`${hasProfile ? 'flex-1' : 'w-full'} px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            className={`${hasProfile ? 'flex-1' : 'w-full'} px-4 py-2 rounded-sm text-sm font-medium transition-colors ${
               isFollowing
                 ? 'bg-neutral-200 text-black hover:bg-neutral-300'
                 : 'bg-black text-white hover:bg-black/80'
@@ -612,7 +612,7 @@ export default function CreatorsPage() {
           {hasProfile && (
             <button
               onClick={() => navigate(`/profile/${creatorSlug}/investment`)}
-              className="flex-1 px-4 py-2 border border-neutral-200 rounded-full text-sm font-medium hover:bg-neutral-50 transition-colors"
+              className="flex-1 px-4 py-2 border border-neutral-200 rounded-sm text-sm font-medium hover:bg-neutral-50 transition-colors"
             >
               View
             </button>
@@ -634,7 +634,7 @@ export default function CreatorsPage() {
 
     return (
       <div key={item.id} onClick={() => handleContentClick(item)} className={`${opts.fullWidth ? 'w-full' : 'flex-shrink-0 w-[min(48vw,220px)] sm:w-64'} group cursor-pointer`}>
-        <div className="relative aspect-[9/16] rounded-xl overflow-hidden mb-3">
+        <div className="relative aspect-[9/16] rounded-md overflow-hidden mb-3">
           <div
             className="absolute inset-0"
             style={{ background: item.thumbnail }}
@@ -675,7 +675,7 @@ export default function CreatorsPage() {
   const renderVideoCard = (video: VideoItem, opts: { fullWidth?: boolean } = {}) => {
     return (
       <div key={video.id} onClick={() => navigate(`/watch/${video.id}`)} className={`${opts.fullWidth ? 'w-full' : 'flex-shrink-0 w-[min(78vw,300px)] sm:w-80'} group cursor-pointer`}>
-        <div className="relative aspect-video rounded-xl overflow-hidden mb-3">
+        <div className="relative aspect-video rounded-md overflow-hidden mb-3">
           <div
             className="absolute inset-0"
             style={{ background: video.thumbnail.startsWith('http') ? `url(${video.thumbnail})` : video.thumbnail, backgroundSize: 'cover', backgroundPosition: 'center' }}
@@ -796,7 +796,7 @@ export default function CreatorsPage() {
                   {creatorsLoading ? (
                     <div className="flex flex-col gap-4">
                       {[1, 2, 3].map(n => (
-                        <div key={n} className="w-full border border-neutral-200 rounded-xl p-6 animate-pulse">
+                        <div key={n} className="w-full border border-neutral-200 rounded-md p-6 animate-pulse">
                           <div className="flex items-start gap-4 mb-4">
                             <div className="w-16 h-16 rounded-full bg-neutral-200 flex-shrink-0" />
                             <div className="flex-1 space-y-2 pt-1">
@@ -871,7 +871,7 @@ export default function CreatorsPage() {
                   <button
                     key={filter}
                     onClick={() => selectDesktopFilter(filter)}
-                    className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all shrink-0 ${
+                    className={`px-6 py-2.5 rounded-sm text-sm font-medium transition-all shrink-0 ${
                       isDesktopFilterActive(filter)
                         ? 'bg-black text-white'
                         : 'bg-white text-neutral-700 border border-neutral-200 hover:border-neutral-300'
@@ -904,7 +904,7 @@ export default function CreatorsPage() {
                     {creatorsLoading ? (
                       <div className="max-w-[1328px] mx-auto flex gap-4 overflow-x-auto pb-2" style={{ justifyContent: 'safe center' }}>
                         {[1, 2, 3].map(n => (
-                          <div key={n} className="flex-shrink-0 w-[min(78vw,300px)] sm:w-80 border border-neutral-200 rounded-xl p-6 animate-pulse">
+                          <div key={n} className="flex-shrink-0 w-[min(78vw,300px)] sm:w-80 border border-neutral-200 rounded-md p-6 animate-pulse">
                             <div className="flex items-start gap-4 mb-4">
                               <div className="w-16 h-16 rounded-full bg-neutral-200 flex-shrink-0" />
                               <div className="flex-1 space-y-2 pt-1">
@@ -1003,7 +1003,7 @@ export default function CreatorsPage() {
             return (
               <>
               <div
-                className="relative w-[min(24rem,calc(100vw-2rem))] h-[85vh] rounded-2xl overflow-hidden bg-black"
+                className="relative w-[min(24rem,calc(100vw-2rem))] h-[85vh] rounded-md overflow-hidden bg-black"
                 style={reel.storage_path ? undefined : { background: reel.thumbnail.startsWith('http') ? `url(${reel.thumbnail})` : reel.thumbnail, backgroundSize: 'cover', backgroundPosition: 'center' }}
                 onClick={(e) => e.stopPropagation()}
               >
@@ -1058,7 +1058,7 @@ export default function CreatorsPage() {
                       {reelHasProfile && (
                         <button
                           onClick={() => toggleFollow(reelCreatorSlug)}
-                          className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                          className={`px-3 py-1 rounded-sm text-xs font-medium transition-colors ${
                             isReelFollowed ? 'bg-white/20 text-white' : 'bg-white text-black hover:bg-white/90'
                           }`}
                         >
@@ -1085,7 +1085,7 @@ export default function CreatorsPage() {
                       showScrollHint ? 'opacity-100' : 'opacity-0'
                     }`}
                   >
-                    <span className="px-3 py-1.5 bg-black/50 rounded-full text-white/90 text-xs font-medium">
+                    <span className="px-3 py-1.5 bg-black/50 rounded-sm text-white/90 text-xs font-medium">
                       Scroll for more
                     </span>
                   </div>

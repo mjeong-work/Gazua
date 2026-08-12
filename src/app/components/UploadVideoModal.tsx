@@ -102,7 +102,7 @@ export default function UploadVideoModal({ onClose, onSuccess }: UploadVideoModa
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-xl w-[min(520px,90vw)] p-6"
+        className="bg-white rounded-md shadow-xl w-[min(520px,90vw)] p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-5">
@@ -125,7 +125,7 @@ export default function UploadVideoModal({ onClose, onSuccess }: UploadVideoModa
           onDragOver={(e) => { e.preventDefault(); if (!processing && !uploading) setIsDragging(true); }}
           onDragLeave={() => setIsDragging(false)}
           onDrop={(e) => { e.preventDefault(); setIsDragging(false); handleFileSelected(e.dataTransfer.files?.[0]); }}
-          className={`border-2 border-dashed rounded-xl p-8 text-center mb-4 transition-colors ${processing || uploading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'} ${isDragging ? 'border-brand bg-green-50' : 'border-neutral-200 hover:border-neutral-300'}`}
+          className={`border-2 border-dashed rounded-md p-8 text-center mb-4 transition-colors ${processing || uploading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'} ${isDragging ? 'border-brand bg-green-50' : 'border-neutral-200 hover:border-neutral-300'}`}
         >
           <div className="text-3xl mb-2">🎬</div>
           <p className="text-sm font-medium text-neutral-700 mb-1">
@@ -142,7 +142,7 @@ export default function UploadVideoModal({ onClose, onSuccess }: UploadVideoModa
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Give your video a title..."
-              className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-black transition-colors"
+              className="w-full px-3 py-2 border border-neutral-200 rounded-sm text-sm focus:outline-none focus:border-black transition-colors"
             />
           </div>
         </div>

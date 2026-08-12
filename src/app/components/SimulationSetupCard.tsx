@@ -78,7 +78,7 @@ export default function SimulationSetupCard({ simulation, expanded, onToggle }: 
   const cashLabel = simulation.cashAmount > 0 ? ' + Cash' : '';
 
   return (
-    <div className="border border-neutral-200 rounded-2xl overflow-hidden">
+    <div className="border border-neutral-200 rounded-md overflow-hidden">
       {/* Header row */}
       <button
         onClick={onToggle}
@@ -121,7 +121,7 @@ export default function SimulationSetupCard({ simulation, expanded, onToggle }: 
                 type="text"
                 value={form.title}
                 onChange={e => updateField('title', e.target.value)}
-                className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300"
+                className="w-full border border-neutral-200 rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300"
               />
             </div>
             <div>
@@ -130,7 +130,7 @@ export default function SimulationSetupCard({ simulation, expanded, onToggle }: 
                 type="date"
                 value={form.startDate}
                 onChange={e => updateField('startDate', e.target.value)}
-                className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300"
+                className="w-full border border-neutral-200 rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300"
               />
             </div>
             <div>
@@ -139,7 +139,7 @@ export default function SimulationSetupCard({ simulation, expanded, onToggle }: 
                 type="date"
                 value={form.endDate}
                 onChange={e => updateField('endDate', e.target.value)}
-                className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300"
+                className="w-full border border-neutral-200 rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300"
               />
             </div>
             <div>
@@ -148,7 +148,7 @@ export default function SimulationSetupCard({ simulation, expanded, onToggle }: 
                 type="number"
                 value={form.capital}
                 onChange={e => updateField('capital', e.target.value)}
-                className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300"
+                className="w-full border border-neutral-200 rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300"
               />
             </div>
           </div>
@@ -180,21 +180,21 @@ export default function SimulationSetupCard({ simulation, expanded, onToggle }: 
                     placeholder="NVDA"
                     value={h.symbol}
                     onChange={e => updateHolding(i, 'symbol', e.target.value.toUpperCase())}
-                    className="col-span-3 border border-neutral-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-violet-300"
+                    className="col-span-3 border border-neutral-200 rounded-sm px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-violet-300"
                   />
                   <input
                     type="number"
                     placeholder="30000"
                     value={h.amount}
                     onChange={e => updateHolding(i, 'amount', e.target.value)}
-                    className="col-span-4 border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300"
+                    className="col-span-4 border border-neutral-200 rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300"
                   />
                   <input
                     type="number"
                     placeholder="25"
                     value={h.expectedReturn}
                     onChange={e => updateHolding(i, 'expectedReturn', e.target.value)}
-                    className="col-span-4 border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300"
+                    className="col-span-4 border border-neutral-200 rounded-sm px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-violet-300"
                   />
                   <button
                     onClick={() => removeHolding(i)}
@@ -212,7 +212,7 @@ export default function SimulationSetupCard({ simulation, expanded, onToggle }: 
             <button
               onClick={handleRun}
               disabled={running}
-              className="px-5 py-2.5 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 disabled:opacity-60 transition-colors"
+              className="px-5 py-2.5 bg-violet-600 text-white text-sm font-medium rounded-sm hover:bg-violet-700 disabled:opacity-60 transition-colors"
             >
               {running ? 'Simulating…' : 'Run Simulation'}
             </button>

@@ -92,7 +92,7 @@ export default function AdminUserDetailPage() {
         Back to Users
       </button>
 
-      <div className="bg-white border border-neutral-200 rounded-xl p-5">
+      <div className="bg-white border border-neutral-200 rounded-md p-5">
         <div className="flex items-start justify-between flex-wrap gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
@@ -106,7 +106,7 @@ export default function AdminUserDetailPage() {
               <select
                 value={detail.credibility_level}
                 onChange={(e) => handleChangeCredibilityLevel(e.target.value as CredibilityLevel)}
-                className="text-xs border border-neutral-200 rounded-full px-2.5 py-1 focus:outline-none focus:border-black transition-colors"
+                className="text-xs border border-neutral-200 rounded-sm px-2.5 py-1 focus:outline-none focus:border-black transition-colors"
               >
                 {CREDIBILITY_LEVELS.map((level) => (
                   <option key={level} value={level}>{level}</option>
@@ -123,7 +123,7 @@ export default function AdminUserDetailPage() {
             {detail.status !== 'suspended' && (
               <button
                 onClick={() => setPendingAction('warning_sent')}
-                className="px-4 py-2 text-xs font-medium rounded-full border border-neutral-800 text-neutral-900 hover:bg-neutral-100 transition-colors"
+                className="px-4 py-2 text-xs font-medium rounded-sm border border-neutral-800 text-neutral-900 hover:bg-neutral-100 transition-colors"
               >
                 Warn
               </button>
@@ -131,14 +131,14 @@ export default function AdminUserDetailPage() {
             {detail.status !== 'suspended' ? (
               <button
                 onClick={() => setPendingAction('user_suspended')}
-                className="px-4 py-2 text-xs font-medium rounded-full border border-red-300 text-red-800 hover:bg-red-50 transition-colors"
+                className="px-4 py-2 text-xs font-medium rounded-sm border border-red-300 text-red-800 hover:bg-red-50 transition-colors"
               >
                 Suspend
               </button>
             ) : (
               <button
                 onClick={() => setPendingAction('user_reinstated')}
-                className="px-4 py-2 text-xs font-medium rounded-full border border-neutral-200 text-neutral-700 hover:bg-neutral-50 transition-colors"
+                className="px-4 py-2 text-xs font-medium rounded-sm border border-neutral-200 text-neutral-700 hover:bg-neutral-50 transition-colors"
               >
                 Reinstate
               </button>
@@ -183,7 +183,7 @@ export default function AdminUserDetailPage() {
         {modHistory.length === 0 ? <p className="text-sm text-neutral-400 py-4 text-center">No warnings, suspensions, or reinstatements.</p> : (
           <div className="space-y-2">
             {modHistory.map(m => (
-              <div key={m.id} className="flex items-center justify-between gap-3 p-3 bg-neutral-50 rounded-lg">
+              <div key={m.id} className="flex items-center justify-between gap-3 p-3 bg-neutral-50 rounded-md">
                 <div>
                   <p className="text-sm font-medium capitalize">{m.action.replace(/_/g, ' ')}</p>
                   {m.notes && <p className="text-xs text-neutral-500 mt-0.5">{m.notes}</p>}
@@ -229,7 +229,7 @@ function Stat({ label, value }: { label: string; value: number }) {
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="bg-white border border-neutral-200 rounded-xl p-4">
+    <div className="bg-white border border-neutral-200 rounded-md p-4">
       <h2 className="text-base font-semibold mb-3">{title}</h2>
       {children}
     </div>
@@ -239,7 +239,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 function ContentRow({ type, item, previewKey }: { type: string; item: Record<string, unknown>; previewKey: string }) {
   const preview = String(item[previewKey] ?? '');
   return (
-    <div className="flex items-center justify-between gap-3 p-3 bg-neutral-50 rounded-lg">
+    <div className="flex items-center justify-between gap-3 p-3 bg-neutral-50 rounded-md">
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 mb-0.5">
           <span className="text-xs font-bold uppercase tracking-widest text-neutral-400">{type}</span>
@@ -256,11 +256,11 @@ function ReportRows({ reports }: { reports: AdminReportListItem[] }) {
   return (
     <div className="space-y-2">
       {reports.map(r => (
-        <div key={r.id} className="flex items-center justify-between gap-3 p-3 bg-neutral-50 rounded-lg">
+        <div key={r.id} className="flex items-center justify-between gap-3 p-3 bg-neutral-50 rounded-md">
           <div className="min-w-0">
             <div className="flex items-center gap-2 mb-0.5">
               <span className="text-xs font-bold uppercase tracking-widest text-neutral-400">{r.content_type}</span>
-              <span className="text-xs px-2 py-0.5 bg-red-50 text-red-700 rounded-full font-medium capitalize">{r.reason.replace(/_/g, ' ')}</span>
+              <span className="text-xs px-2 py-0.5 bg-red-50 text-red-700 rounded-sm font-medium capitalize">{r.reason.replace(/_/g, ' ')}</span>
             </div>
             <p className="text-xs text-neutral-400 truncate font-mono">{r.content_id}</p>
           </div>

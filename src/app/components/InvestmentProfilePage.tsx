@@ -54,7 +54,7 @@ function LoadingSkeleton() {
   return (
     <div className="space-y-8">
       {/* Personality skeleton */}
-      <div className="border border-neutral-200 rounded-xl p-8 space-y-4">
+      <div className="border border-neutral-200 rounded-md p-8 space-y-4">
         <div className={`${pulse} h-8 w-2/3`} />
         <div className={`${pulse} h-4 w-full`} />
         <div className={`${pulse} h-4 w-5/6`} />
@@ -63,7 +63,7 @@ function LoadingSkeleton() {
         </div>
       </div>
       {/* Style bar skeleton */}
-      <div className="border border-neutral-200 rounded-xl p-8 space-y-4">
+      <div className="border border-neutral-200 rounded-md p-8 space-y-4">
         <div className={`${pulse} h-6 w-40`} />
         <div className={`${pulse} h-5 w-full rounded-full`} />
         <div className="flex gap-6">
@@ -72,7 +72,7 @@ function LoadingSkeleton() {
       </div>
       {/* Cards skeleton */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-        {[1, 2, 3, 4].map(i => <div key={i} className={`${pulse} h-36 rounded-xl`} />)}
+        {[1, 2, 3, 4].map(i => <div key={i} className={`${pulse} h-36 rounded-md`} />)}
       </div>
     </div>
   );
@@ -80,7 +80,7 @@ function LoadingSkeleton() {
 
 function ErrorCard({ onRetry }: { onRetry: () => void }) {
   return (
-    <div className="border border-neutral-200 rounded-xl p-10 text-center max-w-xl mx-auto">
+    <div className="border border-neutral-200 rounded-md p-10 text-center max-w-xl mx-auto">
       <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center mx-auto mb-4">
         <AutoAwesomeIcon sx={{ fontSize: 32, color: 'var(--icon-muted)' }} />
       </div>
@@ -90,7 +90,7 @@ function ErrorCard({ onRetry }: { onRetry: () => void }) {
       </p>
       <button
         onClick={onRetry}
-        className="px-6 py-2.5 bg-black text-white rounded-full text-sm font-medium hover:bg-black/80 transition-colors"
+        className="px-6 py-2.5 bg-black text-white rounded-sm text-sm font-medium hover:bg-black/80 transition-colors"
       >
         Try Again
       </button>
@@ -100,7 +100,7 @@ function ErrorCard({ onRetry }: { onRetry: () => void }) {
 
 function PersonalityCard({ personality }: { personality: InvestmentInsights['personality'] }) {
   return (
-    <div className="border border-neutral-200 rounded-xl p-8">
+    <div className="border border-neutral-200 rounded-md p-8">
       <div className="flex items-start gap-4 mb-5">
         <div className="w-12 h-12 bg-mint rounded-full flex items-center justify-center flex-shrink-0">
           <AutoAwesomeIcon sx={{ fontSize: 22, color: '#000' }} />
@@ -114,7 +114,7 @@ function PersonalityCard({ personality }: { personality: InvestmentInsights['per
         {personality.traits.map(trait => (
           <span
             key={trait}
-            className="px-3 py-1.5 bg-mint/15 text-brand text-sm font-medium rounded-full border border-mint/30"
+            className="px-3 py-1.5 bg-mint/15 text-brand text-sm font-medium rounded-sm border border-mint/30"
           >
             {trait}
           </span>
@@ -129,7 +129,7 @@ function TrendingCard({ asset }: { asset: InvestmentInsights['trendingAssets'][n
   return (
     <button
       onClick={() => navigate(`/asset/${asset.ticker}`)}
-      className="w-full text-left border border-neutral-200 rounded-xl p-5 hover:border-neutral-300 transition-colors"
+      className="w-full text-left border border-neutral-200 rounded-md p-5 hover:border-neutral-300 transition-colors"
     >
       <div className="flex items-center gap-3 mb-2">
         <span className="text-lg font-bold font-mono">{asset.ticker}</span>
@@ -147,7 +147,7 @@ const TYPE_LABEL: Record<string, string> = {
 
 function RecommendationCard({ rec }: { rec: InvestmentInsights['recommendations'][number] }) {
   return (
-    <div className="border border-neutral-200 rounded-xl p-5 hover:border-neutral-300 transition-colors">
+    <div className="border border-neutral-200 rounded-md p-5 hover:border-neutral-300 transition-colors">
       <div className="flex items-center gap-2 mb-2">
         <span className="px-2 py-0.5 bg-neutral-100 text-neutral-600 text-xs font-medium rounded">
           {TYPE_LABEL[rec.type] ?? rec.type}
@@ -220,13 +220,13 @@ export default function InvestmentProfilePage() {
             <div className="flex items-center gap-3 justify-center">
               <button
                 onClick={() => navigate('/main')}
-                className="px-6 py-3 bg-black text-white rounded-full text-sm font-medium hover:bg-black/80 transition-colors"
+                className="px-6 py-3 bg-black text-white rounded-sm text-sm font-medium hover:bg-black/80 transition-colors"
               >
                 Explore the Feed
               </button>
               <button
                 onClick={() => navigate('/creators')}
-                className="px-6 py-3 border border-neutral-200 rounded-full text-sm font-medium hover:bg-neutral-50 transition-colors"
+                className="px-6 py-3 border border-neutral-200 rounded-sm text-sm font-medium hover:bg-neutral-50 transition-colors"
               >
                 Discover Creators
               </button>
@@ -260,7 +260,7 @@ export default function InvestmentProfilePage() {
               <button
                 onClick={runAnalysis}
                 disabled={isLoading}
-                className="flex items-center gap-2 px-5 py-2.5 bg-black text-white rounded-full text-sm font-medium hover:bg-black/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 ml-6"
+                className="flex items-center gap-2 px-5 py-2.5 bg-black text-white rounded-sm text-sm font-medium hover:bg-black/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 ml-6"
               >
                 <RefreshIcon sx={{ fontSize: 16 }} className={isLoading ? 'animate-spin' : ''} />
                 {isLoading ? 'Analyzing…' : 'Refresh Analysis'}
@@ -283,7 +283,7 @@ export default function InvestmentProfilePage() {
               <PersonalityCard personality={state.insights.personality} />
 
               {/* Section 2 — Style Breakdown */}
-              <div className="border border-neutral-200 rounded-xl p-8">
+              <div className="border border-neutral-200 rounded-md p-8">
                 <h2 className="text-xl font-bold mb-6">Your Engagement Style</h2>
                 <StyleBar breakdown={state.insights.styleBreakdown} />
               </div>

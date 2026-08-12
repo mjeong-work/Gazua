@@ -21,7 +21,7 @@ export default function ActualInvestmentSummary() {
           <span>Preview:</span>
           <button
             onClick={() => setShowConnected(false)}
-            className={`px-2.5 py-1 rounded-md transition-colors ${
+            className={`px-2.5 py-1 rounded-sm transition-colors ${
               !showConnected ? 'bg-neutral-200 text-neutral-700 font-medium' : 'hover:bg-neutral-100 text-neutral-400'
             }`}
           >
@@ -29,7 +29,7 @@ export default function ActualInvestmentSummary() {
           </button>
           <button
             onClick={() => setShowConnected(true)}
-            className={`px-2.5 py-1 rounded-md transition-colors ${
+            className={`px-2.5 py-1 rounded-sm transition-colors ${
               showConnected ? 'bg-neutral-200 text-neutral-700 font-medium' : 'hover:bg-neutral-100 text-neutral-400'
             }`}
           >
@@ -40,7 +40,7 @@ export default function ActualInvestmentSummary() {
 
       {!data.connected ? (
         /* ── Empty state ── */
-        <div className="border border-neutral-200 rounded-2xl p-10 flex flex-col items-center justify-center text-center">
+        <div className="border border-neutral-200 rounded-md p-10 flex flex-col items-center justify-center text-center">
           <div className="w-14 h-14 rounded-full bg-neutral-100 flex items-center justify-center mb-4">
             <svg className="w-7 h-7 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -55,7 +55,7 @@ export default function ActualInvestmentSummary() {
           <p className="text-sm text-neutral-500 max-w-sm mb-6">
             Connect your brokerage account to display verified investment performance.
           </p>
-          <button className="px-6 py-2.5 bg-black text-white text-sm font-medium rounded-full hover:bg-black/80 transition-colors">
+          <button className="px-6 py-2.5 bg-black text-white text-sm font-medium rounded-sm hover:bg-black/80 transition-colors">
             Connect Account
           </button>
         </div>
@@ -63,7 +63,7 @@ export default function ActualInvestmentSummary() {
         /* ── Connected state ── */
         <div className="space-y-4">
           {/* Account header */}
-          <div className="border border-neutral-200 rounded-2xl p-5">
+          <div className="border border-neutral-200 rounded-md p-5">
             <div className="flex items-center justify-between mb-5">
               <div>
                 <div className="flex items-center gap-2 mb-1">
@@ -83,26 +83,26 @@ export default function ActualInvestmentSummary() {
                     : '—'}
                 </p>
               </div>
-              <button className="text-xs text-neutral-400 hover:text-neutral-600 border border-neutral-200 rounded-lg px-3 py-1.5 transition-colors">
+              <button className="text-xs text-neutral-400 hover:text-neutral-600 border border-neutral-200 rounded-sm px-3 py-1.5 transition-colors">
                 Sync now
               </button>
             </div>
 
             {/* Summary cards */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="bg-neutral-50 rounded-xl p-4">
+              <div className="bg-neutral-50 rounded-md p-4">
                 <p className="text-xs text-neutral-400 mb-1">Account Value</p>
                 <p className="text-xl font-bold text-neutral-900">
                   {formatCurrency(data.accountValue ?? 0)}
                 </p>
               </div>
-              <div className="bg-green-50 rounded-xl p-4">
+              <div className="bg-green-50 rounded-md p-4">
                 <p className="text-xs text-green-500 mb-1">Total Return</p>
                 <p className="text-xl font-bold text-green-700">
                   {formatPercent(data.totalReturnPercent ?? 0)}
                 </p>
               </div>
-              <div className="bg-green-50 rounded-xl p-4">
+              <div className="bg-green-50 rounded-md p-4">
                 <p className="text-xs text-green-500 mb-1">Return ($)</p>
                 <p className="text-xl font-bold text-green-700">
                   {formatCurrency(data.totalReturnValue ?? 0)}
@@ -111,7 +111,7 @@ export default function ActualInvestmentSummary() {
             </div>
           </div>
 
-          <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+          <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-md">
             <svg className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"

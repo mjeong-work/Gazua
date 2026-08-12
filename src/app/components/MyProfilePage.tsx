@@ -129,7 +129,7 @@ export default function MyProfilePage() {
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <button
                       onClick={handleShare}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${shareCopied ? 'bg-brand/10 text-brand' : 'hover:bg-neutral-100 text-neutral-500'}`}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-medium transition-colors whitespace-nowrap ${shareCopied ? 'bg-brand/10 text-brand' : 'hover:bg-neutral-100 text-neutral-500'}`}
                       title="Share profile"
                     >
                       {shareCopied ? <CheckIcon sx={{ fontSize: 15 }} /> : <ShareIcon sx={{ fontSize: 15 }} />}
@@ -154,7 +154,7 @@ export default function MyProfilePage() {
             <div className="flex flex-wrap items-center gap-2 mb-8">
               <button
                 onClick={() => setShowEditProfile(true)}
-                className="px-6 py-2 bg-black text-white font-medium text-sm rounded-full hover:bg-black/80 transition-colors flex items-center gap-2"
+                className="px-6 py-2 bg-black text-white font-medium text-sm rounded-sm hover:bg-black/80 transition-colors flex items-center gap-2"
               >
                 <EditIcon sx={{ fontSize: 15 }} />
                 Edit Profile
@@ -162,7 +162,7 @@ export default function MyProfilePage() {
               {profile?.username && (
                 <button
                   onClick={() => navigate(`/profile/${profile.username}/investment`)}
-                  className="px-6 py-2 bg-mint text-black font-medium text-sm rounded-full hover:bg-mint-hover transition-colors"
+                  className="px-6 py-2 bg-mint text-black font-medium text-sm rounded-sm hover:bg-mint-hover transition-colors"
                 >
                   Preview Public Page
                 </button>

@@ -81,7 +81,7 @@ export default function NotificationsPage() {
           {loading && (
             <div className="space-y-3">
               {[1, 2, 3].map(n => (
-                <div key={n} className="flex gap-3 p-4 rounded-xl border border-neutral-100 animate-pulse">
+                <div key={n} className="flex gap-3 p-4 rounded-md border border-neutral-100 animate-pulse">
                   <div className="w-9 h-9 rounded-full bg-neutral-200 flex-shrink-0" />
                   <div className="flex-1 space-y-2 pt-1">
                     <div className="h-3 bg-neutral-200 rounded w-2/3" />
@@ -110,7 +110,7 @@ export default function NotificationsPage() {
                 <button
                   key={n.id}
                   onClick={() => !n.read && handleMarkRead(n.id)}
-                  className={`w-full flex gap-3 p-4 rounded-xl border text-left transition-colors ${
+                  className={`w-full flex gap-3 p-4 rounded-md border text-left transition-colors ${
                     n.read ? 'border-neutral-100 bg-white' : 'border-brand/30 bg-brand/5'
                   } hover:border-neutral-300`}
                 >

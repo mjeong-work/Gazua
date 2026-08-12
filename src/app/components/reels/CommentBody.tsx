@@ -101,7 +101,7 @@ export default function CommentBody({ theme, comments, onAddComment, listPointer
               placeholder="Add a comment…"
               value={text}
               onChange={(e) => setText(e.target.value.slice(0, 500))}
-              className={`flex-1 px-3 py-1.5 border rounded-full text-sm focus:outline-none focus:border-brand transition-colors ${
+              className={`flex-1 px-3 py-1.5 border rounded-sm text-sm focus:outline-none focus:border-brand transition-colors ${
                 dark ? 'bg-white/10 border-white/20 text-white placeholder:text-white/40' : 'bg-neutral-50 border-neutral-200'
               }`}
             />

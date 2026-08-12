@@ -117,7 +117,7 @@ export default function CreatorProfileInvestment() {
           <div className="text-center">
             <h2 className="text-2xl font-bold mb-2">Creator not found</h2>
             <p className="text-neutral-600 mb-4">This creator profile doesn't exist yet.</p>
-            <button onClick={() => navigate('/creators')} className="px-6 py-3 bg-black text-white rounded-full hover:bg-black/80">
+            <button onClick={() => navigate('/creators')} className="px-6 py-3 bg-black text-white rounded-sm hover:bg-black/80">
               Browse Creators
             </button>
           </div>
@@ -156,7 +156,7 @@ export default function CreatorProfileInvestment() {
           {activeTab === 'investment' && (
           <div className="space-y-4">
             {/* Simulator Toggle */}
-            <div className="flex items-center justify-between p-3 bg-neutral-50 rounded-lg border border-neutral-200">
+            <div className="flex items-center justify-between p-3 bg-neutral-50 rounded-md border border-neutral-200">
               <div>
                 <h3 className="font-medium text-sm mb-0.5">Portfolio Simulator</h3>
                 <p className="text-xs text-neutral-500">Test hypothetical investment scenarios</p>
@@ -208,7 +208,7 @@ export default function CreatorProfileInvestment() {
 
             {/* Actual Portfolio Badge */}
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand/10 text-brand text-xs font-semibold rounded-full border border-brand/20">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand/10 text-brand text-xs font-semibold rounded-sm border border-brand/20">
                 <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -228,7 +228,7 @@ export default function CreatorProfileInvestment() {
                 </div>
               </div>
 
-              <div className="bg-neutral-50 rounded-lg p-4 w-full">
+              <div className="bg-neutral-50 rounded-md p-4 w-full">
                 <div className="h-48 min-h-[192px] w-full min-w-[300px]">
                   <ResponsiveContainer width="100%" height={192} minWidth={300} minHeight={192} key="portfolio-chart-container">
                     <LineChart data={portfolioData} id="portfolio-chart" key="portfolio-line-chart">
@@ -308,7 +308,7 @@ export default function CreatorProfileInvestment() {
                   </div>
                 </div>
               ) : (
-                <div className="p-6 bg-neutral-50 rounded-lg border border-neutral-200 text-center">
+                <div className="p-6 bg-neutral-50 rounded-md border border-neutral-200 text-center">
                   <p className="text-sm text-neutral-500">Portfolio allocation not disclosed yet.</p>
                 </div>
               )}

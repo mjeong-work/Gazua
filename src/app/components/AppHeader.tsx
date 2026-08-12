@@ -116,7 +116,7 @@ export default function AppHeader() {
         </h1>
         <div className="flex items-center gap-2">
           {ticker && (
-            <div className="flex items-center gap-1 px-2.5 py-1 bg-blue-50 border border-blue-200 text-blue-700 text-sm font-semibold rounded-full">
+            <div className="flex items-center gap-1 px-2.5 py-1 bg-blue-50 border border-blue-200 text-blue-700 text-sm font-semibold rounded-sm">
               <span>${ticker}</span>
               <button
                 onClick={() => setSearchParams({})}
@@ -174,12 +174,12 @@ export default function AppHeader() {
                     color: 'var(--icon-muted)',
                   }}
                 />
-                <div className="pl-10 pr-4 py-2 w-full border border-neutral-200 rounded-full text-sm text-left text-neutral-500 hover:border-neutral-300 transition-colors cursor-pointer">
+                <div className="pl-10 pr-4 py-2 w-full border border-neutral-200 rounded-sm text-sm text-left text-neutral-500 hover:border-neutral-300 transition-colors cursor-pointer">
                   Search
                 </div>
               </button>
               {ticker && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 border border-blue-200 text-blue-700 text-sm font-semibold rounded-full whitespace-nowrap">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 border border-blue-200 text-blue-700 text-sm font-semibold rounded-sm whitespace-nowrap">
                   <span>${ticker}</span>
                   <button
                     onClick={() => setSearchParams({})}

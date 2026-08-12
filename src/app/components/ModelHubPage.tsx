@@ -256,13 +256,13 @@ export default function ModelHubPage() {
             <div className="flex items-center justify-center gap-4">
               <button
                 onClick={() => window.scrollTo({ top: 600, behavior: 'smooth' })}
-                className="px-8 py-3 bg-black text-white font-medium rounded-full hover:bg-black/80 transition-colors"
+                className="px-8 py-3 bg-black text-white font-medium rounded-sm hover:bg-black/80 transition-colors"
               >
                 Explore Models
               </button>
               <button
                 onClick={() => setShowUploadModal(true)}
-                className="px-8 py-3 bg-mint text-black font-medium rounded-full hover:bg-mint-hover transition-colors flex items-center gap-2"
+                className="px-8 py-3 bg-mint text-black font-medium rounded-sm hover:bg-mint-hover transition-colors flex items-center gap-2"
               >
                 <UploadIcon sx={{ fontSize: 20 }} />
                 Upload Model
@@ -271,7 +271,7 @@ export default function ModelHubPage() {
           </div>
 
           {/* Search and Filters */}
-          <div className="mb-8 bg-neutral-50 rounded-xl p-6">
+          <div className="mb-8 bg-neutral-50 rounded-md p-6">
             <div className="mb-4">
               <div className="relative">
                 <SearchIcon sx={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', fontSize: 20, color: 'var(--icon-muted)' }} />
@@ -280,7 +280,7 @@ export default function ModelHubPage() {
                   placeholder="Search models by title or description..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-12 pr-4 py-3 w-full border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                  className="pl-12 pr-4 py-3 w-full border border-neutral-200 rounded-sm text-sm focus:outline-none focus:border-brand"
                 />
               </div>
             </div>
@@ -291,7 +291,7 @@ export default function ModelHubPage() {
                 <select
                   value={filters.difficulty}
                   onChange={(e) => setFilters(prev => ({ ...prev, difficulty: e.target.value }))}
-                  className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                  className="w-full px-3 py-2 border border-neutral-200 rounded-sm text-sm focus:outline-none focus:border-brand"
                 >
                   <option>All</option>
                   <option>Beginner</option>
@@ -306,7 +306,7 @@ export default function ModelHubPage() {
                 <select
                   value={filters.fileType}
                   onChange={(e) => setFilters(prev => ({ ...prev, fileType: e.target.value }))}
-                  className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                  className="w-full px-3 py-2 border border-neutral-200 rounded-sm text-sm focus:outline-none focus:border-brand"
                 >
                   <option>All</option>
                   <option>Excel</option>
@@ -322,7 +322,7 @@ export default function ModelHubPage() {
                 <select
                   value={filters.category}
                   onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
-                  className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                  className="w-full px-3 py-2 border border-neutral-200 rounded-sm text-sm focus:outline-none focus:border-brand"
                 >
                   <option>All</option>
                   <option>Valuation</option>
@@ -338,7 +338,7 @@ export default function ModelHubPage() {
                 <select
                   value={filters.access}
                   onChange={(e) => setFilters(prev => ({ ...prev, access: e.target.value }))}
-                  className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                  className="w-full px-3 py-2 border border-neutral-200 rounded-sm text-sm focus:outline-none focus:border-brand"
                 >
                   <option>All</option>
                   <option>Free Preview</option>
@@ -360,7 +360,7 @@ export default function ModelHubPage() {
           {modelsLoading && dbModels === null ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {[1, 2, 3, 4].map(n => (
-                <div key={n} className="border border-neutral-200 rounded-xl p-6 animate-pulse">
+                <div key={n} className="border border-neutral-200 rounded-md p-6 animate-pulse">
                   <div className="flex items-start gap-3 mb-4">
                     <div className="w-10 h-10 rounded-full bg-neutral-200 flex-shrink-0" />
                     <div className="flex-1 space-y-2">
@@ -382,7 +382,7 @@ export default function ModelHubPage() {
                 return (
                   <div
                     key={model.id}
-                    className="border border-neutral-200 rounded-xl p-6 hover:border-neutral-300 transition-colors bg-white"
+                    className="border border-neutral-200 rounded-md p-6 hover:border-neutral-300 transition-colors bg-white"
                   >
                     {/* Header */}
                     <div className="flex items-start gap-3 mb-4">
@@ -408,18 +408,18 @@ export default function ModelHubPage() {
 
                     {/* Badges */}
                     <div className="flex items-center gap-2 mb-4 flex-wrap">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getDifficultyColor(model.difficulty)}`}>
+                      <span className={`px-3 py-1 rounded-sm text-xs font-medium ${getDifficultyColor(model.difficulty)}`}>
                         {model.difficulty}
                       </span>
-                      <span className="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-xs font-medium flex items-center gap-1">
+                      <span className="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-sm text-xs font-medium flex items-center gap-1">
                         <span>{getFileTypeIcon(model.fileType)}</span>
                         {model.fileType}
                       </span>
-                      <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
+                      <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-sm text-xs font-medium">
                         {model.category}
                       </span>
                       {isLocked && (
-                        <span className="px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-xs font-medium flex items-center gap-1">
+                        <span className="px-3 py-1 bg-amber-50 text-amber-700 rounded-sm text-xs font-medium flex items-center gap-1">
                           <LockIcon sx={{ fontSize: 12 }} />
                           Expert Only
                         </span>
@@ -453,14 +453,14 @@ export default function ModelHubPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handlePreview(model)}
-                        className="flex-1 px-4 py-2 border border-neutral-200 rounded-full text-sm font-medium hover:bg-neutral-50 transition-colors flex items-center justify-center gap-2"
+                        className="flex-1 px-4 py-2 border border-neutral-200 rounded-sm text-sm font-medium hover:bg-neutral-50 transition-colors flex items-center justify-center gap-2"
                       >
                         <VisibilityIcon sx={{ fontSize: 16 }} />
                         Preview
                       </button>
                       <button
                         onClick={() => isLocked ? navigate('/') : handleDownload(model)}
-                        className={`flex-1 px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
+                        className={`flex-1 px-4 py-2 rounded-sm text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
                           isLocked
                             ? 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200'
                             : 'bg-black text-white hover:bg-black/80'
@@ -497,7 +497,7 @@ export default function ModelHubPage() {
                   setSearchQuery('');
                   setFilters({ difficulty: 'All', fileType: 'All', category: 'All', access: 'All' });
                 }}
-                className="px-6 py-3 bg-black text-white rounded-full hover:bg-black/90 transition-colors"
+                className="px-6 py-3 bg-black text-white rounded-sm hover:bg-black/90 transition-colors"
               >
                 Clear Filters
               </button>
@@ -513,7 +513,7 @@ export default function ModelHubPage() {
           onClick={handleCloseUploadModal}
         >
           <div
-            className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-md max-w-2xl w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -543,7 +543,7 @@ export default function ModelHubPage() {
                   </p>
                   <button
                     onClick={() => setShowUploadModal(false)}
-                    className="px-6 py-3 bg-black text-white rounded-full hover:bg-black/90 transition-colors"
+                    className="px-6 py-3 bg-black text-white rounded-sm hover:bg-black/90 transition-colors"
                   >
                     Got It
                   </button>
@@ -557,7 +557,7 @@ export default function ModelHubPage() {
                       value={uploadTitle}
                       onChange={(e) => setUploadTitle(e.target.value)}
                       placeholder="e.g., Advanced Portfolio Optimizer"
-                      className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                      className="w-full px-4 py-3 border border-neutral-200 rounded-md text-sm focus:outline-none focus:border-brand"
                     />
                   </div>
 
@@ -567,7 +567,7 @@ export default function ModelHubPage() {
                       <select
                         value={uploadCategory}
                         onChange={(e) => setUploadCategory(e.target.value as ModelCategory)}
-                        className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                        className="w-full px-4 py-3 border border-neutral-200 rounded-md text-sm focus:outline-none focus:border-brand"
                       >
                         <option value="">Select category</option>
                         <option>Valuation</option>
@@ -583,7 +583,7 @@ export default function ModelHubPage() {
                       <select
                         value={uploadDifficulty}
                         onChange={(e) => setUploadDifficulty(e.target.value as ModelDifficulty)}
-                        className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                        className="w-full px-4 py-3 border border-neutral-200 rounded-md text-sm focus:outline-none focus:border-brand"
                       >
                         <option value="">Select difficulty</option>
                         <option>Beginner</option>
@@ -599,7 +599,7 @@ export default function ModelHubPage() {
                     <select
                       value={uploadFileType}
                       onChange={(e) => setUploadFileType(e.target.value as ModelFileType)}
-                      className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                      className="w-full px-4 py-3 border border-neutral-200 rounded-md text-sm focus:outline-none focus:border-brand"
                     >
                       <option value="">Select file type</option>
                       <option>Excel</option>
@@ -617,7 +617,7 @@ export default function ModelHubPage() {
                       value={uploadDescription}
                       onChange={(e) => setUploadDescription(e.target.value)}
                       placeholder="Describe what your model does and who it's for..."
-                      className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand resize-none"
+                      className="w-full px-4 py-3 border border-neutral-200 rounded-md text-sm focus:outline-none focus:border-brand resize-none"
                     />
                   </div>
 
@@ -628,7 +628,7 @@ export default function ModelHubPage() {
                       value={uploadLearnings}
                       onChange={(e) => setUploadLearnings(e.target.value)}
                       placeholder="e.g., Build valuation models&#10;Calculate intrinsic value&#10;Compare to market price"
-                      className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand resize-none"
+                      className="w-full px-4 py-3 border border-neutral-200 rounded-md text-sm focus:outline-none focus:border-brand resize-none"
                     />
                   </div>
 
@@ -643,7 +643,7 @@ export default function ModelHubPage() {
                     />
                     <label
                       htmlFor="model-file-input"
-                      className="block border-2 border-dashed border-neutral-300 rounded-lg p-8 text-center hover:border-neutral-400 transition-colors cursor-pointer"
+                      className="block border-2 border-dashed border-neutral-300 rounded-md p-8 text-center hover:border-neutral-400 transition-colors cursor-pointer"
                     >
                       <UploadIcon sx={{ fontSize: 48, color: 'var(--icon-muted)' }} />
                       <p className="text-sm text-neutral-600 mt-2">
@@ -657,7 +657,7 @@ export default function ModelHubPage() {
                   <button
                     onClick={handlePublishModel}
                     disabled={!uploadTitle.trim() || !uploadCategory || !uploadDifficulty || !uploadFileType || !uploadFile || uploadSubmitting}
-                    className="w-full py-4 bg-black text-white font-bold rounded-full hover:bg-black/80 transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed"
+                    className="w-full py-4 bg-black text-white font-bold rounded-sm hover:bg-black/80 transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed"
                   >
                     {uploadSubmitting ? 'Publishing…' : 'Publish Model'}
                   </button>
@@ -679,7 +679,7 @@ export default function ModelHubPage() {
           onClick={() => setShowPreviewModal(false)}
         >
           <div
-            className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-md max-w-3xl w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -700,14 +700,14 @@ export default function ModelHubPage() {
             <div className="p-8">
               {/* Badges */}
               <div className="flex items-center gap-2 mb-6 flex-wrap">
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${getDifficultyColor(selectedModel.difficulty)}`}>
+                <span className={`px-3 py-1 rounded-sm text-xs font-medium ${getDifficultyColor(selectedModel.difficulty)}`}>
                   {selectedModel.difficulty}
                 </span>
-                <span className="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-xs font-medium flex items-center gap-1">
+                <span className="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-sm text-xs font-medium flex items-center gap-1">
                   <span>{getFileTypeIcon(selectedModel.fileType)}</span>
                   {selectedModel.fileType}
                 </span>
-                <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
+                <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-sm text-xs font-medium">
                   {selectedModel.category}
                 </span>
               </div>
@@ -732,7 +732,7 @@ export default function ModelHubPage() {
               </div>
 
               {/* Preview Placeholder */}
-              <div className="mb-6 bg-neutral-50 rounded-xl p-12 text-center border-2 border-dashed border-neutral-300">
+              <div className="mb-6 bg-neutral-50 rounded-md p-12 text-center border-2 border-dashed border-neutral-300">
                 <div className="text-6xl mb-4">{getFileTypeIcon(selectedModel.fileType)}</div>
                 <h3 className="font-bold mb-2">Model Preview</h3>
                 <p className="text-sm text-neutral-600 mb-4">
@@ -755,7 +755,7 @@ export default function ModelHubPage() {
                     setShowPreviewModal(false);
                   }
                 }}
-                className={`w-full py-4 rounded-full font-bold transition-colors flex items-center justify-center gap-2 ${
+                className={`w-full py-4 rounded-sm font-bold transition-colors flex items-center justify-center gap-2 ${
                   selectedModel.access === 'Expert Only' && !isExpert
                     ? 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200'
                     : 'bg-black text-white hover:bg-black/80'
@@ -780,7 +780,7 @@ export default function ModelHubPage() {
 
       {/* Toast */}
       {showToast && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-brand text-white px-6 py-4 rounded-xl shadow-lg flex items-center gap-3 z-50 animate-slide-up pointer-events-none">
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-brand text-white px-6 py-4 rounded-md shadow-lg flex items-center gap-3 z-50 animate-slide-up pointer-events-none">
           <div>
             <p className="font-bold">{toastMessage}</p>
             {toastSubtitle && <p className="text-sm opacity-90">{toastSubtitle}</p>}

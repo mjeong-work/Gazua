@@ -163,7 +163,7 @@ export default function ProfileSettingsPage() {
         </div>
 
         {/* ── 1. Profile ─────────────────────────────────────────── */}
-        <section className="border border-neutral-200 rounded-2xl p-6">
+        <section className="border border-neutral-200 rounded-md p-6">
           <div className="flex items-center gap-4 mb-4">
             {profile?.avatar_url ? (
               <img
@@ -190,7 +190,7 @@ export default function ProfileSettingsPage() {
           </div>
           <button
             onClick={() => setShowEditProfile(true)}
-            className="w-full py-2.5 border border-neutral-200 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors"
+            className="w-full py-2.5 border border-neutral-200 rounded-sm text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors"
           >
             Edit Profile
           </button>
@@ -199,10 +199,10 @@ export default function ProfileSettingsPage() {
         {showEditProfile && <EditProfileModal onClose={() => setShowEditProfile(false)} />}
 
         {/* ── 2. Subscription ────────────────────────────────────── */}
-        <section className="border border-neutral-200 rounded-2xl p-6">
+        <section className="border border-neutral-200 rounded-md p-6">
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm font-semibold text-neutral-700">Subscription</p>
-            <span className={`text-xs font-bold px-3 py-1 rounded-full ${tierConfig.badge}`}>
+            <span className={`text-xs font-bold px-3 py-1 rounded-sm ${tierConfig.badge}`}>
               {tierConfig.label}
             </span>
           </div>
@@ -219,7 +219,7 @@ export default function ProfileSettingsPage() {
           {tier === 'free' ? (
             <button
               onClick={() => navigate('/pricing')}
-              className="w-full py-2.5 bg-brand text-white rounded-xl text-sm font-semibold hover:bg-brand-hover transition-colors"
+              className="w-full py-2.5 bg-brand text-white rounded-sm text-sm font-semibold hover:bg-brand-hover transition-colors"
             >
               Upgrade Plan
             </button>
@@ -227,14 +227,14 @@ export default function ProfileSettingsPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => navigate('/pricing')}
-                className="flex-1 py-2.5 border border-brand text-brand rounded-xl text-sm font-medium hover:bg-brand/5 transition-colors"
+                className="flex-1 py-2.5 border border-brand text-brand rounded-sm text-sm font-medium hover:bg-brand/5 transition-colors"
               >
                 Manage Subscription
               </button>
               <button
                 onClick={handleBillingPortal}
                 disabled={portalLoading}
-                className="flex-1 py-2.5 border border-neutral-200 text-neutral-700 rounded-xl text-sm font-medium hover:bg-neutral-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 py-2.5 border border-neutral-200 text-neutral-700 rounded-sm text-sm font-medium hover:bg-neutral-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {portalLoading ? 'Opening…' : 'Billing Portal'}
               </button>
@@ -243,7 +243,7 @@ export default function ProfileSettingsPage() {
         </section>
 
         {/* ── 3. Preferences ─────────────────────────────────────── */}
-        <section className="border border-neutral-200 rounded-2xl p-6">
+        <section className="border border-neutral-200 rounded-md p-6">
           <p className="text-sm font-semibold text-neutral-700 mb-4">Investment Preferences</p>
 
           <div className="space-y-3 mb-5">
@@ -266,7 +266,7 @@ export default function ProfileSettingsPage() {
                   {onboarding.interests.map(i => (
                     <span
                       key={i}
-                      className="text-xs px-2.5 py-1 bg-mint/30 text-green-800 rounded-full font-medium"
+                      className="text-xs px-2.5 py-1 bg-mint/30 text-green-800 rounded-sm font-medium"
                     >
                       {i}
                     </span>
@@ -280,19 +280,19 @@ export default function ProfileSettingsPage() {
 
           <button
             onClick={() => navigate('/onboarding/level')}
-            className="w-full py-2.5 border border-neutral-200 rounded-xl text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors"
+            className="w-full py-2.5 border border-neutral-200 rounded-sm text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors"
           >
             Edit Preferences
           </button>
         </section>
 
         {/* ── 4. Account actions ─────────────────────────────────── */}
-        <section className="border border-neutral-200 rounded-2xl p-6">
+        <section className="border border-neutral-200 rounded-md p-6">
           <p className="text-sm font-semibold text-neutral-700 mb-3">Account Actions</p>
           <button
             onClick={handleSignOut}
             disabled={isLoading}
-            className="w-full py-2.5 border border-red-200 text-red-600 rounded-xl text-sm font-medium hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-2.5 border border-red-200 text-red-600 rounded-sm text-sm font-medium hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Signing out…' : 'Sign Out'}
           </button>

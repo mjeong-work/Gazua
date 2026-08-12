@@ -78,7 +78,7 @@ export default function VideosTab({ videos, setVideos, refreshVideos }: VideosTa
     <div>
       <div className="flex items-center justify-between mb-5">
         <h2 className="text-base font-semibold">Your Videos <span className="text-neutral-400 font-normal text-sm ml-1">({videos.length})</span></h2>
-        <button onClick={() => setShowUploadModal(true)} className="flex items-center gap-1.5 px-4 py-2 bg-black text-white text-sm font-medium rounded-full hover:bg-black/80 transition-colors">
+        <button onClick={() => setShowUploadModal(true)} className="flex items-center gap-1.5 px-4 py-2 bg-black text-white text-sm font-medium rounded-sm hover:bg-black/80 transition-colors">
           <AddIcon sx={{ fontSize: 16 }} />
           Upload Video
         </button>
@@ -88,27 +88,27 @@ export default function VideosTab({ videos, setVideos, refreshVideos }: VideosTa
           <div key={video.id} className="group">
             {/* Delete confirmation overlay */}
             {deleteVideoId === video.id ? (
-              <div className="aspect-video rounded-xl bg-red-50 border border-red-200 flex flex-col items-center justify-center gap-3 mb-2.5 p-4">
+              <div className="aspect-video rounded-md bg-red-50 border border-red-200 flex flex-col items-center justify-center gap-3 mb-2.5 p-4">
                 <p className="text-sm font-medium text-red-700 text-center">Delete "{video.title}"?</p>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleConfirmDeleteVideo(video.id)}
                     disabled={deletingVideoId === video.id}
-                    className="px-4 py-1.5 bg-red-600 text-white text-xs font-medium rounded-full hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-1.5 bg-red-600 text-white text-xs font-medium rounded-sm hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {deletingVideoId === video.id ? 'Deleting…' : 'Delete'}
                   </button>
                   <button
                     onClick={() => setDeleteVideoId(null)}
                     disabled={deletingVideoId === video.id}
-                    className="px-4 py-1.5 border border-neutral-300 text-xs font-medium rounded-full hover:bg-neutral-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-1.5 border border-neutral-300 text-xs font-medium rounded-sm hover:bg-neutral-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Cancel
                   </button>
                 </div>
               </div>
             ) : (
-              <div className="relative aspect-video rounded-xl overflow-hidden mb-2.5">
+              <div className="relative aspect-video rounded-md overflow-hidden mb-2.5">
                 <div className="absolute inset-0" style={{ background: video.thumbnail }} />
                 <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity flex items-center justify-center gap-3">
                   <button onClick={() => handleStartEditVideo(video)} className="p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors" title="Edit title">
@@ -145,7 +145,7 @@ export default function VideosTab({ videos, setVideos, refreshVideos }: VideosTa
 
             {/* Analytics panel */}
             {analyticsVideoId === video.id && (
-              <div className="mt-3 p-3 bg-neutral-50 rounded-xl border border-neutral-200">
+              <div className="mt-3 p-3 bg-neutral-50 rounded-md border border-neutral-200">
                 <p className="text-xs font-semibold mb-2 text-neutral-700">7-day views</p>
                 <div className="h-20">
                   <ResponsiveContainer width="100%" height="100%">

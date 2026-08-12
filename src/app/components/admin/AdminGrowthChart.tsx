@@ -14,7 +14,7 @@ interface AdminGrowthChartProps {
 // tightly coupled to currency-formatted simulation data) — just the same established styling.
 export default function AdminGrowthChart({ data, bucket, onBucketChange }: AdminGrowthChartProps) {
   return (
-    <div className="bg-white border border-neutral-200 rounded-xl p-4">
+    <div className="bg-white border border-neutral-200 rounded-md p-4">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-base font-semibold">User Growth</h2>
         <div className="flex items-center gap-1 text-xs font-medium">
@@ -22,7 +22,7 @@ export default function AdminGrowthChart({ data, bucket, onBucketChange }: Admin
             <button
               key={b}
               onClick={() => onBucketChange(b)}
-              className={`px-2.5 py-1 rounded-full capitalize transition-colors ${
+              className={`px-2.5 py-1 rounded-sm capitalize transition-colors ${
                 bucket === b ? 'bg-black text-white' : 'text-neutral-500 hover:bg-neutral-100'
               }`}
             >

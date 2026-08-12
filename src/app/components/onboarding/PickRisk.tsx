@@ -54,7 +54,7 @@ export default function PickRisk() {
             <button
               key={style.id}
               onClick={() => setSelectedRisk(style.id)}
-              className={`p-6 rounded-2xl border-2 transition-all text-left relative ${
+              className={`p-6 rounded-md border-2 transition-all text-left relative ${
                 selectedRisk === style.id
                   ? `${style.color} ${style.selectedBg} shadow-md`
                   : 'border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50'
@@ -80,7 +80,7 @@ export default function PickRisk() {
         <button
           onClick={handleContinue}
           disabled={!selectedRisk}
-          className="w-full px-8 py-4 bg-black text-white rounded-full hover:bg-black/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full px-8 py-4 bg-black text-white rounded-sm hover:bg-black/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Continue
         </button>

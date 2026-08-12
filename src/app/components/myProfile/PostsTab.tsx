@@ -86,21 +86,21 @@ export default function PostsTab({ posts, setPosts, displayName, displayHandle, 
     <div>
       <div className="flex items-center justify-between mb-5">
         <h2 className="text-base font-semibold">Your Posts <span className="text-neutral-400 font-normal text-sm ml-1">({posts.filter(p => !p.draft).length} published · {posts.filter(p => p.draft).length} drafts)</span></h2>
-        <button onClick={handleOpenComposer} className="flex items-center gap-1.5 px-4 py-2 bg-black text-white text-sm font-medium rounded-full hover:bg-black/80 transition-colors">
+        <button onClick={handleOpenComposer} className="flex items-center gap-1.5 px-4 py-2 bg-black text-white text-sm font-medium rounded-sm hover:bg-black/80 transition-colors">
           <AddIcon sx={{ fontSize: 16 }} />
           New Post
         </button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {posts.map((post) => (
-          <div key={post.id} className={`bg-white border rounded-xl flex flex-col transition-colors ${post.draft ? 'border-dashed border-neutral-300 bg-neutral-50/50' : 'border-neutral-200 hover:border-neutral-300'}`}>
+          <div key={post.id} className={`bg-white border rounded-md flex flex-col transition-colors ${post.draft ? 'border-dashed border-neutral-300 bg-neutral-50/50' : 'border-neutral-200 hover:border-neutral-300'}`}>
             {/* Delete confirmation */}
             {deletePostId === post.id ? (
               <div className="flex-1 flex flex-col items-center justify-center gap-3 p-6">
                 <p className="text-sm font-medium text-red-700 text-center">Delete this post?</p>
                 <div className="flex items-center gap-2">
-                  <button onClick={() => handleConfirmDeletePost(post.id)} className="px-4 py-1.5 bg-red-600 text-white text-xs font-medium rounded-full hover:bg-red-700 transition-colors">Delete</button>
-                  <button onClick={() => setDeletePostId(null)} className="px-4 py-1.5 border border-neutral-300 text-xs font-medium rounded-full hover:bg-neutral-50 transition-colors">Cancel</button>
+                  <button onClick={() => handleConfirmDeletePost(post.id)} className="px-4 py-1.5 bg-red-600 text-white text-xs font-medium rounded-sm hover:bg-red-700 transition-colors">Delete</button>
+                  <button onClick={() => setDeletePostId(null)} className="px-4 py-1.5 border border-neutral-300 text-xs font-medium rounded-sm hover:bg-neutral-50 transition-colors">Cancel</button>
                 </div>
               </div>
             ) : (
@@ -118,8 +118,8 @@ export default function PostsTab({ posts, setPosts, displayName, displayHandle, 
                     </div>
                   </div>
                   <div className="flex items-center gap-1 flex-shrink-0">
-                    {post.draft && <span className="text-xs font-medium px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full">Draft</span>}
-                    <span className="text-xs font-medium px-2 py-1 bg-neutral-100 rounded-full text-neutral-500">{post.tag}</span>
+                    {post.draft && <span className="text-xs font-medium px-2 py-0.5 bg-amber-100 text-amber-700 rounded-sm">Draft</span>}
+                    <span className="text-xs font-medium px-2 py-1 bg-neutral-100 rounded-sm text-neutral-500">{post.tag}</span>
                   </div>
                 </div>
 
@@ -128,8 +128,8 @@ export default function PostsTab({ posts, setPosts, displayName, displayHandle, 
                 <div className="flex items-center justify-between pt-3 border-t border-neutral-100 mt-auto">
                   {post.draft ? (
                     <div className="flex items-center gap-2">
-                      <button onClick={() => handlePublishDraft(post.id)} className="text-xs font-medium px-3 py-1.5 bg-black text-white rounded-full hover:bg-black/80 transition-colors">Publish</button>
-                      <button onClick={() => handleOpenEditPost(post)} className="text-xs font-medium px-3 py-1.5 border border-neutral-200 rounded-full hover:bg-neutral-50 transition-colors">Edit</button>
+                      <button onClick={() => handlePublishDraft(post.id)} className="text-xs font-medium px-3 py-1.5 bg-black text-white rounded-sm hover:bg-black/80 transition-colors">Publish</button>
+                      <button onClick={() => handleOpenEditPost(post)} className="text-xs font-medium px-3 py-1.5 border border-neutral-200 rounded-sm hover:bg-neutral-50 transition-colors">Edit</button>
                     </div>
                   ) : (
                     <div className="flex items-center gap-4 text-xs text-neutral-400">
@@ -165,7 +165,7 @@ export default function PostsTab({ posts, setPosts, displayName, displayHandle, 
       {/* ── Post Composer Modal ── */}
       {showPostComposer && (
         <Overlay onClose={() => { setShowPostComposer(false); setEditingPostId(null); }}>
-          <div className="bg-white rounded-2xl shadow-xl w-[min(540px,90vw)] p-6">
+          <div className="bg-white rounded-md shadow-xl w-[min(540px,90vw)] p-6">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold">{editingPostId ? 'Edit Post' : 'New Post'}</h2>
               <button onClick={() => { setShowPostComposer(false); setEditingPostId(null); }} className="icon-tap-target p-1.5 hover:bg-neutral-100 rounded-full transition-colors"><CloseIcon sx={{ fontSize: 18 }} /></button>
@@ -185,7 +185,7 @@ export default function PostsTab({ posts, setPosts, displayName, displayHandle, 
               onChange={e => setComposerContent(e.target.value)}
               placeholder="What's on your mind? Share an investing insight..."
               rows={5}
-              className="w-full text-sm text-neutral-800 border border-neutral-200 rounded-xl p-3 resize-none focus:outline-none focus:border-black transition-colors mb-4"
+              className="w-full text-sm text-neutral-800 border border-neutral-200 rounded-md p-3 resize-none focus:outline-none focus:border-black transition-colors mb-4"
             />
 
             <div className="mb-4">
@@ -195,7 +195,7 @@ export default function PostsTab({ posts, setPosts, displayName, displayHandle, 
                   <button
                     key={t}
                     onClick={() => setComposerTag(t)}
-                    className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${composerTag === t ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'}`}
+                    className={`px-3 py-1 rounded-sm text-xs font-medium transition-colors ${composerTag === t ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'}`}
                   >
                     {t}
                   </button>
@@ -206,8 +206,8 @@ export default function PostsTab({ posts, setPosts, displayName, displayHandle, 
             <div className="flex items-center justify-between">
               <span className="text-xs text-neutral-400">{composerContent.length} / 500</span>
               <div className="flex items-center gap-2">
-                <button onClick={() => { setShowPostComposer(false); setEditingPostId(null); }} className="px-5 py-2 border border-neutral-200 text-sm font-medium rounded-full hover:bg-neutral-50 transition-colors">Cancel</button>
-                <button onClick={handleSavePost} disabled={!composerContent.trim()} className="px-5 py-2 bg-black text-white text-sm font-medium rounded-full hover:bg-black/80 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                <button onClick={() => { setShowPostComposer(false); setEditingPostId(null); }} className="px-5 py-2 border border-neutral-200 text-sm font-medium rounded-sm hover:bg-neutral-50 transition-colors">Cancel</button>
+                <button onClick={handleSavePost} disabled={!composerContent.trim()} className="px-5 py-2 bg-black text-white text-sm font-medium rounded-sm hover:bg-black/80 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
                   {editingPostId ? 'Save' : 'Publish'}
                 </button>
               </div>

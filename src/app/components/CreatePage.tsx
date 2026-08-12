@@ -81,9 +81,9 @@ export default function CreatePage() {
               <button
                 key={type.id}
                 onClick={() => handleCreate(type.id)}
-                className="text-left border-2 border-neutral-200 rounded-2xl p-5 sm:p-8 hover:border-brand hover:shadow-lg transition-all bg-white group"
+                className="text-left border-2 border-neutral-200 rounded-md p-5 sm:p-8 hover:border-brand hover:shadow-lg transition-all bg-white group"
               >
-                <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${type.color} flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform`}>
+                <div className={`w-20 h-20 rounded-md bg-gradient-to-br ${type.color} flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform`}>
                   {type.icon}
                 </div>
                 <h3 className="text-2xl font-bold mb-3">{type.title}</h3>
@@ -97,7 +97,7 @@ export default function CreatePage() {
           </div>
 
           {/* Tips Section */}
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+          <div className="bg-blue-50 border border-blue-200 rounded-md p-6">
             <h3 className="font-bold mb-3">Tips for Great Content</h3>
             <ul className="space-y-2 text-sm text-neutral-700">
               <li className="flex items-start gap-2">
@@ -146,7 +146,7 @@ export default function CreatePage() {
           onClick={handleCloseModal}
         >
           <div
-            className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-md max-w-3xl w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -170,7 +170,7 @@ export default function CreatePage() {
             {/* Content */}
             <div className="p-8">
               <div className="text-center py-12">
-                <div className={`w-24 h-24 rounded-2xl bg-gradient-to-br ${contentTypes.find(t => t.id === selectedType)?.color} flex items-center justify-center text-white mb-6 mx-auto`}>
+                <div className={`w-24 h-24 rounded-md bg-gradient-to-br ${contentTypes.find(t => t.id === selectedType)?.color} flex items-center justify-center text-white mb-6 mx-auto`}>
                   {contentTypes.find(t => t.id === selectedType)?.icon}
                 </div>
                 <h3 className="text-xl font-bold mb-2">Coming Soon</h3>
@@ -179,7 +179,7 @@ export default function CreatePage() {
                 </p>
                 <button
                   onClick={handleCloseModal}
-                  className="px-6 py-3 bg-black text-white rounded-full hover:bg-black/90 transition-colors"
+                  className="px-6 py-3 bg-black text-white rounded-sm hover:bg-black/90 transition-colors"
                 >
                   Got It
                 </button>

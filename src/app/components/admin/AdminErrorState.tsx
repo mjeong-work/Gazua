@@ -13,7 +13,7 @@ export default function AdminErrorState({ message = 'Something went wrong.', onR
       {onRetry && (
         <button
           onClick={onRetry}
-          className="px-4 py-2 text-xs font-medium rounded-full bg-black text-white hover:bg-black/80 transition-colors"
+          className="px-4 py-2 text-xs font-medium rounded-sm bg-black text-white hover:bg-black/80 transition-colors"
         >
           Retry
         </button>

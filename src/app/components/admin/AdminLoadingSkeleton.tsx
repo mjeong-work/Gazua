@@ -8,7 +8,7 @@ export default function AdminLoadingSkeleton({ rows = 3 }: AdminLoadingSkeletonP
   return (
     <div className="space-y-4">
       {Array.from({ length: rows }, (_, i) => (
-        <div key={i} className="border border-neutral-200 rounded-xl p-5 animate-pulse">
+        <div key={i} className="border border-neutral-200 rounded-md p-5 animate-pulse">
           <div className="flex gap-2 mb-3">
             <div className="h-4 bg-neutral-200 rounded w-16" />
             <div className="h-4 bg-neutral-200 rounded w-32" />

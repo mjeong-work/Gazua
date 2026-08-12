@@ -16,7 +16,7 @@ function DisclosureBadges({ disclosures }: { disclosures: DisclosureType[] }) {
       {labels.map((label) => (
         <span
           key={label}
-          className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200"
+          className="text-[10px] font-medium px-1.5 py-0.5 rounded-sm bg-amber-50 text-amber-700 border border-amber-200"
         >
           {label}
         </span>

@@ -54,7 +54,7 @@ export default function PickLevel() {
             <button
               key={level.id}
               onClick={() => setSelectedLevel(level.id)}
-              className={`w-full p-6 rounded-2xl border-2 transition-all text-left relative ${
+              className={`w-full p-6 rounded-md border-2 transition-all text-left relative ${
                 selectedLevel === level.id
                   ? 'border-mint bg-mint/5 shadow-md'
                   : 'border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50'
@@ -80,7 +80,7 @@ export default function PickLevel() {
         <button
           onClick={handleContinue}
           disabled={!selectedLevel}
-          className="w-full px-8 py-4 bg-black text-white rounded-full hover:bg-black/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full px-8 py-4 bg-black text-white rounded-sm hover:bg-black/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Continue
         </button>

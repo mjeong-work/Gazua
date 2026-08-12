@@ -145,7 +145,7 @@ export default function AssetPage() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <h1 className="text-2xl sm:text-3xl font-bold font-mono break-all">{ticker}</h1>
                     {displayType && (
-                      <Badge variant="outline" className="border-transparent px-2.5 py-1 rounded-full bg-neutral-100 text-neutral-600 font-medium flex-shrink-0">
+                      <Badge variant="outline" className="border-transparent px-2.5 py-1 rounded-sm bg-neutral-100 text-neutral-600 font-medium flex-shrink-0">
                         {displayType}
                       </Badge>
                     )}
@@ -173,7 +173,7 @@ export default function AssetPage() {
           })()}
 
           {!priceLoading && !tickerInfo && (
-            <div className="p-4 bg-neutral-50 rounded-lg border border-neutral-200 text-center mb-6">
+            <div className="p-4 bg-neutral-50 rounded-md border border-neutral-200 text-center mb-6">
               <p className="text-sm text-neutral-500">Live price data is not available for {ticker} right now.</p>
             </div>
           )}
@@ -182,7 +182,7 @@ export default function AssetPage() {
           {liveData && (
             <div className="mb-8">
               <h2 className="text-base font-semibold mb-3">Price Chart</h2>
-              <div className="bg-neutral-50 rounded-lg p-4 w-full">
+              <div className="bg-neutral-50 rounded-md p-4 w-full">
                 {chartLoading ? (
                   <div className="h-48 min-h-[192px] w-full animate-pulse bg-neutral-100 rounded" />
                 ) : chartData.length > 0 ? (
@@ -219,7 +219,7 @@ export default function AssetPage() {
           )}
 
           {!liveData && (
-            <div className="p-6 bg-neutral-50 rounded-lg border border-neutral-200 text-center mb-8">
+            <div className="p-6 bg-neutral-50 rounded-md border border-neutral-200 text-center mb-8">
               <p className="text-sm text-neutral-500">Live market data isn't connected in this environment.</p>
             </div>
           )}
@@ -229,7 +229,7 @@ export default function AssetPage() {
             <h2 className="text-base font-semibold mb-3">Creator Activity</h2>
             {postsLoading ? (
               <div className="space-y-3 animate-pulse">
-                {[1, 2].map(n => <div key={n} className="h-20 bg-neutral-100 rounded-xl" />)}
+                {[1, 2].map(n => <div key={n} className="h-20 bg-neutral-100 rounded-md" />)}
               </div>
             ) : posts && posts.length > 0 ? (
               <div className="space-y-3">
@@ -237,7 +237,7 @@ export default function AssetPage() {
                   <button
                     key={post.id}
                     onClick={() => navigate(`/profile/${post.creator.username}/investment`)}
-                    className="w-full flex items-start gap-3 p-4 bg-white border border-neutral-200 rounded-xl hover:border-neutral-300 transition-colors text-left"
+                    className="w-full flex items-start gap-3 p-4 bg-white border border-neutral-200 rounded-md hover:border-neutral-300 transition-colors text-left"
                   >
                     <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-sm font-semibold flex-shrink-0">
                       {(post.creator.full_name?.[0] ?? '?').toUpperCase()}
@@ -254,13 +254,13 @@ export default function AssetPage() {
                 ))}
               </div>
             ) : (
-              <div className="p-6 bg-neutral-50 rounded-lg border border-neutral-200 text-center">
+              <div className="p-6 bg-neutral-50 rounded-md border border-neutral-200 text-center">
                 <p className="text-sm text-neutral-500">No creator activity tagged with ${ticker} yet.</p>
               </div>
             )}
           </div>
 
-          <div className="p-4 border border-amber-200 bg-amber-50 rounded-xl mt-8">
+          <div className="p-4 border border-amber-200 bg-amber-50 rounded-md mt-8">
             <p className="text-xs text-amber-800 leading-relaxed">
               <strong>Disclaimer:</strong> Content shown here is for educational purposes only and not financial advice. Always do your own research and consult a licensed advisor before making investment decisions.
             </p>

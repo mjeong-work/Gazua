@@ -41,7 +41,7 @@ export default function AdminConfirmDialog({
 
   return (
     <Dialog open onOpenChange={(open) => { if (!open) onClose(); }}>
-      <DialogContent className="max-w-sm rounded-2xl p-6">
+      <DialogContent className="max-w-sm rounded-md p-6">
         <DialogTitle className="text-base font-bold mb-1">{title}</DialogTitle>
         {body ? (
           <DialogDescription className="text-sm text-neutral-500 mb-4">{body}</DialogDescription>
@@ -56,7 +56,7 @@ export default function AdminConfirmDialog({
             onChange={e => setNotes(e.target.value)}
             placeholder={notesPlaceholder}
             rows={3}
-            className="w-full px-3 py-2 border border-neutral-200 rounded-lg text-sm resize-none focus:outline-none focus:border-neutral-400 mb-4"
+            className="w-full px-3 py-2 border border-neutral-200 rounded-sm text-sm resize-none focus:outline-none focus:border-neutral-400 mb-4"
           />
         )}
 
@@ -72,7 +72,7 @@ export default function AdminConfirmDialog({
           <Button
             onClick={handleConfirm}
             disabled={submitting}
-            className={`px-4 py-2 h-auto text-xs rounded-full text-white ${
+            className={`px-4 py-2 h-auto text-xs rounded-sm text-white ${
               destructive ? 'bg-red-600 hover:bg-red-700' : 'bg-black hover:bg-black/80'
             }`}
           >

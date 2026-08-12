@@ -30,17 +30,17 @@ export default function PortfolioSimulator() {
   return (
     <div className="space-y-5">
       {/* ── Header card ── */}
-      <div className="flex items-center justify-between rounded-2xl border border-neutral-200 bg-white px-5 py-4">
+      <div className="flex items-center justify-between rounded-md border border-neutral-200 bg-white px-5 py-4">
         <div>
           <h2 className="text-lg font-bold text-neutral-900">Portfolio Simulator</h2>
           <p className="text-sm text-neutral-500 mt-0.5">Test hypothetical investment scenarios</p>
         </div>
 
         {/* Segmented control */}
-        <div className="flex bg-neutral-100 rounded-xl p-0.5 flex-shrink-0">
+        <div className="flex bg-neutral-100 rounded-md p-0.5 flex-shrink-0">
           <button
             onClick={() => setView('simulation')}
-            className={`px-3.5 py-1.5 text-xs font-medium rounded-lg transition-all ${
+            className={`px-3.5 py-1.5 text-xs font-medium rounded-sm transition-all ${
               view === 'simulation'
                 ? 'bg-white text-neutral-900 shadow-sm'
                 : 'text-neutral-500 hover:text-neutral-700'
@@ -50,7 +50,7 @@ export default function PortfolioSimulator() {
           </button>
           <button
             onClick={() => setView('actual')}
-            className={`px-3.5 py-1.5 text-xs font-medium rounded-lg transition-all ${
+            className={`px-3.5 py-1.5 text-xs font-medium rounded-sm transition-all ${
               view === 'actual'
                 ? 'bg-white text-neutral-900 shadow-sm'
                 : 'text-neutral-500 hover:text-neutral-700'

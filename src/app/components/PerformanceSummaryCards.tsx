@@ -12,7 +12,7 @@ export default function PerformanceSummaryCards({ simulation }: Props) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
       {/* Hypothesis */}
-      <div className="rounded-2xl border border-violet-200 bg-violet-50 p-5">
+      <div className="rounded-md border border-violet-200 bg-violet-50 p-5">
         <p className="text-xs font-medium text-violet-500 uppercase tracking-wide mb-3">
           Your Hypothesis
         </p>
@@ -25,7 +25,7 @@ export default function PerformanceSummaryCards({ simulation }: Props) {
       </div>
 
       {/* Actual */}
-      <div className="rounded-2xl border border-green-200 bg-green-50 p-5">
+      <div className="rounded-md border border-green-200 bg-green-50 p-5">
         <p className="text-xs font-medium text-green-600 uppercase tracking-wide mb-3">
           Actual Performance
         </p>
@@ -39,7 +39,7 @@ export default function PerformanceSummaryCards({ simulation }: Props) {
 
       {/* Difference */}
       <div
-        className={`rounded-2xl border p-5 ${
+        className={`rounded-md border p-5 ${
           diffPositive
             ? 'border-green-200 bg-green-50'
             : 'border-red-200 bg-red-50'

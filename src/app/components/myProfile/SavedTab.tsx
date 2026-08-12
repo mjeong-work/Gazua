@@ -29,7 +29,7 @@ export default function SavedTab() {
           {savedItems.map((item) => (
             <div key={item.contentId} className="group">
               <div
-                className="relative aspect-video rounded-xl overflow-hidden mb-2.5 cursor-pointer"
+                className="relative aspect-video rounded-md overflow-hidden mb-2.5 cursor-pointer"
                 style={{ background: item.thumbnail }}
                 onClick={() => handleOpenSavedItem(item)}
               >

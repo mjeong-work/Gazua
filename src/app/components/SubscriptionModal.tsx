@@ -57,7 +57,7 @@ export default function SubscriptionModal({ onClose, creatorName }: Subscription
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-md max-w-2xl w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -81,14 +81,14 @@ export default function SubscriptionModal({ onClose, creatorName }: Subscription
               <div
                 key={tier.id}
                 onClick={() => setSelectedTier(tier.id)}
-                className={`relative border-2 rounded-xl p-6 cursor-pointer transition-all ${
+                className={`relative border-2 rounded-md p-6 cursor-pointer transition-all ${
                   selectedTier === tier.id
                     ? 'border-brand bg-brand/5'
                     : 'border-neutral-200 hover:border-neutral-300'
                 }`}
               >
                 {tier.badge && (
-                  <div className="absolute -top-3 left-6 bg-mint text-black text-xs font-bold px-3 py-1 rounded-full">
+                  <div className="absolute -top-3 left-6 bg-mint text-black text-xs font-bold px-3 py-1 rounded-sm">
                     {tier.badge}
                   </div>
                 )}
@@ -137,7 +137,7 @@ export default function SubscriptionModal({ onClose, creatorName }: Subscription
           {/* Subscribe Button — redirects to platform pricing page */}
           <button
             onClick={() => { onClose(); navigate('/pricing'); }}
-            className="w-full py-4 bg-black text-white font-bold rounded-full hover:bg-black/80 transition-colors mb-4"
+            className="w-full py-4 bg-black text-white font-bold rounded-sm hover:bg-black/80 transition-colors mb-4"
           >
             Subscribe for ${tiers.find(t => t.id === selectedTier)?.price}/month
           </button>

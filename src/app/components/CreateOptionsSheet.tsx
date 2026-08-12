@@ -41,7 +41,7 @@ function OptionsList({ onSelect }: { onSelect: (type: CreateContentType) => void
         <button
           key={opt.type}
           onClick={() => onSelect(opt.type)}
-          className="w-full flex items-center gap-4 px-3 py-3.5 rounded-xl hover:bg-neutral-50 active:bg-neutral-100 transition-colors text-left"
+          className="w-full flex items-center gap-4 px-3 py-3.5 rounded-md hover:bg-neutral-50 active:bg-neutral-100 transition-colors text-left"
         >
           <div className="w-11 h-11 rounded-full bg-neutral-100 flex items-center justify-center flex-shrink-0 text-neutral-800">
             {opt.icon}
@@ -105,7 +105,7 @@ export default function CreateOptionsSheet({ onClose, onSelect }: CreateOptionsS
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 8 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
-          className="relative bg-white rounded-2xl shadow-2xl w-[min(380px,90vw)] p-2"
+          className="relative bg-white rounded-md shadow-2xl w-[min(380px,90vw)] p-2"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center justify-between px-3 pt-2.5 pb-1">
@@ -134,7 +134,7 @@ export default function CreateOptionsSheet({ onClose, onSelect }: CreateOptionsS
           animate={{ y: 0 }}
           exit={{ y: '100%' }}
           transition={{ duration: 0.28, ease: 'easeOut' }}
-          className="relative w-full rounded-t-2xl bg-white shadow-2xl touch-none pb-[max(1rem,env(safe-area-inset-bottom))]"
+          className="relative w-full rounded-t-md bg-white shadow-2xl touch-none pb-[max(1rem,env(safe-area-inset-bottom))]"
           onClick={(e) => e.stopPropagation()}
         >
           <div

@@ -20,7 +20,7 @@ interface ReelMoreMenuProps {
   onToggleTickerSave?: () => void;
 }
 
-const ROW_CLASS = 'w-full flex items-center gap-3 px-3 py-3 text-sm text-neutral-700 hover:bg-neutral-50 rounded-xl transition-colors text-left';
+const ROW_CLASS = 'w-full flex items-center gap-3 px-3 py-3 text-sm text-neutral-700 hover:bg-neutral-50 rounded-md transition-colors text-left';
 
 // Centered card, matching ReportButton's own modal convention. Absorbs what used to be a
 // separate Share menu — the standalone Share rail icon was folded in here to keep the rail
@@ -68,7 +68,7 @@ export default function ReelMoreMenu({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 8 }}
         transition={{ type: 'spring', damping: 28, stiffness: 340 }}
-        className="bg-white rounded-2xl max-w-sm w-full p-5"
+        className="bg-white rounded-md max-w-sm w-full p-5"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">

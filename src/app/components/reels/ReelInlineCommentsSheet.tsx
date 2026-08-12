@@ -43,7 +43,7 @@ export default function ReelInlineCommentsSheet({ comments, commentCount, onAddC
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 32, stiffness: 320 }}
-        className="absolute inset-x-0 bottom-0 h-[72%] rounded-t-2xl bg-white shadow-2xl flex flex-col touch-none overflow-hidden"
+        className="absolute inset-x-0 bottom-0 h-[72%] rounded-t-md bg-white shadow-2xl flex flex-col touch-none overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         <div

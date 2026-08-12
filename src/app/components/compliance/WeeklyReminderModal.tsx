@@ -45,7 +45,7 @@ export default function WeeklyReminderModal() {
       onClick={dismiss}
     >
       <div
-        className="bg-white rounded-2xl max-w-sm w-full p-6"
+        className="bg-white rounded-md max-w-sm w-full p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between mb-4">
@@ -73,7 +73,7 @@ export default function WeeklyReminderModal() {
 
         <button
           onClick={dismiss}
-          className="w-full py-3 bg-black text-white rounded-full text-sm font-bold hover:bg-black/80 transition-colors"
+          className="w-full py-3 bg-black text-white rounded-sm text-sm font-bold hover:bg-black/80 transition-colors"
         >
           Continue
         </button>

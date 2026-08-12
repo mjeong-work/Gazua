@@ -96,7 +96,7 @@ export default function SignUp() {
           </p>
           <button
             onClick={() => navigate('/signin')}
-            className="w-full px-8 py-4 bg-black text-white rounded-full hover:bg-black/90 transition-colors"
+            className="w-full px-8 py-4 bg-black text-white rounded-sm hover:bg-black/90 transition-colors"
           >
             Go to Sign In
           </button>
@@ -146,7 +146,7 @@ export default function SignUp() {
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
-              className="w-full px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-mint/50"
+              className="w-full px-4 py-3 border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-mint/50"
             />
           </div>
 
@@ -161,7 +161,7 @@ export default function SignUp() {
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               required
-              className="w-full px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-mint/50"
+              className="w-full px-4 py-3 border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-mint/50"
             />
           </div>
 
@@ -176,7 +176,7 @@ export default function SignUp() {
               value={formData.confirmPassword}
               onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
               required
-              className="w-full px-4 py-3 border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-mint/50"
+              className="w-full px-4 py-3 border border-neutral-200 rounded-md focus:outline-none focus:ring-2 focus:ring-mint/50"
             />
           </div>
 
@@ -195,7 +195,7 @@ export default function SignUp() {
             type="button"
             onClick={handleGoogleAuth}
             disabled={isGoogleLoading}
-            className="w-full px-4 py-3 border-2 border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-4 py-3 border-2 border-neutral-200 rounded-md hover:bg-neutral-50 transition-colors flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isGoogleLoading ? (
               <>
@@ -241,7 +241,7 @@ export default function SignUp() {
           <Button
             type="submit"
             disabled={!allAgreed || formData.password !== formData.confirmPassword || isSubmitLoading}
-            className="w-full px-8 py-4 bg-black text-white rounded-full hover:bg-black/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-8 py-4 bg-black text-white rounded-sm hover:bg-black/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitLoading ? (
               <span className="flex items-center justify-center gap-2">

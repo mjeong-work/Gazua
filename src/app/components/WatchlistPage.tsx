@@ -120,7 +120,7 @@ export default function WatchlistPage() {
             <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6">Build your investing logic</h2>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {learningPaths.map((path, idx) => (
-                <div key={idx} className="border border-neutral-200 rounded-xl p-5 hover:border-neutral-300 transition-colors bg-white">
+                <div key={idx} className="border border-neutral-200 rounded-md p-5 hover:border-neutral-300 transition-colors bg-white">
                   <div className="text-4xl mb-3">{path.icon}</div>
                   <h3 className="font-bold mb-2">{path.title}</h3>
                   <p className="text-sm text-neutral-600 mb-4 leading-relaxed">{path.description}</p>
@@ -139,7 +139,7 @@ export default function WatchlistPage() {
                 <h2 className="text-2xl font-bold">Your Watchlist ({watchlistItems.length})</h2>
                 <button
                   onClick={() => setShowAddModal(true)}
-                  className="px-4 py-2 bg-black text-white rounded-full text-sm font-medium hover:bg-black/80 transition-colors flex items-center gap-2"
+                  className="px-4 py-2 bg-black text-white rounded-sm text-sm font-medium hover:bg-black/80 transition-colors flex items-center gap-2"
                 >
                   <AddIcon sx={{ fontSize: 18 }} />
                   Add Asset
@@ -150,7 +150,7 @@ export default function WatchlistPage() {
                 {watchlistItems.map(item => (
                   <div
                     key={item.id}
-                    className="border border-neutral-200 rounded-xl p-6 hover:border-neutral-300 transition-colors bg-white cursor-pointer"
+                    className="border border-neutral-200 rounded-md p-6 hover:border-neutral-300 transition-colors bg-white cursor-pointer"
                     onClick={() => setSelectedItem(item)}
                   >
                     <div className="flex items-start justify-between mb-4">
@@ -185,8 +185,8 @@ export default function WatchlistPage() {
                     </div>
 
                     <div className="flex items-center gap-2 mb-4 flex-wrap">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}>{item.status}</span>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getInterestColor(item.interest_level)}`}>{item.interest_level} Interest</span>
+                      <span className={`px-3 py-1 rounded-sm text-xs font-medium ${getStatusColor(item.status)}`}>{item.status}</span>
+                      <span className={`px-3 py-1 rounded-sm text-xs font-medium ${getInterestColor(item.interest_level)}`}>{item.interest_level} Interest</span>
                     </div>
 
                     <div className="mb-4">
@@ -203,7 +203,7 @@ export default function WatchlistPage() {
 
                     <button
                       onClick={(e) => { e.stopPropagation(); setSelectedItem(item); }}
-                      className="w-full py-2 border border-neutral-200 rounded-full text-sm font-medium hover:bg-neutral-50 transition-colors"
+                      className="w-full py-2 border border-neutral-200 rounded-sm text-sm font-medium hover:bg-neutral-50 transition-colors"
                     >
                       View Thesis
                     </button>
@@ -217,8 +217,8 @@ export default function WatchlistPage() {
               <h3 className="text-2xl font-bold mb-2">Start Building Your Watchlist</h3>
               <p className="text-neutral-600 mb-8 max-w-md">Save investing ideas from posts, reels, and models to track your thesis and build conviction over time.</p>
               <div className="flex items-center gap-3">
-                <button onClick={() => navigate('/main')} className="px-6 py-3 bg-black text-white rounded-full hover:bg-black/90 transition-colors">Explore Content</button>
-                <button onClick={() => setShowAddModal(true)} className="px-6 py-3 border-2 border-neutral-200 rounded-full hover:border-neutral-300 hover:bg-neutral-50 transition-colors">Add Asset</button>
+                <button onClick={() => navigate('/main')} className="px-6 py-3 bg-black text-white rounded-sm hover:bg-black/90 transition-colors">Explore Content</button>
+                <button onClick={() => setShowAddModal(true)} className="px-6 py-3 border-2 border-neutral-200 rounded-sm hover:border-neutral-300 hover:bg-neutral-50 transition-colors">Add Asset</button>
               </div>
             </div>
           )}
@@ -229,13 +229,13 @@ export default function WatchlistPage() {
       {/* Thesis Detail Modal */}
       {selectedItem && !editingThesis && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setSelectedItem(null)}>
-          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-md max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="sticky top-0 bg-white border-b border-neutral-200 px-8 py-6 flex items-center justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <h2 className="text-3xl font-bold">{selectedItem.ticker}</h2>
-                  <span className="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-sm font-medium">{selectedItem.asset_type}</span>
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(selectedItem.status)}`}>{selectedItem.status}</span>
+                  <span className="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-sm text-sm font-medium">{selectedItem.asset_type}</span>
+                  <span className={`px-3 py-1 rounded-sm text-sm font-medium ${getStatusColor(selectedItem.status)}`}>{selectedItem.status}</span>
                 </div>
                 <p className="text-neutral-600">{selectedItem.name ?? selectedItem.ticker}</p>
               </div>
@@ -266,7 +266,7 @@ export default function WatchlistPage() {
               {/* My Thesis */}
               <div>
                 <h3 className="font-bold mb-3">My Thesis</h3>
-                <div className="p-4 bg-neutral-50 rounded-lg border border-neutral-200">
+                <div className="p-4 bg-neutral-50 rounded-md border border-neutral-200">
                   <p className="text-neutral-700 leading-relaxed">{selectedItem.thesis || 'No thesis written yet.'}</p>
                 </div>
               </div>
@@ -275,7 +275,7 @@ export default function WatchlistPage() {
               {selectedItem.why_watching && (
                 <div>
                   <h3 className="font-bold mb-3">Why I'm Watching This</h3>
-                  <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <div className="p-4 bg-blue-50 rounded-md border border-blue-200">
                     <p className="text-neutral-700 leading-relaxed">{selectedItem.why_watching}</p>
                   </div>
                 </div>
@@ -287,7 +287,7 @@ export default function WatchlistPage() {
                   <h3 className="font-bold mb-3">Key Assumptions</h3>
                   <ul className="space-y-2">
                     {selectedItem.assumptions.map((a, i) => (
-                      <li key={i} className="flex items-start gap-3 p-3 bg-neutral-50 rounded-lg">
+                      <li key={i} className="flex items-start gap-3 p-3 bg-neutral-50 rounded-md">
                         <span className="text-brand mt-0.5">✓</span>
                         <span className="text-neutral-700">{a}</span>
                       </li>
@@ -302,7 +302,7 @@ export default function WatchlistPage() {
                   <h3 className="font-bold mb-3">Upside Drivers</h3>
                   <ul className="space-y-2">
                     {selectedItem.upside_drivers.map((d, i) => (
-                      <li key={i} className="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
+                      <li key={i} className="flex items-start gap-3 p-3 bg-green-50 rounded-md">
                         <span className="text-green-600 mt-0.5">↗</span>
                         <span className="text-neutral-700">{d}</span>
                       </li>
@@ -317,7 +317,7 @@ export default function WatchlistPage() {
                   <h3 className="font-bold mb-3">Downside Risks</h3>
                   <ul className="space-y-2">
                     {selectedItem.downside.map((r, i) => (
-                      <li key={i} className="flex items-start gap-3 p-3 bg-red-50 rounded-lg">
+                      <li key={i} className="flex items-start gap-3 p-3 bg-red-50 rounded-md">
                         <span className="text-red-600 mt-0.5">⚠</span>
                         <span className="text-neutral-700">{r}</span>
                       </li>
@@ -333,17 +333,17 @@ export default function WatchlistPage() {
               <div>
                 <h3 className="font-bold mb-3">Related Content</h3>
                 <div className="grid grid-cols-3 gap-4">
-                  <div className="p-4 bg-neutral-50 rounded-lg text-center">
+                  <div className="p-4 bg-neutral-50 rounded-md text-center">
                     <ArticleIcon sx={{ fontSize: 32, color: 'var(--icon-muted)', marginBottom: 1 }} />
                     <p className="text-sm text-neutral-400 mb-1">Coming soon</p>
                     <p className="text-sm text-neutral-600">Posts</p>
                   </div>
-                  <div className="p-4 bg-neutral-50 rounded-lg text-center">
+                  <div className="p-4 bg-neutral-50 rounded-md text-center">
                     <VideoLibraryIcon sx={{ fontSize: 32, color: 'var(--icon-muted)', marginBottom: 1 }} />
                     <p className="text-sm text-neutral-400 mb-1">Coming soon</p>
                     <p className="text-sm text-neutral-600">Reels</p>
                   </div>
-                  <div className="p-4 bg-neutral-50 rounded-lg text-center">
+                  <div className="p-4 bg-neutral-50 rounded-md text-center">
                     <InsertChartIcon sx={{ fontSize: 32, color: 'var(--icon-muted)', marginBottom: 1 }} />
                     <p className="text-sm text-neutral-400 mb-1">Coming soon</p>
                     <p className="text-sm text-neutral-600">Models</p>
@@ -355,7 +355,7 @@ export default function WatchlistPage() {
               {selectedItem.decision_notes && (
                 <div>
                   <h3 className="font-bold mb-3">Decision Notes</h3>
-                  <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
+                  <div className="p-4 bg-amber-50 rounded-md border border-amber-200">
                     <p className="text-neutral-700 leading-relaxed">{selectedItem.decision_notes}</p>
                   </div>
                 </div>
@@ -365,13 +365,13 @@ export default function WatchlistPage() {
               <div className="flex items-center gap-3 pt-4">
                 <button
                   onClick={() => { setEditThesisText(selectedItem.thesis); setEditingThesis(true); }}
-                  className="flex-1 py-3 bg-black text-white rounded-full font-medium hover:bg-black/80 transition-colors"
+                  className="flex-1 py-3 bg-black text-white rounded-sm font-medium hover:bg-black/80 transition-colors"
                 >
                   Edit Thesis
                 </button>
                 <button
                   onClick={() => handleRemove(selectedItem.id)}
-                  className="px-6 py-3 border-2 border-red-200 text-red-600 rounded-full font-medium hover:bg-red-50 transition-colors"
+                  className="px-6 py-3 border-2 border-red-200 text-red-600 rounded-sm font-medium hover:bg-red-50 transition-colors"
                 >
                   Remove
                 </button>
@@ -384,7 +384,7 @@ export default function WatchlistPage() {
       {/* Edit Thesis Modal */}
       {selectedItem && editingThesis && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setEditingThesis(false)}>
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-8" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-md max-w-2xl w-full p-8" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold">Edit Thesis — {selectedItem.ticker}</h2>
               <button onClick={() => setEditingThesis(false)} className="p-2 hover:bg-neutral-100 rounded-full">
@@ -396,13 +396,13 @@ export default function WatchlistPage() {
               onChange={e => setEditThesisText(e.target.value)}
               rows={8}
               placeholder="Write your investment thesis here..."
-              className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand resize-none mb-4"
+              className="w-full px-4 py-3 border border-neutral-200 rounded-md text-sm focus:outline-none focus:border-brand resize-none mb-4"
             />
             <div className="flex gap-3">
-              <button onClick={handleSaveThesis} className="flex-1 py-3 bg-black text-white rounded-full font-medium hover:bg-black/80 transition-colors">
+              <button onClick={handleSaveThesis} className="flex-1 py-3 bg-black text-white rounded-sm font-medium hover:bg-black/80 transition-colors">
                 Save Thesis
               </button>
-              <button onClick={() => setEditingThesis(false)} className="flex-1 py-3 border-2 border-neutral-200 rounded-full font-medium hover:bg-neutral-50 transition-colors">
+              <button onClick={() => setEditingThesis(false)} className="flex-1 py-3 border-2 border-neutral-200 rounded-sm font-medium hover:bg-neutral-50 transition-colors">
                 Cancel
               </button>
             </div>
@@ -413,7 +413,7 @@ export default function WatchlistPage() {
       {/* Add Asset Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowAddModal(false)}>
-          <div className="bg-white rounded-2xl max-w-lg w-full p-8" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-md max-w-lg w-full p-8" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold">Add to Watchlist</h2>
               <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-neutral-100 rounded-full">
@@ -428,7 +428,7 @@ export default function WatchlistPage() {
                   placeholder="e.g., AAPL, BTC, SPY"
                   value={newTicker}
                   onChange={e => setNewTicker(e.target.value.toUpperCase())}
-                  className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                  className="w-full px-4 py-3 border border-neutral-200 rounded-md text-sm focus:outline-none focus:border-brand"
                 />
               </div>
               <div>
@@ -438,7 +438,7 @@ export default function WatchlistPage() {
                   placeholder="e.g., Apple Inc."
                   value={newName}
                   onChange={e => setNewName(e.target.value)}
-                  className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                  className="w-full px-4 py-3 border border-neutral-200 rounded-md text-sm focus:outline-none focus:border-brand"
                 />
               </div>
               <div>
@@ -446,7 +446,7 @@ export default function WatchlistPage() {
                 <select
                   value={newAssetType}
                   onChange={e => setNewAssetType(e.target.value as WatchlistItem['asset_type'])}
-                  className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:border-brand"
+                  className="w-full px-4 py-3 border border-neutral-200 rounded-md text-sm focus:outline-none focus:border-brand"
                 >
                   <option value="Stock">Stock</option>
                   <option value="ETF">ETF</option>
@@ -458,7 +458,7 @@ export default function WatchlistPage() {
               <button
                 onClick={handleAddAsset}
                 disabled={!newTicker.trim()}
-                className="w-full py-3 bg-black text-white rounded-full font-medium hover:bg-black/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 bg-black text-white rounded-sm font-medium hover:bg-black/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Add to Watchlist
               </button>
@@ -469,7 +469,7 @@ export default function WatchlistPage() {
 
       {/* Toast */}
       {showToast && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-brand text-white px-6 py-4 rounded-xl shadow-lg z-50 animate-slide-up pointer-events-none">
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-brand text-white px-6 py-4 rounded-md shadow-lg z-50 animate-slide-up pointer-events-none">
           <p className="font-bold">{toastMessage}</p>
         </div>
       )}

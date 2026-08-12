@@ -154,7 +154,7 @@ export default function PricingPage() {
           </div>
           <div className="flex items-center gap-3">
             <button onClick={() => navigate('/signin')} className="px-4 py-2 text-sm hover:opacity-70">Sign In</button>
-            <button onClick={() => navigate('/onboarding/welcome')} className="px-5 py-2 bg-black text-white text-sm rounded-full hover:bg-black/80">
+            <button onClick={() => navigate('/onboarding/welcome')} className="px-5 py-2 bg-black text-white text-sm rounded-sm hover:bg-black/80">
               Get Started
             </button>
           </div>
@@ -171,7 +171,7 @@ export default function PricingPage() {
         </p>
 
         {/* Beta Notice */}
-        <div className="mb-8 rounded-2xl border border-mint/40 bg-mint/10 px-6 py-5 text-left">
+        <div className="mb-8 rounded-md border border-mint/40 bg-mint/10 px-6 py-5 text-left">
           <p className="font-bold text-black">🚧 Gazua is currently in Beta</p>
           <p className="mt-1 text-sm text-neutral-600">
             During the beta testing period, all premium features are available through the Free plan.
@@ -193,14 +193,14 @@ export default function PricingPage() {
             return (
               <div
                 key={tier.name}
-                className={`relative rounded-2xl border-2 p-8 text-left transition-all ${
+                className={`relative rounded-md border-2 p-8 text-left transition-all ${
                   tier.highlighted
                     ? 'border-mint shadow-xl scale-105 bg-gradient-to-b from-mint/5 to-white'
                     : 'border-neutral-200 hover:border-neutral-300'
                 }`}
               >
                 {tier.highlighted && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-mint text-black text-xs font-bold px-4 py-1 rounded-full">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-mint text-black text-xs font-bold px-4 py-1 rounded-sm">
                     MOST POPULAR
                   </div>
                 )}
@@ -218,7 +218,7 @@ export default function PricingPage() {
                         <span className="text-lg text-neutral-400 line-through">${tier.price}{tier.period}</span>
                         <span className="text-4xl font-bold">Beta: $0{tier.period}</span>
                       </div>
-                      <span className="inline-block mt-2 bg-brand/15 text-brand text-xs font-bold px-2.5 py-1 rounded-full">
+                      <span className="inline-block mt-2 bg-brand/15 text-brand text-xs font-bold px-2.5 py-1 rounded-sm">
                         {Math.round((1 - BETA_PRICE / tier.price) * 100)}% off during beta
                       </span>
                     </>
@@ -226,14 +226,14 @@ export default function PricingPage() {
                 </div>
 
                 {isActivePlan ? (
-                  <div className="w-full py-3 rounded-full font-medium mb-8 text-center border-2 border-brand text-brand text-sm">
+                  <div className="w-full py-3 rounded-sm font-medium mb-8 text-center border-2 border-brand text-brand text-sm">
                     Current Plan
                   </div>
                 ) : (
                   <button
                     onClick={() => handleTierClick(tier.stripeTier)}
                     disabled={isLoading}
-                    className={`w-full py-3 rounded-full font-medium mb-8 transition-all disabled:opacity-60 disabled:cursor-not-allowed ${
+                    className={`w-full py-3 rounded-sm font-medium mb-8 transition-all disabled:opacity-60 disabled:cursor-not-allowed ${
                       tier.highlighted
                         ? 'bg-black text-white hover:bg-black/80'
                         : 'bg-neutral-100 hover:bg-neutral-200'

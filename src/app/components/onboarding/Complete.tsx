@@ -48,7 +48,7 @@ export default function Complete() {
         </p>
 
         {/* Level Badge */}
-        <div className="inline-flex items-center gap-3 bg-gradient-to-r from-mint/10 to-green-500/10 px-8 py-4 rounded-2xl border-2 border-mint/30 mb-12">
+        <div className="inline-flex items-center gap-3 bg-gradient-to-r from-mint/10 to-green-500/10 px-8 py-4 rounded-md border-2 border-mint/30 mb-12">
           <span className="text-3xl">{levelConfig.emoji}</span>
           <div className="text-left">
             <div className="text-xs text-neutral-600 uppercase tracking-wide">Your Level</div>
@@ -58,15 +58,15 @@ export default function Complete() {
 
         {/* Features preview */}
         <div className="grid grid-cols-3 gap-4 mb-12 text-center">
-          <div className="p-4 rounded-xl bg-neutral-50">
+          <div className="p-4 rounded-md bg-neutral-50">
             <div className="text-2xl mb-2">📚</div>
             <div className="text-sm font-medium text-neutral-700">Learn</div>
           </div>
-          <div className="p-4 rounded-xl bg-neutral-50">
+          <div className="p-4 rounded-md bg-neutral-50">
             <div className="text-2xl mb-2">💬</div>
             <div className="text-sm font-medium text-neutral-700">Engage</div>
           </div>
-          <div className="p-4 rounded-xl bg-neutral-50">
+          <div className="p-4 rounded-md bg-neutral-50">
             <div className="text-2xl mb-2">📈</div>
             <div className="text-sm font-medium text-neutral-700">Grow</div>
           </div>
@@ -75,7 +75,7 @@ export default function Complete() {
         {/* CTA */}
         <button
           onClick={() => navigate('/main')}
-          className="w-full px-8 py-4 bg-black text-white rounded-full hover:bg-black/90 transition-colors mb-6"
+          className="w-full px-8 py-4 bg-black text-white rounded-sm hover:bg-black/90 transition-colors mb-6"
         >
           Explore the Feed
         </button>

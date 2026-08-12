@@ -22,13 +22,13 @@ export default function AIDisclaimerCard({ compact = false, confidence, classNam
   }
 
   return (
-    <div className={`flex items-start gap-3 bg-neutral-50 border border-neutral-100 rounded-xl p-4 ${className}`}>
+    <div className={`flex items-start gap-3 bg-neutral-50 border border-neutral-100 rounded-md p-4 ${className}`}>
       <Sparkles className="w-4 h-4 text-neutral-400 flex-shrink-0 mt-0.5" aria-hidden="true" />
       <div>
         <div className="flex items-center gap-2 mb-1">
           <p className="text-sm font-medium text-black">AI-generated Summary</p>
           {confidence && (
-            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-neutral-100 text-neutral-500">
+            <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-sm bg-neutral-100 text-neutral-500">
               Confidence: {confidence}
             </span>
           )}

@@ -87,7 +87,7 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-md max-w-lg w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -117,7 +117,7 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as typeof CATEGORIES[number])}
-                className="text-xs text-neutral-500 bg-neutral-100 rounded-full px-2.5 py-0.5 mt-0.5 border-none focus:outline-none cursor-pointer"
+                className="text-xs text-neutral-500 bg-neutral-100 rounded-sm px-2.5 py-0.5 mt-0.5 border-none focus:outline-none cursor-pointer"
               >
                 {CATEGORIES.map(c => <option key={c}>{c}</option>)}
               </select>
@@ -147,7 +147,7 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
                 placeholder="Ticker"
                 value={ticker}
                 onChange={(e) => setTicker(e.target.value)}
-                className="w-28 pl-6 pr-3 py-1.5 border border-neutral-200 rounded-full text-xs focus:outline-none focus:border-brand"
+                className="w-28 pl-6 pr-3 py-1.5 border border-neutral-200 rounded-sm text-xs focus:outline-none focus:border-brand"
               />
             </div>
 
@@ -192,7 +192,7 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
           <button
             onClick={handleSubmit}
             disabled={!ticker.trim() || !content.trim() || submitting}
-            className="w-full py-3 bg-black text-white font-bold rounded-full hover:bg-black/80 transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed"
+            className="w-full py-3 bg-black text-white font-bold rounded-sm hover:bg-black/80 transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed"
           >
             {submitting ? 'Publishing…' : 'Publish Post'}
           </button>

@@ -73,7 +73,7 @@ export default function AdminDashboardPage() {
 
       <AdminGrowthChart data={growth} bucket={bucket} onBucketChange={setBucket} />
 
-      <div className="bg-white border border-neutral-200 rounded-xl p-4">
+      <div className="bg-white border border-neutral-200 rounded-md p-4">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-base font-semibold">Needs Attention</h2>
           <button onClick={() => navigate('/admin/reports')} className="text-xs font-medium text-neutral-500 hover:text-black transition-colors">
@@ -85,11 +85,11 @@ export default function AdminDashboardPage() {
         ) : (
           <div className="space-y-2">
             {pendingReports.map(report => (
-              <div key={report.id} className="flex items-center justify-between gap-3 p-3 bg-neutral-50 rounded-lg">
+              <div key={report.id} className="flex items-center justify-between gap-3 p-3 bg-neutral-50 rounded-md">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
                     <span className="text-xs font-bold uppercase tracking-widest text-neutral-400">{report.content_type}</span>
-                    <span className="text-xs px-2 py-0.5 bg-red-50 text-red-700 rounded-full font-medium">
+                    <span className="text-xs px-2 py-0.5 bg-red-50 text-red-700 rounded-sm font-medium">
                       {REASON_LABELS[report.reason] ?? report.reason}
                     </span>
                   </div>

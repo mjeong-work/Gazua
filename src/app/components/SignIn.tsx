@@ -92,7 +92,7 @@ export default function SignIn() {
               </p>
               <button
                 onClick={() => { setForgotMode(false); setResetSent(false); }}
-                className="w-full px-8 py-4 bg-black text-white rounded-full hover:bg-black/90 transition-colors"
+                className="w-full px-8 py-4 bg-black text-white rounded-sm hover:bg-black/90 transition-colors"
               >
                 Back to Sign In
               </button>
@@ -108,7 +108,7 @@ export default function SignIn() {
                   value={resetEmail}
                   onChange={e => setResetEmail(e.target.value)}
                   required
-                  className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-mint/50"
+                  className="w-full px-4 py-3 border border-neutral-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-mint/50"
                 />
               </div>
 
@@ -119,7 +119,7 @@ export default function SignIn() {
               <button
                 type="submit"
                 disabled={resetLoading}
-                className="w-full px-8 py-4 bg-black text-white rounded-full hover:bg-black/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-8 py-4 bg-black text-white rounded-sm hover:bg-black/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {resetLoading ? (
                   <span className="flex items-center justify-center gap-2">
@@ -163,7 +163,7 @@ export default function SignIn() {
               value={email}
               onChange={e => { setEmail(e.target.value); setAuthError(null); }}
               required
-              className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-mint/50"
+              className="w-full px-4 py-3 border border-neutral-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-mint/50"
             />
           </div>
 
@@ -185,7 +185,7 @@ export default function SignIn() {
               value={password}
               onChange={e => { setPassword(e.target.value); setAuthError(null); }}
               required
-              className="w-full px-4 py-3 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-mint/50"
+              className="w-full px-4 py-3 border border-neutral-200 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-mint/50"
             />
           </div>
 
@@ -209,7 +209,7 @@ export default function SignIn() {
             type="button"
             onClick={handleGoogle}
             disabled={isGoogleLoading}
-            className="w-full px-4 py-3 border-2 border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-4 py-3 border-2 border-neutral-200 rounded-md hover:bg-neutral-50 transition-colors flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isGoogleLoading ? (
               <>
@@ -233,7 +233,7 @@ export default function SignIn() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full px-8 py-4 bg-black text-white rounded-full hover:bg-black/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-8 py-4 bg-black text-white rounded-sm hover:bg-black/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <span className="flex items-center justify-center gap-2">

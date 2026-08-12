@@ -37,13 +37,13 @@ export default function Welcome() {
         <div className="space-y-4">
           <button
             onClick={() => navigate('/onboarding/signup')}
-            className="w-full px-8 py-4 bg-black text-white rounded-full hover:bg-black/90 transition-colors"
+            className="w-full px-8 py-4 bg-black text-white rounded-sm hover:bg-black/90 transition-colors"
           >
             Get Started
           </button>
           <button
             onClick={() => navigate('/signin')}
-            className="w-full px-8 py-4 border-2 border-neutral-200 text-neutral-700 rounded-full hover:border-neutral-300 hover:bg-neutral-50 transition-colors"
+            className="w-full px-8 py-4 border-2 border-neutral-200 text-neutral-700 rounded-sm hover:border-neutral-300 hover:bg-neutral-50 transition-colors"
           >
             Sign In
           </button>

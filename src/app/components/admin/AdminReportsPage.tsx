@@ -112,11 +112,11 @@ export default function AdminReportsPage() {
             {rows.map(report => (
               <div
                 key={report.id}
-                className={`border rounded-xl p-5 transition-opacity ${report.status !== 'pending' ? 'opacity-60' : ''} border-neutral-200`}
+                className={`border rounded-md p-5 transition-opacity ${report.status !== 'pending' ? 'opacity-60' : ''} border-neutral-200`}
               >
                 <div className="flex items-start gap-3 mb-3 flex-wrap">
                   <span className="text-xs font-bold uppercase tracking-widest text-neutral-400 mt-0.5">{report.content_type}</span>
-                  <span className="text-xs px-2 py-0.5 bg-red-50 text-red-700 rounded-full font-medium">
+                  <span className="text-xs px-2 py-0.5 bg-red-50 text-red-700 rounded-sm font-medium">
                     {REASON_LABELS[report.reason] ?? report.reason}
                   </span>
                   <AdminStatusBadge status={report.status} />
@@ -128,7 +128,7 @@ export default function AdminReportsPage() {
                 </p>
 
                 {report.details && (
-                  <div className="bg-neutral-50 border border-neutral-100 rounded-lg px-3 py-2 mb-3">
+                  <div className="bg-neutral-50 border border-neutral-100 rounded-sm px-3 py-2 mb-3">
                     <p className="text-sm text-neutral-700 italic">"{report.details}"</p>
                   </div>
                 )}
@@ -137,7 +137,7 @@ export default function AdminReportsPage() {
                   <div className="flex flex-wrap gap-2">
                     <button
                       onClick={() => runAction(report, 'dismissed')}
-                      className="px-4 py-2 text-xs font-medium rounded-full border border-neutral-200 text-neutral-700 hover:bg-neutral-50 transition-colors"
+                      className="px-4 py-2 text-xs font-medium rounded-sm border border-neutral-200 text-neutral-700 hover:bg-neutral-50 transition-colors"
                     >
                       Dismiss
                     </button>
@@ -145,13 +145,13 @@ export default function AdminReportsPage() {
                       <>
                         <button
                           onClick={() => setConfirm({ report, action: 'warning_sent' })}
-                          className="px-4 py-2 text-xs font-medium rounded-full border border-neutral-800 text-neutral-900 hover:bg-neutral-100 transition-colors"
+                          className="px-4 py-2 text-xs font-medium rounded-sm border border-neutral-800 text-neutral-900 hover:bg-neutral-100 transition-colors"
                         >
                           Send Warning
                         </button>
                         <button
                           onClick={() => setConfirm({ report, action: 'user_suspended' })}
-                          className="px-4 py-2 text-xs font-medium rounded-full border border-red-300 text-red-800 hover:bg-red-50 transition-colors"
+                          className="px-4 py-2 text-xs font-medium rounded-sm border border-red-300 text-red-800 hover:bg-red-50 transition-colors"
                         >
                           Suspend User
                         </button>
@@ -159,7 +159,7 @@ export default function AdminReportsPage() {
                     ) : (
                       <button
                         onClick={() => setConfirm({ report, action: 'content_removed' })}
-                        className="px-4 py-2 text-xs font-medium rounded-full border border-red-200 text-red-700 hover:bg-red-50 transition-colors"
+                        className="px-4 py-2 text-xs font-medium rounded-sm border border-red-200 text-red-700 hover:bg-red-50 transition-colors"
                       >
                         Remove Content
                       </button>

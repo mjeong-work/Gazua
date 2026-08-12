@@ -67,7 +67,7 @@ export default function MessagesPage() {
                   <button
                     key={conv.partnerId}
                     onClick={() => handleSelect({ id: conv.partnerId, name: conv.partnerName, username: conv.partnerUsername, avatarUrl: conv.partnerAvatarUrl })}
-                    className={`w-full flex items-center gap-3 p-2.5 rounded-lg text-left transition-colors ${isSelected ? 'bg-neutral-100' : 'hover:bg-neutral-50'}`}
+                    className={`w-full flex items-center gap-3 p-2.5 rounded-md text-left transition-colors ${isSelected ? 'bg-neutral-100' : 'hover:bg-neutral-50'}`}
                   >
                     <Avatar name={conv.partnerName} avatarUrl={conv.partnerAvatarUrl} />
                     <div className="flex-1 min-w-0">
@@ -113,7 +113,7 @@ export default function MessagesPage() {
                     const isMine = m.sender_id === user?.id;
                     return (
                       <div key={m.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[80%] lg:max-w-[60%] px-3.5 py-2 rounded-2xl text-sm ${isMine ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-800'}`}>
+                        <div className={`max-w-[80%] lg:max-w-[60%] px-3.5 py-2 rounded-sm text-sm ${isMine ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-800'}`}>
                           {m.content}
                           <div className={`text-[10px] mt-1 ${isMine ? 'text-white/60' : 'text-neutral-400'}`}>{formatRelative(m.created_at)}</div>
                         </div>
@@ -129,7 +129,7 @@ export default function MessagesPage() {
                   onChange={e => setInputValue(e.target.value)}
                   onKeyDown={e => { if (e.key === 'Enter') handleSend(); }}
                   placeholder="Type a message..."
-                  className="flex-1 px-4 py-2 border border-neutral-200 rounded-full text-sm focus:outline-none focus:border-black transition-colors"
+                  className="flex-1 px-4 py-2 border border-neutral-200 rounded-sm text-sm focus:outline-none focus:border-black transition-colors"
                 />
                 <button
                   onClick={handleSend}

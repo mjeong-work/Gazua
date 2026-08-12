@@ -38,7 +38,7 @@ function CustomTooltip({ active, payload, label }: TooltipProps<number, string>)
     : label;
 
   return (
-    <div className="bg-white border border-neutral-200 rounded-xl p-3 shadow-lg text-xs">
+    <div className="bg-white border border-neutral-200 rounded-md p-3 shadow-lg text-xs">
       <p className="font-semibold text-neutral-700 mb-2">{dateStr}</p>
       {payload.map(p => (
         <div key={p.dataKey} className="flex justify-between gap-4">
@@ -66,7 +66,7 @@ export default function PerformanceTrendChart({ chartData, timeRange, onTimeRang
   const interval = Math.max(1, Math.floor((chartData.length - 1) / (tickCount - 1)));
 
   return (
-    <div className="border border-neutral-200 rounded-2xl p-5">
+    <div className="border border-neutral-200 rounded-md p-5">
       <div className="flex items-center justify-between mb-5">
         <h3 className="font-semibold text-neutral-900">Performance Trend</h3>
         <div className="flex gap-1">
@@ -74,7 +74,7 @@ export default function PerformanceTrendChart({ chartData, timeRange, onTimeRang
             <button
               key={r}
               onClick={() => onTimeRangeChange(r)}
-              className={`px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+              className={`px-2.5 py-1 rounded-sm text-xs font-medium transition-colors ${
                 timeRange === r
                   ? 'bg-neutral-900 text-white'
                   : 'text-neutral-500 hover:bg-neutral-100'

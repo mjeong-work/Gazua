@@ -91,7 +91,7 @@ export default function ComplianceReviewModal({
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
       <div
-        className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-md max-w-lg w-full max-h-[90vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
@@ -107,7 +107,7 @@ export default function ComplianceReviewModal({
 
         <div className="p-6 space-y-5">
           {/* Risk score banner */}
-          <div className={`border rounded-xl p-4 ${cfg.bgBorder}`}>
+          <div className={`border rounded-md p-4 ${cfg.bgBorder}`}>
             <p className={`text-sm font-bold mb-1 ${cfg.textColor}`}>{cfg.label}</p>
             <p className={`text-sm ${cfg.textColor}`}>{cfg.description}</p>
           </div>
@@ -177,7 +177,7 @@ export default function ComplianceReviewModal({
           <div className="flex gap-3 pt-1">
             <button
               onClick={onCancel}
-              className="flex-1 py-3 border border-neutral-200 rounded-full text-sm font-medium hover:bg-neutral-50 transition-colors"
+              className="flex-1 py-3 border border-neutral-200 rounded-sm text-sm font-medium hover:bg-neutral-50 transition-colors"
             >
               {isBlocked ? 'Edit Content' : 'Go Back'}
             </button>
@@ -185,7 +185,7 @@ export default function ComplianceReviewModal({
               <button
                 onClick={() => onApprove([...accepted])}
                 disabled={!canPublish}
-                className="flex-1 py-3 bg-black text-white rounded-full text-sm font-bold hover:bg-black/80 transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed"
+                className="flex-1 py-3 bg-black text-white rounded-sm text-sm font-bold hover:bg-black/80 transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed"
               >
                 Confirm & Publish
               </button>
