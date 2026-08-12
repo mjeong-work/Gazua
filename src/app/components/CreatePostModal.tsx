@@ -1,16 +1,20 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect, type ChangeEvent } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
+import ImageIcon from '@mui/icons-material/Image';
 import ComplianceReviewModal from './compliance/ComplianceReviewModal';
 import PublishReminder from './compliance/PublishReminder';
 import { screenContent, saveComplianceReview, logAuditEvent } from '../../lib/services/compliance.service';
-import { createPost } from '../../lib/services/posts.service';
+import { createPost, updatePostImages } from '../../lib/services/posts.service';
 import { useAuth } from '../contexts/AuthContext';
 import type { DisclosureType } from '../../types/compliance';
+import { resizeImage } from '../../lib/imageMedia';
+import { BUCKETS, uploadToBucket } from '../../lib/storage';
 
 const CATEGORIES = ['Stocks', 'ETFs', 'Crypto', 'Retirement', 'Options', 'News', 'Beginner Basics'] as const;
+const MAX_IMAGES = 5;
 
 interface CreatePostModalProps {
   onClose: () => void;
@@ -26,10 +30,55 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  // Image attachments — uploaded only on publish (see handleApprove). Kept as raw File[]
+  // so preview/remove/reorder-free UI stays instant; resize + upload happens once at submit.
+  const [images, setImages] = useState<File[]>([]);
+  const [imageWarning, setImageWarning] = useState<string | null>(null);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  // Object URLs are only valid while the File they wrap is still selected — regenerate
+  // (and revoke the previous batch) whenever the image list changes.
+  useEffect(() => {
+    const urls = images.map(file => URL.createObjectURL(file));
+    setPreviewUrls(urls);
+    setActiveImageIndex(i => Math.min(i, Math.max(urls.length - 1, 0)));
+    return () => urls.forEach(url => URL.revokeObjectURL(url));
+  }, [images]);
+
   const { profile } = useAuth();
   const isCreator = profile?.is_creator ?? false;
 
   const handleSubmit = () => setShowCompliance(true);
+
+  const handleFilesSelected = (e: ChangeEvent<HTMLInputElement>) => {
+    const picked = Array.from(e.target.files ?? []);
+    e.target.value = ''; // allow re-selecting the same file(s) later
+    if (picked.length === 0) return;
+
+    const combined = [...images, ...picked];
+    setImageWarning(combined.length > MAX_IMAGES ? `You can add up to ${MAX_IMAGES} images.` : null);
+    setImages(combined.slice(0, MAX_IMAGES));
+  };
+
+  const removeImage = (index: number) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
+    setImageWarning(null);
+  };
+
+  const scrollToImage = (index: number) => {
+    const el = carouselRef.current;
+    if (!el) return;
+    el.scrollTo({ left: index * el.clientWidth, behavior: 'smooth' });
+  };
+
+  const handleCarouselScroll = () => {
+    const el = carouselRef.current;
+    if (!el || el.clientWidth === 0) return;
+    setActiveImageIndex(Math.round(el.scrollLeft / el.clientWidth));
+  };
 
   const handleApprove = async (disclosures: DisclosureType[]) => {
     if (!profile?.id) {
@@ -68,14 +117,36 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
       }).catch(() => {});
     }).catch(() => {});
 
-    setSubmitting(false);
-
     if (error || !newPost) {
+      setSubmitting(false);
       setSubmitError(error ?? 'Failed to publish. Please try again.');
       setShowCompliance(false);
       return;
     }
 
+    // Images upload after the post row exists — the storage path is keyed by post id
+    // (see BUCKETS.postImages in storage.ts) so order stays stable and predictable.
+    if (images.length > 0) {
+      const urls: string[] = [];
+      for (let i = 0; i < images.length; i++) {
+        const webp = await resizeImage(images[i], { maxDimension: 1600, quality: 0.8 });
+        const { data: uploaded, error: uploadError } = await uploadToBucket(
+          BUCKETS.postImages,
+          `${profile.id}/${newPost.id}/${i}.webp`,
+          webp
+        );
+        if (uploadError || !uploaded) {
+          setSubmitting(false);
+          setSubmitError(uploadError ?? 'Post was published, but one of the images failed to upload.');
+          setShowCompliance(false);
+          return;
+        }
+        urls.push(uploaded.publicUrl);
+      }
+      await updatePostImages(newPost.id, urls);
+    }
+
+    setSubmitting(false);
     setShowCompliance(false);
     onClose();
     onSuccess?.('Post published!');
@@ -137,9 +208,92 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
             {content.length} / 500
           </p>
 
+          {/* Image preview — carousel (2+) or single image, plus a removable thumbnail row.
+              Renders nothing when no images are attached. */}
+          {previewUrls.length > 0 && (
+            <div>
+              {previewUrls.length > 1 ? (
+                <>
+                  <div
+                    ref={carouselRef}
+                    onScroll={handleCarouselScroll}
+                    className="flex overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar rounded-md"
+                  >
+                    {previewUrls.map((url, i) => (
+                      <img
+                        key={i}
+                        src={url}
+                        alt=""
+                        className="w-full flex-shrink-0 snap-center aspect-video object-cover"
+                      />
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-center gap-1.5 mt-2">
+                    {previewUrls.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => scrollToImage(i)}
+                        aria-label={`Go to image ${i + 1}`}
+                        className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                          i === activeImageIndex ? 'bg-neutral-800' : 'bg-neutral-300'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <img src={previewUrls[0]} alt="" className="w-full rounded-md aspect-video object-cover" />
+              )}
+
+              <div className="flex items-center gap-2 mt-2">
+                {images.map((file, i) => (
+                  <div key={i} className="relative w-14 h-14 flex-shrink-0">
+                    <img
+                      src={previewUrls[i]}
+                      alt={file.name}
+                      className="w-full h-full rounded-md object-cover"
+                    />
+                    <button
+                      onClick={() => removeImage(i)}
+                      aria-label="Remove image"
+                      className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-neutral-800 text-white rounded-full flex items-center justify-center hover:bg-black transition-colors"
+                    >
+                      <CloseIcon sx={{ fontSize: 12 }} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {imageWarning && (
+            <p className="text-[11px] text-neutral-400 -mt-3">{imageWarning}</p>
+          )}
+
           {/* Ticker + Sentiment — the two pieces of investment context every post needs,
               kept as one compact row instead of two separate labeled sections. */}
           <div className="flex items-center gap-2 flex-wrap">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleFilesSelected}
+              className="hidden"
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              title="Add images"
+              aria-label="Add images"
+              className="relative w-8 h-8 rounded-full flex items-center justify-center transition-colors text-neutral-400 hover:bg-neutral-100"
+            >
+              <ImageIcon sx={{ fontSize: 18 }} />
+              {images.length > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-black text-white text-[10px] font-semibold rounded-full flex items-center justify-center">
+                  {images.length}
+                </span>
+              )}
+            </button>
+
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 text-xs font-medium">$</span>
               <input
@@ -191,7 +345,7 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
           {/* Submit */}
           <button
             onClick={handleSubmit}
-            disabled={!ticker.trim() || !content.trim() || submitting}
+            disabled={!ticker.trim() || !content.trim() || images.length === 0 || submitting}
             className="w-full py-3 bg-black text-white font-bold rounded-sm hover:bg-black/80 transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed"
           >
             {submitting ? 'Publishing…' : 'Publish Post'}

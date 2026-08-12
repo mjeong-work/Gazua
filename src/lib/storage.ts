@@ -10,6 +10,7 @@ export const BUCKETS = {
   reels: (import.meta.env.VITE_STORAGE_BUCKET_REELS as string | undefined) ?? 'reels',
   models: (import.meta.env.VITE_STORAGE_BUCKET_MODELS as string | undefined) ?? 'models',
   thumbnails: (import.meta.env.VITE_STORAGE_BUCKET_THUMBNAILS as string | undefined) ?? 'thumbnails',
+  postImages: (import.meta.env.VITE_STORAGE_BUCKET_POST_IMAGES as string | undefined) ?? 'post-images',
 } as const
 
 // ── buildOwnerPath ───────────────────────────────────────────────

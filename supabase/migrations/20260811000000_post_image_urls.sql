@@ -1,0 +1,21 @@
+-- ================================================================
+-- Gazua — posts.image_urls
+-- Apply via: Supabase Dashboard > SQL Editor, or supabase db push
+--
+-- Create Post modal now supports attaching up to 5 images per post
+-- (CreatePostModal.tsx). Images are uploaded client-side to the
+-- `post-images` storage bucket (see BUCKETS.postImages in
+-- src/lib/storage.ts — bucket itself is provisioned manually in the
+-- Supabase dashboard, same as avatars/videos/reels/models/thumbnails;
+-- no bucket-creation migration exists in this repo for any bucket) at
+-- {userId}/{postId}/{index}.webp, then the resulting public URLs are
+-- written here, in display order.
+--
+-- Nullable/no-default array, not NOT NULL DEFAULT '{}': absent vs.
+-- empty isn't meaningfully different for a post with no images, and
+-- every read site already treats a missing/empty array the same way
+-- (no images to render), so there's no correctness reason to force a
+-- default here.
+-- ================================================================
+
+ALTER TABLE public.posts ADD COLUMN IF NOT EXISTS image_urls text[];

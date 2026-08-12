@@ -214,6 +214,20 @@ export async function createPost(
   return { data, error: null }
 }
 
+// ── updatePostImages ─────────────────────────────────────────────
+/** Writes the uploaded image public URLs (in display order) onto an existing post. Called
+ * after createPost + the storage upload, since the upload path needs the post's own id
+ * (see CreatePostModal.tsx). */
+export async function updatePostImages(postId: string, imageUrls: string[]): Promise<ServiceResult<void>> {
+  const { error } = await supabase
+    .from('posts')
+    .update({ image_urls: imageUrls })
+    .eq('id', postId)
+
+  if (error) return { data: null, error: error.message }
+  return { data: null, error: null }
+}
+
 // ── incrementShareCount ──────────────────────────────────────────
 /** Atomically increment the share counter on a post. */
 export async function incrementShareCount(postId: string): Promise<ServiceResult<void>> {

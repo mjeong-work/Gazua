@@ -191,6 +191,7 @@ export interface Database {
           confidence: Confidence | null
           share_count: number
           moderation_status: ContentModerationStatus
+          image_urls: string[] | null
           created_at: string
           updated_at: string
         }
@@ -207,6 +208,7 @@ export interface Database {
           confidence?: Confidence | null
           share_count?: number
           moderation_status?: ContentModerationStatus
+          image_urls?: string[] | null
           created_at?: string
           updated_at?: string
         }
@@ -223,6 +225,7 @@ export interface Database {
           confidence?: Confidence | null
           share_count?: number
           moderation_status?: ContentModerationStatus
+          image_urls?: string[] | null
           created_at?: string
           updated_at?: string
         }
