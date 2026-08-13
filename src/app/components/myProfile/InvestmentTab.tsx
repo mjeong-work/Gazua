@@ -8,6 +8,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import { parseAllocation } from '../../utils/creator';
 import { Button } from '../ui/button';
 import Overlay from './Overlay';
+import CompareRow from '../shared/CompareRow';
+import ChartCard from '../shared/ChartCard';
 
 // Same 4-color default palette CreatorProfileInvestment.tsx uses for the public view, extended
 // for portfolios with more than 4 real slices.
@@ -185,115 +187,136 @@ export default function InvestmentTab() {
             </button>
           </div>
 
-          {/* Simulation Setup */}
-          <div onClick={() => setSimulationExpanded(!simulationExpanded)} className="p-4 bg-white rounded-md border border-neutral-200 cursor-pointer hover:border-neutral-300 transition-colors">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-base font-semibold">{selectedSimulation.name}</h2>
-              <svg className={`w-4 h-4 text-neutral-500 transition-transform flex-shrink-0 ${simulationExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-            {!simulationExpanded ? (
-              <div className="space-y-1">
-                <p className="text-xs text-neutral-600"><span className="font-medium">Period:</span> {selectedSimulation.startDate}{selectedSimulation.endDate ? ` – ${selectedSimulation.endDate}` : ' – Present'}</p>
-                <p className="text-xs text-neutral-600">
-                  <span className="font-medium">Holdings:</span>{' '}
-                  {selectedSimulation.holdings.length > 0
-                    ? `${selectedSimulation.holdings.length} stock${selectedSimulation.holdings.length > 1 ? 's' : ''} (${selectedSimulation.holdings.map(h => h.symbol).join(', ')}) + Cash`
-                    : 'All cash'}
-                </p>
-                <p className="text-xs text-neutral-600"><span className="font-medium">Capital:</span> ${selectedSimulation.capital.toLocaleString()}</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-medium text-neutral-600 mb-1.5">Start Date</label>
-                    <div className="px-3 py-1.5 bg-neutral-50 border border-neutral-200 rounded text-xs">{selectedSimulation.startDate}</div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-neutral-600 mb-1.5">Initial Capital</label>
-                    <div className="px-3 py-1.5 bg-neutral-50 border border-neutral-200 rounded text-xs">${selectedSimulation.capital.toLocaleString()}</div>
-                  </div>
+          {/* Setup + Compare (left column on md:+) beside the chart (right column on md:+).
+              On mobile these two groups simply stack in the same order they always have — the
+              grouping only matters once flex-row kicks in at md:. */}
+          <div className="flex flex-col gap-4 md:flex-row md:items-start md:gap-6">
+            <div className="md:w-[42%] md:flex-shrink-0 space-y-4">
+              {/* Simulation Setup */}
+              <div onClick={() => setSimulationExpanded(!simulationExpanded)} className="p-4 bg-white rounded-md border border-neutral-200 cursor-pointer hover:border-neutral-300 transition-colors">
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="text-base font-semibold">{selectedSimulation.name}</h2>
+                  <svg className={`w-4 h-4 text-neutral-500 transition-transform flex-shrink-0 ${simulationExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
                 </div>
-                <div>
-                  <label className="block text-xs font-medium text-neutral-600 mb-1.5">Hypothetical Holdings</label>
-                  <div className="space-y-1.5">
-                    {selectedSimulation.holdings.map(h => (
-                      <div key={h.symbol} className="px-3 py-2 bg-neutral-50 border border-neutral-200 rounded text-xs flex items-center justify-between">
-                        <span>{h.symbol}</span><span className="text-neutral-500">${h.amount.toLocaleString()}</span>
+                {!simulationExpanded ? (
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div>
+                      <p className="text-[10px] text-neutral-400 uppercase tracking-wide mb-0.5">Period</p>
+                      <p className="text-xs font-medium text-neutral-700">{selectedSimulation.startDate}{selectedSimulation.endDate ? ` – ${selectedSimulation.endDate}` : ' – Present'}</p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-neutral-400 uppercase tracking-wide mb-0.5">Holdings</p>
+                      <p className="text-xs font-medium text-neutral-700">
+                        {selectedSimulation.holdings.length > 0 ? `${selectedSimulation.holdings.length} stock${selectedSimulation.holdings.length > 1 ? 's' : ''}` : 'All cash'}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-neutral-400 uppercase tracking-wide mb-0.5">Capital</p>
+                      <p className="text-xs font-medium text-neutral-700">${selectedSimulation.capital.toLocaleString()}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-neutral-600 mb-1.5">Start Date</label>
+                        <div className="px-3 py-1.5 bg-neutral-50 border border-neutral-200 rounded text-xs">{selectedSimulation.startDate}</div>
                       </div>
-                    ))}
-                    {selectedSimCash > 0 && (
-                      <div className="px-3 py-2 bg-neutral-50 border border-neutral-200 rounded text-xs flex items-center justify-between">
-                        <span>Cash</span><span className="text-neutral-500">${selectedSimCash.toLocaleString()}</span>
+                      <div>
+                        <label className="block text-xs font-medium text-neutral-600 mb-1.5">Initial Capital</label>
+                        <div className="px-3 py-1.5 bg-neutral-50 border border-neutral-200 rounded text-xs">${selectedSimulation.capital.toLocaleString()}</div>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-neutral-600 mb-1.5">Hypothetical Holdings</label>
+                      <div className="space-y-1.5">
+                        {selectedSimulation.holdings.map(h => (
+                          <div key={h.symbol} className="px-3 py-2 bg-neutral-50 border border-neutral-200 rounded text-xs flex items-center justify-between">
+                            <span>{h.symbol}</span><span className="text-neutral-500">${h.amount.toLocaleString()}</span>
+                          </div>
+                        ))}
+                        {selectedSimCash > 0 && (
+                          <div className="px-3 py-2 bg-neutral-50 border border-neutral-200 rounded text-xs flex items-center justify-between">
+                            <span>Cash</span><span className="text-neutral-500">${selectedSimCash.toLocaleString()}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    {selectedSimulation.rationale && (
+                      <div>
+                        <label className="block text-xs font-medium text-neutral-600 mb-1.5">Rationale</label>
+                        <div className="px-3 py-2 bg-neutral-50 border border-neutral-200 rounded text-xs text-neutral-600">{selectedSimulation.rationale}</div>
                       </div>
                     )}
                   </div>
-                </div>
-                {selectedSimulation.rationale && (
-                  <div>
-                    <label className="block text-xs font-medium text-neutral-600 mb-1.5">Rationale</label>
-                    <div className="px-3 py-2 bg-neutral-50 border border-neutral-200 rounded text-xs text-neutral-600">{selectedSimulation.rationale}</div>
+                )}
+              </div>
+
+              {/* Compare card — Hypothesis vs Actual, 2 rows + a thin difference badge */}
+              <div>
+                <h2 className="text-sm font-semibold mb-2">Hypothesis vs Actual</h2>
+                {!hasSimPerformance ? (
+                  <div className="p-6 bg-neutral-50 rounded-md border border-neutral-200 text-center">
+                    <p className="text-sm font-medium text-neutral-700 mb-1">This simulation just started</p>
+                    <p className="text-xs text-neutral-500">Performance data will appear here once enough time has passed to compare your hypothesis against the market.</p>
+                  </div>
+                ) : (
+                  <div className="px-4 py-1 bg-white rounded-md border border-neutral-200 divide-y divide-neutral-100">
+                    <CompareRow
+                      label="Hypothesis"
+                      percent={selectedSimulation.hypothesisPercent!}
+                      amount={simHypothesisValue}
+                      dotColorClass="bg-violet-500"
+                      valueColorClass="text-violet-700"
+                    />
+                    <CompareRow
+                      label="Actual"
+                      percent={selectedSimulation.actualPercent!}
+                      amount={simActualValue}
+                      dotColorClass="bg-brand"
+                      valueColorClass="text-brand"
+                    />
+                    <div className="flex items-center justify-between py-2">
+                      <span className="text-sm text-neutral-600">Difference</span>
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold ${simDiffPercent >= 0 ? 'bg-green-50 text-brand' : 'bg-red-50 text-red-600'}`}>
+                        {simDiffPercent >= 0 ? '+' : ''}{simDiffPercent.toFixed(1)}% · {simDiffValue >= 0 ? '+' : '-'}${Math.abs(simDiffValue).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                      </span>
+                    </div>
                   </div>
                 )}
               </div>
-            )}
-          </div>
+            </div>
 
-          {/* Performance Comparison */}
-          <div>
-            <h2 className="text-base font-semibold mb-3">Hypothesis vs Actual Performance</h2>
-            {!hasSimPerformance ? (
-              <div className="p-6 bg-neutral-50 rounded-md border border-neutral-200 text-center">
-                <p className="text-sm font-medium text-neutral-700 mb-1">This simulation just started</p>
-                <p className="text-xs text-neutral-500">Performance data will appear here once enough time has passed to compare your hypothesis against the market.</p>
-              </div>
-            ) : (
-              <>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-                  <div className="p-3 bg-purple-50 rounded-md border border-purple-200">
-                    <p className="text-xs text-neutral-600 mb-1">Your Hypothesis</p>
-                    <p className="text-xl font-bold text-purple-700 mb-0.5">{selectedSimulation.hypothesisPercent! >= 0 ? '+' : ''}{selectedSimulation.hypothesisPercent!.toFixed(1)}%</p>
-                    <p className="text-xs text-neutral-500">${simHypothesisValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
-                  </div>
-                  <div className="p-3 bg-green-50 rounded-md border border-green-200">
-                    <p className="text-xs text-neutral-600 mb-1">Actual Performance</p>
-                    <p className="text-xl font-bold text-brand mb-0.5">{selectedSimulation.actualPercent! >= 0 ? '+' : ''}{selectedSimulation.actualPercent!.toFixed(1)}%</p>
-                    <p className="text-xs text-neutral-500">${simActualValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
-                  </div>
-                  <div className={`p-3 rounded-md border ${simDiffPercent >= 0 ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
-                    <p className="text-xs text-neutral-600 mb-1">Difference</p>
-                    <p className={`text-xl font-bold mb-0.5 ${simDiffPercent >= 0 ? 'text-brand' : 'text-red-700'}`}>{simDiffPercent >= 0 ? '+' : ''}{simDiffPercent.toFixed(1)}%</p>
-                    <p className="text-xs text-neutral-500">{simDiffValue >= 0 ? '+' : '-'}${Math.abs(simDiffValue).toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
-                  </div>
-                </div>
-                <div className="bg-neutral-50 rounded-md p-4">
-                  <div className="h-48 w-full">
-                    <ResponsiveContainer width="100%" height={192}>
-                      <LineChart key="sim-chart">
-                        <XAxis dataKey="time" hide key="sim-xaxis" />
-                        <YAxis hide domain={['dataMin', 'dataMax']} key="sim-yaxis" />
-                        <Tooltip contentStyle={CHART_TOOLTIP_STYLE} formatter={chartCurrencyFormatter('Value')} labelFormatter={hideChartLabel} />
-                        <Line data={portfolioData} type="monotone" dataKey="value" stroke="var(--brand)" strokeWidth={2} dot={false} isAnimationActive={false} key="sim-actual" name="Actual" />
-                        <Line data={portfolioData.map(d => ({ ...d, value: d.value * 1.06 }))} type="monotone" dataKey="value" stroke="#9333ea" strokeWidth={2} strokeDasharray="5 5" dot={false} isAnimationActive={false} key="sim-hypothesis" name="Hypothesis" />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                  <div className="flex items-center justify-center gap-4 mt-3">
-                    <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-brand" /><span className="text-xs font-medium">Actual</span></div>
-                    <div className="flex items-center gap-1.5"><div className="w-3 h-0.5 bg-purple-600" style={{ borderTop: '2px dashed #9333ea', height: 0 }} /><span className="text-xs font-medium">Hypothesis</span></div>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
+            {/* Chart (enlarged on md:+) + View Past Simulations */}
+            <div className="flex-1 space-y-3">
+              {hasSimPerformance && (
+                <ChartCard
+                  title="Performance"
+                  heightClassName="h-[110px] md:h-[260px] lg:h-[320px]"
+                  legend={[
+                    { label: 'Actual', colorClass: 'bg-brand' },
+                    { label: 'Hypothesis', dashed: true, dashColor: '#8b5cf6' },
+                  ]}
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart key="sim-chart">
+                      <XAxis dataKey="time" hide key="sim-xaxis" />
+                      <YAxis hide domain={['dataMin', 'dataMax']} key="sim-yaxis" />
+                      <Tooltip contentStyle={CHART_TOOLTIP_STYLE} formatter={chartCurrencyFormatter('Value')} labelFormatter={hideChartLabel} />
+                      <Line data={portfolioData} type="monotone" dataKey="value" stroke="var(--brand)" strokeWidth={2} dot={false} isAnimationActive={false} key="sim-actual" name="Actual" />
+                      <Line data={portfolioData.map(d => ({ ...d, value: d.value * 1.06 }))} type="monotone" dataKey="value" stroke="#8b5cf6" strokeWidth={2} strokeDasharray="5 5" dot={false} isAnimationActive={false} key="sim-hypothesis" name="Hypothesis" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </ChartCard>
+              )}
 
-          {/* Past Simulations */}
-          <button onClick={() => setShowSimulationList(!showSimulationList)} className="w-full p-3 bg-white rounded-md border border-neutral-200 hover:border-neutral-300 transition-colors flex items-center justify-center gap-2 text-xs font-medium text-neutral-600">
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-            {showSimulationList ? 'Hide Past Simulations' : 'View Past Simulations'}
-          </button>
+              <button onClick={() => setShowSimulationList(!showSimulationList)} className="text-xs font-medium text-neutral-500 hover:text-black transition-colors">
+                {showSimulationList ? 'Hide Past Simulations' : 'View Past Simulations →'}
+              </button>
+            </div>
+          </div>
 
           {showSimulationList && (
             <div className="p-4 bg-white rounded-md border border-neutral-200 space-y-2.5">

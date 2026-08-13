@@ -1,71 +1,38 @@
 import type { Simulation } from '../data/simulations';
 import { formatCurrency, formatPercent } from '../data/simulations';
+import CompareRow from './shared/CompareRow';
 
 interface Props {
   simulation: Simulation;
 }
 
+// Hypothesis vs Actual, as a single compare card (2 rows + a thin difference badge) instead of
+// three separate stat boxes — same pattern as myProfile/InvestmentTab.tsx's compare card.
 export default function PerformanceSummaryCards({ simulation }: Props) {
   const diff = simulation.differencePercent;
   const diffPositive = diff >= 0;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      {/* Hypothesis */}
-      <div className="rounded-md border border-violet-200 bg-violet-50 p-5">
-        <p className="text-xs font-medium text-violet-500 uppercase tracking-wide mb-3">
-          Your Hypothesis
-        </p>
-        <p className="text-2xl font-bold text-violet-700">
-          {formatPercent(simulation.hypothesisReturnPercent)}
-        </p>
-        <p className="text-sm text-violet-600 mt-1">
-          {formatCurrency(simulation.hypothesisValue)}
-        </p>
-      </div>
-
-      {/* Actual */}
-      <div className="rounded-md border border-green-200 bg-green-50 p-5">
-        <p className="text-xs font-medium text-green-600 uppercase tracking-wide mb-3">
-          Actual Performance
-        </p>
-        <p className="text-2xl font-bold text-green-700">
-          {formatPercent(simulation.actualReturnPercent)}
-        </p>
-        <p className="text-sm text-green-600 mt-1">
-          {formatCurrency(simulation.actualValue)}
-        </p>
-      </div>
-
-      {/* Difference */}
-      <div
-        className={`rounded-md border p-5 ${
-          diffPositive
-            ? 'border-green-200 bg-green-50'
-            : 'border-red-200 bg-red-50'
-        }`}
-      >
-        <p
-          className={`text-xs font-medium uppercase tracking-wide mb-3 ${
-            diffPositive ? 'text-green-600' : 'text-red-400'
-          }`}
-        >
-          Difference
-        </p>
-        <p
-          className={`text-2xl font-bold ${
-            diffPositive ? 'text-green-700' : 'text-red-600'
-          }`}
-        >
-          {formatPercent(simulation.differencePercent)}
-        </p>
-        <p
-          className={`text-sm mt-1 ${
-            diffPositive ? 'text-green-600' : 'text-red-500'
-          }`}
-        >
-          {formatCurrency(simulation.differenceValue)}
-        </p>
+    <div className="px-4 py-1 bg-white rounded-md border border-neutral-200 divide-y divide-neutral-100">
+      <CompareRow
+        label="Hypothesis"
+        percent={simulation.hypothesisReturnPercent}
+        amount={simulation.hypothesisValue}
+        dotColorClass="bg-violet-500"
+        valueColorClass="text-violet-700"
+      />
+      <CompareRow
+        label="Actual"
+        percent={simulation.actualReturnPercent}
+        amount={simulation.actualValue}
+        dotColorClass="bg-brand"
+        valueColorClass="text-brand"
+      />
+      <div className="flex items-center justify-between py-2">
+        <span className="text-sm text-neutral-600">Difference</span>
+        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold ${diffPositive ? 'bg-green-50 text-brand' : 'bg-red-50 text-red-600'}`}>
+          {formatPercent(diff)} · {diffPositive ? '+' : '-'}{formatCurrency(Math.abs(simulation.differenceValue))}
+        </span>
       </div>
     </div>
   );

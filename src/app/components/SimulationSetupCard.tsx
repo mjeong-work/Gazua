@@ -92,21 +92,22 @@ export default function SimulationSetupCard({ simulation, expanded, onToggle }: 
         )}
       </button>
 
-      {/* Collapsed summary */}
+      {/* Collapsed summary — Period/Holdings/Capital strip, same 3-column pattern as
+          myProfile/InvestmentTab.tsx's setup card. */}
       {!expanded && (
-        <div className="px-5 pb-4 flex flex-wrap gap-x-6 gap-y-1 text-sm text-neutral-600 border-t border-neutral-100">
-          <span>
-            <span className="text-neutral-400 mr-1">Period:</span>
-            {formatDateRange(simulation.startDate, simulation.endDate)}
-          </span>
-          <span>
-            <span className="text-neutral-400 mr-1">Holdings:</span>
-            {holdingSummary}{cashLabel}
-          </span>
-          <span>
-            <span className="text-neutral-400 mr-1">Capital:</span>
-            ${simulation.capital.toLocaleString()}
-          </span>
+        <div className="px-5 pb-4 grid grid-cols-3 gap-2 text-center border-t border-neutral-100 pt-4">
+          <div>
+            <p className="text-[10px] text-neutral-400 uppercase tracking-wide mb-0.5">Period</p>
+            <p className="text-xs font-medium text-neutral-700">{formatDateRange(simulation.startDate, simulation.endDate)}</p>
+          </div>
+          <div>
+            <p className="text-[10px] text-neutral-400 uppercase tracking-wide mb-0.5">Holdings</p>
+            <p className="text-xs font-medium text-neutral-700 truncate" title={`${holdingSummary}${cashLabel}`}>{holdingSummary}{cashLabel}</p>
+          </div>
+          <div>
+            <p className="text-[10px] text-neutral-400 uppercase tracking-wide mb-0.5">Capital</p>
+            <p className="text-xs font-medium text-neutral-700">${simulation.capital.toLocaleString()}</p>
+          </div>
         </div>
       )}
 

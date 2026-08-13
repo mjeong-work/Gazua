@@ -86,7 +86,7 @@ export default function PerformanceTrendChart({ chartData, timeRange, onTimeRang
         </div>
       </div>
 
-      <div className="h-56">
+      <div className="h-[110px] md:h-[260px] lg:h-[320px]">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 4, right: 8, bottom: 0, left: 4 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />

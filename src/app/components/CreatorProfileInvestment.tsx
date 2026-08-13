@@ -178,21 +178,26 @@ export default function CreatorProfileInvestment() {
             </div>
 
             {simulatorMode ? (
-              // Simulator View
+              // Simulator View — meta strip + compare card in a left rail beside the (enlarged
+              // on md:+) chart, same split as myProfile/InvestmentTab.tsx's simulator.
               <div className="space-y-4">
-                <SimulationSetupCard
-                  simulation={selectedSimulation}
-                  expanded={simulationExpanded}
-                  onToggle={() => setSimulationExpanded(v => !v)}
-                />
-
-                <PerformanceSummaryCards simulation={selectedSimulation} />
-
-                <PerformanceTrendChart
-                  chartData={simulationChartData}
-                  timeRange={timeRange}
-                  onTimeRangeChange={setTimeRange}
-                />
+                <div className="flex flex-col gap-4 md:flex-row md:items-start md:gap-6">
+                  <div className="md:w-[42%] md:flex-shrink-0 space-y-4">
+                    <SimulationSetupCard
+                      simulation={selectedSimulation}
+                      expanded={simulationExpanded}
+                      onToggle={() => setSimulationExpanded(v => !v)}
+                    />
+                    <PerformanceSummaryCards simulation={selectedSimulation} />
+                  </div>
+                  <div className="flex-1">
+                    <PerformanceTrendChart
+                      chartData={simulationChartData}
+                      timeRange={timeRange}
+                      onTimeRangeChange={setTimeRange}
+                    />
+                  </div>
+                </div>
 
                 <PastSimulationsList
                   simulations={MOCK_SIMULATIONS}

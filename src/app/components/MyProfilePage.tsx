@@ -19,6 +19,10 @@ import AnalyticsTab from './myProfile/AnalyticsTab';
 import EditProfileModal from './myProfile/EditProfileModal';
 import TabPanel from './myProfile/TabPanel';
 import VerifiedBadge from './VerifiedBadge';
+import Avatar from './shared/Avatar';
+import RiskPill from './shared/RiskPill';
+import StatRow from './shared/StatRow';
+import AllocationBar from './shared/AllocationBar';
 import { isCreatorVerified } from '../utils/creator';
 
 type Tab = 'investment' | 'videos' | 'posts' | 'saved' | 'watching' | 'about' | 'analytics';
@@ -51,7 +55,8 @@ export default function MyProfilePage() {
   const displayName = profile?.full_name || '';
   const displayHandle = profile?.handle ? `@${profile.handle}` : profile?.username ? `@${profile.username}` : '';
   const bioText = profile?.bio?.trim() || '';
-  const avatarGradient = 'from-blue-500 to-purple-600';
+  const focusAreas = profile?.tags ?? [];
+  const isVerified = isCreatorVerified(profile);
   const [avatarImageUrl, setAvatarImageUrl] = useState<string | null>(null);
   const displayAvatarUrl = avatarImageUrl ?? profile?.avatar_url ?? null;
   const [showEditProfile, setShowEditProfile] = useState(false);
@@ -73,6 +78,29 @@ export default function MyProfilePage() {
         toast.error('Could not copy link. Please try again.');
       });
   };
+
+  // Rendered twice (mobile position + desktop position — see the Profile Header markup below)
+  // rather than lifted into its own file: it's two small buttons whose only job is calling
+  // setShowEditProfile/navigate, not something any other page reuses.
+  const renderProfileActionButtons = () => (
+    <>
+      <button
+        onClick={() => setShowEditProfile(true)}
+        className="px-5 py-1.5 bg-black text-white font-medium text-xs md:text-sm rounded-full hover:bg-black/80 transition-colors flex items-center gap-1.5"
+      >
+        <EditIcon sx={{ fontSize: 14 }} />
+        Edit Profile
+      </button>
+      {profile?.username && (
+        <button
+          onClick={() => navigate(`/profile/${profile.username}/investment`)}
+          className="px-5 py-1.5 bg-mint text-black font-medium text-xs md:text-sm rounded-full hover:bg-mint-hover transition-colors"
+        >
+          Preview
+        </button>
+      )}
+    </>
+  );
 
   const handleAvatarClick = () => fileInputRef.current?.click();
 
@@ -100,73 +128,89 @@ export default function MyProfilePage() {
 
           <div className="max-w-5xl mx-auto px-6 pt-6 pb-24 lg:pb-8">
 
-            {/* Profile Header */}
-            <div className="flex items-start gap-5 mb-5">
-              <div className="relative group flex-shrink-0">
-                <div className={`w-20 h-20 rounded-full flex items-center justify-center text-white font-bold text-xl ring-4 ring-white shadow-md overflow-hidden ${displayAvatarUrl ? '' : `bg-gradient-to-br ${avatarGradient}`}`}>
-                  {displayAvatarUrl ? <img src={displayAvatarUrl} alt="Your avatar" className="w-full h-full object-cover" /> : initials}
-                </div>
-                <button onClick={handleAvatarClick} className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity flex items-center justify-center">
-                  <EditIcon sx={{ fontSize: 18, color: 'white' }} />
-                </button>
-                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
-              </div>
-
-              <div className="flex-1 pt-1 min-w-0">
-                <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <h1 className="text-2xl font-bold tracking-tight break-words">{displayName}</h1>
-                      {isCreatorVerified(profile) && <VerifiedBadge size={20} />}
-                    </div>
-                    <p className="text-neutral-500 text-sm mb-3">{displayHandle}</p>
-                    <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm">
-                      <div className="whitespace-nowrap"><span className="font-bold">127K</span><span className="text-neutral-500 ml-1">followers</span></div>
-                      <div className="whitespace-nowrap"><span className="font-bold">342</span><span className="text-neutral-500 ml-1">following</span></div>
-                      <div className="whitespace-nowrap"><span className="font-bold">{posts.filter(p => !p.draft).length + videos.length}</span><span className="text-neutral-500 ml-1">posts</span></div>
-                    </div>
+            {/* Profile Header — mobile: single stacked column (identity → risk/tags →
+                allocation → bio → stats → buttons). Desktop (md:+): a fixed-width left rail
+                (identity, risk/tags, buttons) beside a flexible right column (allocation, bio,
+                stats-as-cards). The Edit/Preview buttons are the one piece whose *position*
+                genuinely differs (mobile: last; desktop: top of the left rail) rather than just
+                its styling, so renderButtons() is rendered twice — once per breakpoint, toggled
+                via hidden/flex — instead of forcing a single flex order to do both jobs. */}
+            <div className="flex flex-col gap-3 md:flex-row md:gap-10 md:items-start mb-8">
+              {/* Left rail (desktop) / top block (mobile) */}
+              <div className="md:w-80 md:flex-shrink-0 space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="relative group flex-shrink-0">
+                    <Avatar
+                      imageUrl={displayAvatarUrl}
+                      initials={initials}
+                      verified={isVerified}
+                      className="w-16 h-16 text-lg md:w-24 md:h-24 md:text-2xl"
+                    />
+                    <button onClick={handleAvatarClick} className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 pointer-coarse:opacity-100 transition-opacity flex items-center justify-center">
+                      <EditIcon sx={{ fontSize: 18, color: 'white' }} />
+                    </button>
+                    <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
                   </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <h1 className="text-lg md:text-2xl font-bold tracking-tight truncate md:whitespace-normal md:break-words">{displayName}</h1>
+                      {isVerified && <VerifiedBadge size={16} className="md:hidden" />}
+                      {isVerified && <VerifiedBadge size={20} className="hidden md:inline-flex" />}
+                    </div>
+                    <p className="text-neutral-500 text-xs md:text-sm truncate">{displayHandle}</p>
+                  </div>
+                  <div className="flex items-center gap-1 flex-shrink-0 self-start">
                     <button
                       onClick={handleShare}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-medium transition-colors whitespace-nowrap ${shareCopied ? 'bg-brand/10 text-brand' : 'hover:bg-neutral-100 text-neutral-500'}`}
+                      className={`p-2 rounded-full transition-colors ${shareCopied ? 'bg-brand/10 text-brand' : 'hover:bg-neutral-100 text-neutral-500'}`}
                       title="Share profile"
                     >
-                      {shareCopied ? <CheckIcon sx={{ fontSize: 15 }} /> : <ShareIcon sx={{ fontSize: 15 }} />}
-                      {shareCopied ? 'Copied!' : 'Share'}
+                      {shareCopied ? <CheckIcon sx={{ fontSize: 16 }} /> : <ShareIcon sx={{ fontSize: 16 }} />}
                     </button>
                     <button onClick={() => navigate('/my-profile/settings')} className="p-2 hover:bg-neutral-100 rounded-full transition-colors flex-shrink-0" title="Settings">
-                      <SettingsIcon sx={{ fontSize: 20, color: '#6b7280' }} />
+                      <SettingsIcon sx={{ fontSize: 18, color: '#6b7280' }} />
                     </button>
                   </div>
                 </div>
+
+                {(profile?.creator_risk_style || focusAreas.length > 0) && (
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <RiskPill riskStyle={profile?.creator_risk_style} />
+                    {focusAreas.slice(0, 3).map((tag) => (
+                      <span key={tag} className="px-2 py-0.5 bg-neutral-100 text-neutral-600 rounded-sm text-[11px] font-medium">{tag}</span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Buttons — desktop position (top of left rail) */}
+                <div className="hidden md:flex items-center gap-2 pt-1">
+                  {renderProfileActionButtons()}
+                </div>
               </div>
-            </div>
 
-            {/* Bio */}
-            <p className="text-sm leading-relaxed text-neutral-600 mb-4 max-w-2xl">
-              {bioText || <span className="text-neutral-400 italic">Tell people about yourself</span>}
-              <span className="text-neutral-400"> · Not financial advice.</span>
-            </p>
+              {/* Right column (desktop) / rest of the stack (mobile) */}
+              <div className="flex-1 min-w-0 space-y-3 md:space-y-4">
+                <AllocationBar raw={profile?.portfolio_allocation} />
 
+                <p className="text-sm leading-relaxed text-neutral-600 max-w-2xl">
+                  {bioText || <span className="text-neutral-400 italic">Tell people about yourself</span>}
+                  <span className="text-neutral-400"> · Not financial advice.</span>
+                </p>
 
-            {/* Action Buttons */}
-            <div className="flex flex-wrap items-center gap-2 mb-8">
-              <button
-                onClick={() => setShowEditProfile(true)}
-                className="px-6 py-2 bg-black text-white font-medium text-sm rounded-sm hover:bg-black/80 transition-colors flex items-center gap-2"
-              >
-                <EditIcon sx={{ fontSize: 15 }} />
-                Edit Profile
-              </button>
-              {profile?.username && (
-                <button
-                  onClick={() => navigate(`/profile/${profile.username}/investment`)}
-                  className="px-6 py-2 bg-mint text-black font-medium text-sm rounded-sm hover:bg-mint-hover transition-colors"
-                >
-                  Preview Public Page
-                </button>
-              )}
+                <StatRow
+                  className="max-w-sm"
+                  stats={[
+                    { label: 'followers', value: '127K' },
+                    { label: 'following', value: '342' },
+                    { label: 'posts', value: String(posts.filter(p => !p.draft).length + videos.length) },
+                  ]}
+                />
+
+                {/* Buttons — mobile position (end of stack) */}
+                <div className="flex md:hidden items-center gap-2">
+                  {renderProfileActionButtons()}
+                </div>
+              </div>
             </div>
 
             {/* Tabs */}
