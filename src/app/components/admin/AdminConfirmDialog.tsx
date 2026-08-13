@@ -72,7 +72,7 @@ export default function AdminConfirmDialog({
           <Button
             onClick={handleConfirm}
             disabled={submitting}
-            className={`px-4 py-2 h-auto text-xs rounded-sm text-white ${
+            className={`px-4 py-2 h-auto text-xs rounded-full text-white ${
               destructive ? 'bg-red-600 hover:bg-red-700' : 'bg-black hover:bg-black/80'
             }`}
           >

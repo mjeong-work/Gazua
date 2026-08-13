@@ -129,7 +129,7 @@ export default function ReportButton({
                 <button
                   onClick={handleSubmit}
                   disabled={!selected || submitting}
-                  className="w-full py-3 bg-black text-white rounded-sm text-sm font-bold hover:bg-black/80 transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed"
+                  className="w-full py-3 bg-black text-white rounded-full text-sm font-bold hover:bg-black/80 transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed"
                 >
                   {submitting ? 'Submitting…' : 'Submit Report'}
                 </button>

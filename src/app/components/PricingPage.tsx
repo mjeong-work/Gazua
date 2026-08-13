@@ -154,7 +154,7 @@ export default function PricingPage() {
           </div>
           <div className="flex items-center gap-3">
             <button onClick={() => navigate('/signin')} className="px-4 py-2 text-sm hover:opacity-70">Sign In</button>
-            <button onClick={() => navigate('/onboarding/welcome')} className="px-5 py-2 bg-black text-white text-sm rounded-sm hover:bg-black/80">
+            <button onClick={() => navigate('/onboarding/welcome')} className="px-5 py-2 bg-black text-white text-sm rounded-full hover:bg-black/80">
               Get Started
             </button>
           </div>
@@ -233,7 +233,7 @@ export default function PricingPage() {
                   <button
                     onClick={() => handleTierClick(tier.stripeTier)}
                     disabled={isLoading}
-                    className={`w-full py-3 rounded-sm font-medium mb-8 transition-all disabled:opacity-60 disabled:cursor-not-allowed ${
+                    className={`w-full py-3 rounded-full font-medium mb-8 transition-all disabled:opacity-60 disabled:cursor-not-allowed ${
                       tier.highlighted
                         ? 'bg-black text-white hover:bg-black/80'
                         : 'bg-neutral-100 hover:bg-neutral-200'

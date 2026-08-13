@@ -170,7 +170,7 @@ export default function InvestmentTab() {
                 <button
                   key={sim.id}
                   onClick={() => { setSelectedSimulationId(sim.id); setSimulationExpanded(false); }}
-                  className={`flex-shrink-0 px-3 py-1.5 rounded-sm text-xs font-medium transition-colors whitespace-nowrap ${
+                  className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
                     sim.id === selectedSimulationId ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
                   }`}
                 >
@@ -180,7 +180,7 @@ export default function InvestmentTab() {
             </div>
             <button
               onClick={() => setShowNewSimulationForm(true)}
-              className="flex-shrink-0 flex items-center gap-1 px-3 py-1.5 bg-black text-white rounded-sm text-xs font-medium hover:bg-black/80 transition-colors"
+              className="flex-shrink-0 flex items-center gap-1 px-3 py-1.5 bg-black text-white rounded-full text-xs font-medium hover:bg-black/80 transition-colors"
             >
               <AddIcon sx={{ fontSize: 14 }} />
               New

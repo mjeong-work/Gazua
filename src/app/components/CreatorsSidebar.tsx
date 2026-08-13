@@ -97,7 +97,7 @@ export default function CreatorsSidebar() {
                       key={creator.id}
                       onClick={() => handleSelectCreator(creator.id)}
                       title={!isExpanded ? creator.name : undefined}
-                      className={`w-full flex items-center gap-2.5 py-2 rounded-sm text-left hover:bg-neutral-100 transition-colors ${
+                      className={`w-full flex items-center gap-2.5 py-2 rounded-full text-left hover:bg-neutral-100 transition-colors ${
                         isExpanded ? 'px-2.5' : 'px-2.5 lg:px-0 lg:justify-center'
                       }`}
                     >
@@ -137,7 +137,7 @@ export default function CreatorsSidebar() {
                       key={item.id}
                       onClick={() => handleSelectWatchlistItem(item.ticker)}
                       title={!isExpanded ? item.ticker : undefined}
-                      className={`w-full flex items-center gap-2.5 py-2 rounded-sm text-left hover:bg-neutral-100 transition-colors ${
+                      className={`w-full flex items-center gap-2.5 py-2 rounded-full text-left hover:bg-neutral-100 transition-colors ${
                         isExpanded ? 'px-2.5' : 'px-2.5 lg:px-0 lg:justify-center'
                       }`}
                     >

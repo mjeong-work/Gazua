@@ -193,7 +193,7 @@ export default function AboutTab({ bioText, onEditProfile, videosCount, postsCou
             {isEditingExperience ? (
               <div className="flex items-center gap-2">
                 <button onClick={handleSaveExperience} className="text-xs font-medium px-3 py-1.5 bg-black text-white rounded-sm hover:bg-black/80 transition-colors">Save</button>
-                <button onClick={() => setIsEditingExperience(false)} className="text-xs font-medium px-3 py-1.5 border border-neutral-200 rounded-sm hover:bg-neutral-50 transition-colors">Cancel</button>
+                <button onClick={() => setIsEditingExperience(false)} className="text-xs font-medium px-3 py-1.5 border border-neutral-200 rounded-full hover:bg-neutral-50 transition-colors">Cancel</button>
               </div>
             ) : (
               <button onClick={handleStartEditExperience} className="flex items-center gap-1.5 text-xs font-medium text-neutral-500 hover:text-black transition-colors">
@@ -242,7 +242,7 @@ export default function AboutTab({ bioText, onEditProfile, videosCount, postsCou
                 <button onClick={handleSaveFocusAreas} disabled={savingFocusAreas} className="text-xs font-medium px-3 py-1.5 bg-black text-white rounded-sm hover:bg-black/80 transition-colors disabled:opacity-50">
                   {savingFocusAreas ? 'Saving…' : 'Save'}
                 </button>
-                <button onClick={() => setIsEditingFocusAreas(false)} className="text-xs font-medium px-3 py-1.5 border border-neutral-200 rounded-sm hover:bg-neutral-50 transition-colors">Cancel</button>
+                <button onClick={() => setIsEditingFocusAreas(false)} className="text-xs font-medium px-3 py-1.5 border border-neutral-200 rounded-full hover:bg-neutral-50 transition-colors">Cancel</button>
               </div>
             ) : (
               <button onClick={handleStartEditFocusAreas} className="flex items-center gap-1.5 text-xs font-medium text-neutral-500 hover:text-black transition-colors">
@@ -291,7 +291,7 @@ export default function AboutTab({ bioText, onEditProfile, videosCount, postsCou
                 <button onClick={handleSaveRiskStyle} disabled={savingRiskStyle} className="text-xs font-medium px-3 py-1.5 bg-black text-white rounded-sm hover:bg-black/80 transition-colors disabled:opacity-50">
                   {savingRiskStyle ? 'Saving…' : 'Save'}
                 </button>
-                <button onClick={() => setIsEditingRiskStyle(false)} className="text-xs font-medium px-3 py-1.5 border border-neutral-200 rounded-sm hover:bg-neutral-50 transition-colors">Cancel</button>
+                <button onClick={() => setIsEditingRiskStyle(false)} className="text-xs font-medium px-3 py-1.5 border border-neutral-200 rounded-full hover:bg-neutral-50 transition-colors">Cancel</button>
               </div>
             ) : (
               <button onClick={handleStartEditRiskStyle} className="flex items-center gap-1.5 text-xs font-medium text-neutral-500 hover:text-black transition-colors">
@@ -306,7 +306,7 @@ export default function AboutTab({ bioText, onEditProfile, videosCount, postsCou
                   <button
                     key={style}
                     onClick={() => setEditRiskStyle(style)}
-                    className={`px-3 py-1.5 rounded-sm text-xs font-medium border transition-colors ${
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                       editRiskStyle === style ? 'bg-black text-white border-black' : 'bg-white text-neutral-600 border-neutral-200 hover:border-neutral-300'
                     }`}
                   >
@@ -339,7 +339,7 @@ export default function AboutTab({ bioText, onEditProfile, videosCount, postsCou
                 <button onClick={handleSaveAllocation} disabled={savingAllocation || !canSaveAllocation} className="text-xs font-medium px-3 py-1.5 bg-black text-white rounded-sm hover:bg-black/80 transition-colors disabled:opacity-40">
                   {savingAllocation ? 'Saving…' : 'Save'}
                 </button>
-                <button onClick={() => setIsEditingAllocation(false)} className="text-xs font-medium px-3 py-1.5 border border-neutral-200 rounded-sm hover:bg-neutral-50 transition-colors">Cancel</button>
+                <button onClick={() => setIsEditingAllocation(false)} className="text-xs font-medium px-3 py-1.5 border border-neutral-200 rounded-full hover:bg-neutral-50 transition-colors">Cancel</button>
               </div>
             ) : (
               <button onClick={handleStartEditAllocation} className="flex items-center gap-1.5 text-xs font-medium text-neutral-500 hover:text-black transition-colors">

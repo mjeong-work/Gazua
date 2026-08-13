@@ -471,7 +471,7 @@ export default function MainPageReels() {
                 <p className="text-white/60 text-sm mb-6 max-w-xs">When you follow creators, their reels will appear here.</p>
                 <button
                   onClick={() => setActiveTab('reels')}
-                  className="px-6 py-2.5 bg-white text-black font-bold text-sm rounded-sm hover:bg-white/90 transition-colors"
+                  className="px-6 py-2.5 bg-white text-black font-bold text-sm rounded-full hover:bg-white/90 transition-colors"
                 >
                   Explore All Reels
                 </button>
@@ -494,7 +494,7 @@ export default function MainPageReels() {
                 <p className="text-white/60 text-sm mb-6 max-w-xs">The creators you follow haven't posted any reels yet. Check back soon!</p>
                 <button
                   onClick={() => setActiveTab('reels')}
-                  className="px-6 py-2.5 bg-white text-black font-bold text-sm rounded-sm hover:bg-white/90 transition-colors"
+                  className="px-6 py-2.5 bg-white text-black font-bold text-sm rounded-full hover:bg-white/90 transition-colors"
                 >
                   Explore All Reels
                 </button>
@@ -634,7 +634,7 @@ export default function MainPageReels() {
                             </div>
                             <button
                               onClick={() => followId && toggleFollow(followId)}
-                              className={`px-6 py-2 font-bold text-sm rounded-sm transition-colors ${
+                              className={`px-6 py-2 font-bold text-sm rounded-full transition-colors ${
                                 isReelCreatorFollowed
                                   ? 'bg-white/20 text-white border border-white/40 hover:bg-white/30'
                                   : 'bg-white text-black hover:bg-white/90'

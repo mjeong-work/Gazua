@@ -87,14 +87,14 @@ export default function AdminContentPage() {
         item.moderationStatus === 'visible' ? (
           <button
             onClick={() => setConfirm({ item, status: 'removed' })}
-            className="px-3 py-1.5 text-xs font-medium rounded-sm border border-red-200 text-red-700 hover:bg-red-50 transition-colors"
+            className="px-3 py-1.5 text-xs font-medium rounded-full border border-red-200 text-red-700 hover:bg-red-50 transition-colors"
           >
             Remove
           </button>
         ) : (
           <button
             onClick={() => setConfirm({ item, status: 'visible' })}
-            className="px-3 py-1.5 text-xs font-medium rounded-sm border border-neutral-200 text-neutral-700 hover:bg-neutral-50 transition-colors"
+            className="px-3 py-1.5 text-xs font-medium rounded-full border border-neutral-200 text-neutral-700 hover:bg-neutral-50 transition-colors"
           >
             Restore
           </button>
@@ -115,7 +115,7 @@ export default function AdminContentPage() {
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`px-4 py-2 text-xs font-medium rounded-sm border transition-colors capitalize ${
+            className={`px-4 py-2 text-xs font-medium rounded-full border transition-colors capitalize ${
               tab === t ? 'bg-black text-white border-black' : 'border-neutral-200 text-neutral-700 hover:bg-neutral-50'
             }`}
           >

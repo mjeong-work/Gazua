@@ -22,7 +22,7 @@ export default function AdminGrowthChart({ data, bucket, onBucketChange }: Admin
             <button
               key={b}
               onClick={() => onBucketChange(b)}
-              className={`px-2.5 py-1 rounded-sm capitalize transition-colors ${
+              className={`px-2.5 py-1 rounded-full capitalize transition-colors ${
                 bucket === b ? 'bg-black text-white' : 'text-neutral-500 hover:bg-neutral-100'
               }`}
             >

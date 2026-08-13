@@ -601,7 +601,7 @@ export default function CreatorsPage() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => toggleFollow(followId)}
-            className={`${hasProfile ? 'flex-1' : 'w-full'} px-4 py-2 rounded-sm text-sm font-medium transition-colors ${
+            className={`${hasProfile ? 'flex-1' : 'w-full'} px-4 py-2 rounded-full text-sm font-medium transition-colors ${
               isFollowing
                 ? 'bg-neutral-200 text-black hover:bg-neutral-300'
                 : 'bg-black text-white hover:bg-black/80'
@@ -612,7 +612,7 @@ export default function CreatorsPage() {
           {hasProfile && (
             <button
               onClick={() => navigate(`/profile/${creatorSlug}/investment`)}
-              className="flex-1 px-4 py-2 border border-neutral-200 rounded-sm text-sm font-medium hover:bg-neutral-50 transition-colors"
+              className="flex-1 px-4 py-2 border border-neutral-200 rounded-full text-sm font-medium hover:bg-neutral-50 transition-colors"
             >
               View
             </button>
@@ -871,7 +871,7 @@ export default function CreatorsPage() {
                   <button
                     key={filter}
                     onClick={() => selectDesktopFilter(filter)}
-                    className={`px-6 py-2.5 rounded-sm text-sm font-medium transition-all shrink-0 ${
+                    className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all shrink-0 ${
                       isDesktopFilterActive(filter)
                         ? 'bg-black text-white'
                         : 'bg-white text-neutral-700 border border-neutral-200 hover:border-neutral-300'
@@ -1058,7 +1058,7 @@ export default function CreatorsPage() {
                       {reelHasProfile && (
                         <button
                           onClick={() => toggleFollow(reelCreatorSlug)}
-                          className={`px-3 py-1 rounded-sm text-xs font-medium transition-colors ${
+                          className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
                             isReelFollowed ? 'bg-white/20 text-white' : 'bg-white text-black hover:bg-white/90'
                           }`}
                         >

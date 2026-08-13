@@ -284,7 +284,7 @@ export default function VideoWatchPage() {
 
             <button
               onClick={() => toggleFollow(video.creatorFollowId)}
-              className={`px-5 py-2 rounded-sm text-sm font-medium transition-colors ${
+              className={`px-5 py-2 rounded-full text-sm font-medium transition-colors ${
                 isFollowingCreator ? 'bg-neutral-200 text-black hover:bg-neutral-300' : 'bg-black text-white hover:bg-black/80'
               }`}
             >

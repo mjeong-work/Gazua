@@ -346,7 +346,7 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
           <button
             onClick={handleSubmit}
             disabled={!ticker.trim() || !content.trim() || images.length === 0 || submitting}
-            className="w-full py-3 bg-black text-white font-bold rounded-sm hover:bg-black/80 transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed"
+            className="w-full py-3 bg-black text-white font-bold rounded-full hover:bg-black/80 transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed"
           >
             {submitting ? 'Publishing…' : 'Publish Post'}
           </button>

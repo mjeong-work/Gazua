@@ -73,7 +73,7 @@ export default function WeeklyReminderModal() {
 
         <button
           onClick={dismiss}
-          className="w-full py-3 bg-black text-white rounded-sm text-sm font-bold hover:bg-black/80 transition-colors"
+          className="w-full py-3 bg-black text-white rounded-full text-sm font-bold hover:bg-black/80 transition-colors"
         >
           Continue
         </button>

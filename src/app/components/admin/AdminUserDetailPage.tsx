@@ -123,7 +123,7 @@ export default function AdminUserDetailPage() {
             {detail.status !== 'suspended' && (
               <button
                 onClick={() => setPendingAction('warning_sent')}
-                className="px-4 py-2 text-xs font-medium rounded-sm border border-neutral-800 text-neutral-900 hover:bg-neutral-100 transition-colors"
+                className="px-4 py-2 text-xs font-medium rounded-full border border-neutral-800 text-neutral-900 hover:bg-neutral-100 transition-colors"
               >
                 Warn
               </button>
@@ -131,14 +131,14 @@ export default function AdminUserDetailPage() {
             {detail.status !== 'suspended' ? (
               <button
                 onClick={() => setPendingAction('user_suspended')}
-                className="px-4 py-2 text-xs font-medium rounded-sm border border-red-300 text-red-800 hover:bg-red-50 transition-colors"
+                className="px-4 py-2 text-xs font-medium rounded-full border border-red-300 text-red-800 hover:bg-red-50 transition-colors"
               >
                 Suspend
               </button>
             ) : (
               <button
                 onClick={() => setPendingAction('user_reinstated')}
-                className="px-4 py-2 text-xs font-medium rounded-sm border border-neutral-200 text-neutral-700 hover:bg-neutral-50 transition-colors"
+                className="px-4 py-2 text-xs font-medium rounded-full border border-neutral-200 text-neutral-700 hover:bg-neutral-50 transition-colors"
               >
                 Reinstate
               </button>

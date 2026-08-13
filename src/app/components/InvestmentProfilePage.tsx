@@ -90,7 +90,7 @@ function ErrorCard({ onRetry }: { onRetry: () => void }) {
       </p>
       <button
         onClick={onRetry}
-        className="px-6 py-2.5 bg-black text-white rounded-sm text-sm font-medium hover:bg-black/80 transition-colors"
+        className="px-6 py-2.5 bg-black text-white rounded-full text-sm font-medium hover:bg-black/80 transition-colors"
       >
         Try Again
       </button>
@@ -220,13 +220,13 @@ export default function InvestmentProfilePage() {
             <div className="flex items-center gap-3 justify-center">
               <button
                 onClick={() => navigate('/main')}
-                className="px-6 py-3 bg-black text-white rounded-sm text-sm font-medium hover:bg-black/80 transition-colors"
+                className="px-6 py-3 bg-black text-white rounded-full text-sm font-medium hover:bg-black/80 transition-colors"
               >
                 Explore the Feed
               </button>
               <button
                 onClick={() => navigate('/creators')}
-                className="px-6 py-3 border border-neutral-200 rounded-sm text-sm font-medium hover:bg-neutral-50 transition-colors"
+                className="px-6 py-3 border border-neutral-200 rounded-full text-sm font-medium hover:bg-neutral-50 transition-colors"
               >
                 Discover Creators
               </button>
@@ -260,7 +260,7 @@ export default function InvestmentProfilePage() {
               <button
                 onClick={runAnalysis}
                 disabled={isLoading}
-                className="flex items-center gap-2 px-5 py-2.5 bg-black text-white rounded-sm text-sm font-medium hover:bg-black/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 ml-6"
+                className="flex items-center gap-2 px-5 py-2.5 bg-black text-white rounded-full text-sm font-medium hover:bg-black/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0 ml-6"
               >
                 <RefreshIcon sx={{ fontSize: 16 }} className={isLoading ? 'animate-spin' : ''} />
                 {isLoading ? 'Analyzing…' : 'Refresh Analysis'}

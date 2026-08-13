@@ -96,7 +96,7 @@ export default function SignUp() {
           </p>
           <button
             onClick={() => navigate('/signin')}
-            className="w-full px-8 py-4 bg-black text-white rounded-sm hover:bg-black/90 transition-colors"
+            className="w-full px-8 py-4 bg-black text-white rounded-full hover:bg-black/90 transition-colors"
           >
             Go to Sign In
           </button>
@@ -241,7 +241,7 @@ export default function SignUp() {
           <Button
             type="submit"
             disabled={!allAgreed || formData.password !== formData.confirmPassword || isSubmitLoading}
-            className="w-full px-8 py-4 bg-black text-white rounded-sm hover:bg-black/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-8 py-4 bg-black text-white rounded-full hover:bg-black/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitLoading ? (
               <span className="flex items-center justify-center gap-2">

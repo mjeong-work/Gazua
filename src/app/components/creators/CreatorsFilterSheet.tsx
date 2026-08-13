@@ -7,7 +7,7 @@ export type Difficulty = 'Beginner' | 'Intermediate' | 'Advanced';
 const DIFFICULTY_OPTIONS: Difficulty[] = ['Beginner', 'Intermediate', 'Advanced'];
 
 const PILL_CLASS = (active: boolean) =>
-  `px-5 py-2.5 rounded-sm text-sm font-medium border transition-colors ${
+  `px-5 py-2.5 rounded-full text-sm font-medium border transition-colors ${
     active ? 'bg-black text-white border-black' : 'bg-white text-neutral-700 border-neutral-200 hover:border-neutral-300'
   }`;
 
@@ -118,13 +118,13 @@ export default function CreatorsFilterSheet({
           <button
             onClick={onClear}
             disabled={!hasActiveFilters}
-            className="flex-1 px-4 py-3 rounded-sm text-sm font-medium border border-neutral-200 text-neutral-700 hover:bg-neutral-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex-1 px-4 py-3 rounded-full text-sm font-medium border border-neutral-200 text-neutral-700 hover:bg-neutral-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             Clear all
           </button>
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-3 rounded-sm text-sm font-medium bg-black text-white hover:bg-black/90 transition-colors"
+            className="flex-1 px-4 py-3 rounded-full text-sm font-medium bg-black text-white hover:bg-black/90 transition-colors"
           >
             Show results
           </button>

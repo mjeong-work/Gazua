@@ -43,7 +43,7 @@ export default function AdminSearchFilterBar({
             <button
               key={opt.value}
               onClick={() => group.onChange(opt.value)}
-              className={`px-4 py-2 text-xs font-medium rounded-sm border transition-colors capitalize ${
+              className={`px-4 py-2 text-xs font-medium rounded-full border transition-colors capitalize ${
                 group.value === opt.value
                   ? 'bg-black text-white border-black'
                   : 'border-neutral-200 text-neutral-700 hover:bg-neutral-50'

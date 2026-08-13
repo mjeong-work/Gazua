@@ -690,7 +690,7 @@ export default function MainPagePosting() {
                     <button
                       key={filter}
                       onClick={() => setContentFilter(filter)}
-                      className={`px-4 py-1.5 rounded-sm text-xs font-medium whitespace-nowrap transition-colors ${contentFilter === filter ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'}`}
+                      className={`px-4 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${contentFilter === filter ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-700 hover:bg-neutral-200'}`}
                     >
                       {filter}
                     </button>

@@ -137,7 +137,7 @@ export default function SubscriptionModal({ onClose, creatorName }: Subscription
           {/* Subscribe Button — redirects to platform pricing page */}
           <button
             onClick={() => { onClose(); navigate('/pricing'); }}
-            className="w-full py-4 bg-black text-white font-bold rounded-sm hover:bg-black/80 transition-colors mb-4"
+            className="w-full py-4 bg-black text-white font-bold rounded-full hover:bg-black/80 transition-colors mb-4"
           >
             Subscribe for ${tiers.find(t => t.id === selectedTier)?.price}/month
           </button>

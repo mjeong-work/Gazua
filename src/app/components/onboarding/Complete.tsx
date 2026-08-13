@@ -75,7 +75,7 @@ export default function Complete() {
         {/* CTA */}
         <button
           onClick={() => navigate('/main')}
-          className="w-full px-8 py-4 bg-black text-white rounded-sm hover:bg-black/90 transition-colors mb-6"
+          className="w-full px-8 py-4 bg-black text-white rounded-full hover:bg-black/90 transition-colors mb-6"
         >
           Explore the Feed
         </button>

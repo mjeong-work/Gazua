@@ -87,7 +87,7 @@ export default function AuthCallback() {
           </p>
           <button
             onClick={() => { setOauthError(null); navigate('/signin', { replace: true }); }}
-            className="px-6 py-2 bg-black text-white rounded-sm text-sm hover:bg-black/90 transition-colors"
+            className="px-6 py-2 bg-black text-white rounded-full text-sm hover:bg-black/90 transition-colors"
           >
             Back to Sign In
           </button>

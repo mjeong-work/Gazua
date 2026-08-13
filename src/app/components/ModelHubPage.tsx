@@ -256,13 +256,13 @@ export default function ModelHubPage() {
             <div className="flex items-center justify-center gap-4">
               <button
                 onClick={() => window.scrollTo({ top: 600, behavior: 'smooth' })}
-                className="px-8 py-3 bg-black text-white font-medium rounded-sm hover:bg-black/80 transition-colors"
+                className="px-8 py-3 bg-black text-white font-medium rounded-full hover:bg-black/80 transition-colors"
               >
                 Explore Models
               </button>
               <button
                 onClick={() => setShowUploadModal(true)}
-                className="px-8 py-3 bg-mint text-black font-medium rounded-sm hover:bg-mint-hover transition-colors flex items-center gap-2"
+                className="px-8 py-3 bg-mint text-black font-medium rounded-full hover:bg-mint-hover transition-colors flex items-center gap-2"
               >
                 <UploadIcon sx={{ fontSize: 20 }} />
                 Upload Model
@@ -453,14 +453,14 @@ export default function ModelHubPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handlePreview(model)}
-                        className="flex-1 px-4 py-2 border border-neutral-200 rounded-sm text-sm font-medium hover:bg-neutral-50 transition-colors flex items-center justify-center gap-2"
+                        className="flex-1 px-4 py-2 border border-neutral-200 rounded-full text-sm font-medium hover:bg-neutral-50 transition-colors flex items-center justify-center gap-2"
                       >
                         <VisibilityIcon sx={{ fontSize: 16 }} />
                         Preview
                       </button>
                       <button
                         onClick={() => isLocked ? navigate('/') : handleDownload(model)}
-                        className={`flex-1 px-4 py-2 rounded-sm text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
+                        className={`flex-1 px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
                           isLocked
                             ? 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200'
                             : 'bg-black text-white hover:bg-black/80'
@@ -497,7 +497,7 @@ export default function ModelHubPage() {
                   setSearchQuery('');
                   setFilters({ difficulty: 'All', fileType: 'All', category: 'All', access: 'All' });
                 }}
-                className="px-6 py-3 bg-black text-white rounded-sm hover:bg-black/90 transition-colors"
+                className="px-6 py-3 bg-black text-white rounded-full hover:bg-black/90 transition-colors"
               >
                 Clear Filters
               </button>
@@ -543,7 +543,7 @@ export default function ModelHubPage() {
                   </p>
                   <button
                     onClick={() => setShowUploadModal(false)}
-                    className="px-6 py-3 bg-black text-white rounded-sm hover:bg-black/90 transition-colors"
+                    className="px-6 py-3 bg-black text-white rounded-full hover:bg-black/90 transition-colors"
                   >
                     Got It
                   </button>
@@ -657,7 +657,7 @@ export default function ModelHubPage() {
                   <button
                     onClick={handlePublishModel}
                     disabled={!uploadTitle.trim() || !uploadCategory || !uploadDifficulty || !uploadFileType || !uploadFile || uploadSubmitting}
-                    className="w-full py-4 bg-black text-white font-bold rounded-sm hover:bg-black/80 transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed"
+                    className="w-full py-4 bg-black text-white font-bold rounded-full hover:bg-black/80 transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed"
                   >
                     {uploadSubmitting ? 'Publishing…' : 'Publish Model'}
                   </button>
@@ -755,7 +755,7 @@ export default function ModelHubPage() {
                     setShowPreviewModal(false);
                   }
                 }}
-                className={`w-full py-4 rounded-sm font-bold transition-colors flex items-center justify-center gap-2 ${
+                className={`w-full py-4 rounded-full font-bold transition-colors flex items-center justify-center gap-2 ${
                   selectedModel.access === 'Expert Only' && !isExpert
                     ? 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200'
                     : 'bg-black text-white hover:bg-black/80'

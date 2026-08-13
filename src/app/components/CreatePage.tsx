@@ -179,7 +179,7 @@ export default function CreatePage() {
                 </p>
                 <button
                   onClick={handleCloseModal}
-                  className="px-6 py-3 bg-black text-white rounded-sm hover:bg-black/90 transition-colors"
+                  className="px-6 py-3 bg-black text-white rounded-full hover:bg-black/90 transition-colors"
                 >
                   Got It
                 </button>

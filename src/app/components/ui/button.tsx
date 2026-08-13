@@ -20,13 +20,12 @@ const buttonVariants = cva(
           "hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50",
         link: "text-primary underline-offset-4 hover:underline",
         // Gazua's own recurring CTA styles (Save/Publish/Upload buttons app-wide) — same
-        // rounded-sm corners and colors the app already hand-rolled everywhere, just
-        // centralized here instead of copy-pasted per modal (see audit Issue 9). Was a
-        // rounded-full pill shape before the site-wide radius tightening (2026-08-11).
-        pill: "bg-black text-white hover:bg-black/80 rounded-sm",
+        // rounded-full pill shape and colors the app already hand-rolled everywhere, just
+        // centralized here instead of copy-pasted per modal (see audit Issue 9).
+        pill: "bg-black text-white hover:bg-black/80 rounded-full",
         pillOutline:
-          "border border-neutral-200 text-foreground hover:bg-neutral-50 rounded-sm",
-        pillMint: "bg-mint text-black hover:bg-mint-hover rounded-sm",
+          "border border-neutral-200 text-foreground hover:bg-neutral-50 rounded-full",
+        pillMint: "bg-mint text-black hover:bg-mint-hover rounded-full",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

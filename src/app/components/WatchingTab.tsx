@@ -84,7 +84,7 @@ export default function WatchingTab() {
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-1.5 px-4 py-2 bg-black text-white text-sm font-medium rounded-sm hover:bg-black/80 transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2 bg-black text-white text-sm font-medium rounded-full hover:bg-black/80 transition-colors"
         >
           <AddIcon sx={{ fontSize: 16 }} />
           Add Asset
@@ -104,13 +104,13 @@ export default function WatchingTab() {
           <div className="flex items-center gap-3 justify-center">
             <button
               onClick={() => setShowAddModal(true)}
-              className="px-5 py-2 bg-black text-white text-sm font-medium rounded-sm hover:bg-black/80 transition-colors"
+              className="px-5 py-2 bg-black text-white text-sm font-medium rounded-full hover:bg-black/80 transition-colors"
             >
               Add Asset
             </button>
             <button
               onClick={() => navigate('/main')}
-              className="px-5 py-2 border border-neutral-200 text-sm font-medium rounded-sm hover:bg-neutral-50 transition-colors"
+              className="px-5 py-2 border border-neutral-200 text-sm font-medium rounded-full hover:bg-neutral-50 transition-colors"
             >
               Browse Content
             </button>
@@ -301,7 +301,7 @@ export default function WatchingTab() {
               <button
                 onClick={handleAdd}
                 disabled={!newTicker.trim()}
-                className="w-full py-2.5 bg-black text-white text-sm font-medium rounded-sm hover:bg-black/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="w-full py-2.5 bg-black text-white text-sm font-medium rounded-full hover:bg-black/80 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Add to Watching
               </button>

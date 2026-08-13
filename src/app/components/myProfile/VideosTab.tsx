@@ -94,14 +94,14 @@ export default function VideosTab({ videos, setVideos, refreshVideos }: VideosTa
                   <button
                     onClick={() => handleConfirmDeleteVideo(video.id)}
                     disabled={deletingVideoId === video.id}
-                    className="px-4 py-1.5 bg-red-600 text-white text-xs font-medium rounded-sm hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-1.5 bg-red-600 text-white text-xs font-medium rounded-full hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {deletingVideoId === video.id ? 'Deleting…' : 'Delete'}
                   </button>
                   <button
                     onClick={() => setDeleteVideoId(null)}
                     disabled={deletingVideoId === video.id}
-                    className="px-4 py-1.5 border border-neutral-300 text-xs font-medium rounded-sm hover:bg-neutral-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-1.5 border border-neutral-300 text-xs font-medium rounded-full hover:bg-neutral-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Cancel
                   </button>

@@ -177,7 +177,7 @@ export default function ComplianceReviewModal({
           <div className="flex gap-3 pt-1">
             <button
               onClick={onCancel}
-              className="flex-1 py-3 border border-neutral-200 rounded-sm text-sm font-medium hover:bg-neutral-50 transition-colors"
+              className="flex-1 py-3 border border-neutral-200 rounded-full text-sm font-medium hover:bg-neutral-50 transition-colors"
             >
               {isBlocked ? 'Edit Content' : 'Go Back'}
             </button>
@@ -185,7 +185,7 @@ export default function ComplianceReviewModal({
               <button
                 onClick={() => onApprove([...accepted])}
                 disabled={!canPublish}
-                className="flex-1 py-3 bg-black text-white rounded-sm text-sm font-bold hover:bg-black/80 transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed"
+                className="flex-1 py-3 bg-black text-white rounded-full text-sm font-bold hover:bg-black/80 transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed"
               >
                 Confirm & Publish
               </button>

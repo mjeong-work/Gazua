@@ -100,7 +100,7 @@ export default function PostsTab({ posts, setPosts, displayName, displayHandle, 
                 <p className="text-sm font-medium text-red-700 text-center">Delete this post?</p>
                 <div className="flex items-center gap-2">
                   <button onClick={() => handleConfirmDeletePost(post.id)} className="px-4 py-1.5 bg-red-600 text-white text-xs font-medium rounded-sm hover:bg-red-700 transition-colors">Delete</button>
-                  <button onClick={() => setDeletePostId(null)} className="px-4 py-1.5 border border-neutral-300 text-xs font-medium rounded-sm hover:bg-neutral-50 transition-colors">Cancel</button>
+                  <button onClick={() => setDeletePostId(null)} className="px-4 py-1.5 border border-neutral-300 text-xs font-medium rounded-full hover:bg-neutral-50 transition-colors">Cancel</button>
                 </div>
               </div>
             ) : (
@@ -129,7 +129,7 @@ export default function PostsTab({ posts, setPosts, displayName, displayHandle, 
                   {post.draft ? (
                     <div className="flex items-center gap-2">
                       <button onClick={() => handlePublishDraft(post.id)} className="text-xs font-medium px-3 py-1.5 bg-black text-white rounded-sm hover:bg-black/80 transition-colors">Publish</button>
-                      <button onClick={() => handleOpenEditPost(post)} className="text-xs font-medium px-3 py-1.5 border border-neutral-200 rounded-sm hover:bg-neutral-50 transition-colors">Edit</button>
+                      <button onClick={() => handleOpenEditPost(post)} className="text-xs font-medium px-3 py-1.5 border border-neutral-200 rounded-full hover:bg-neutral-50 transition-colors">Edit</button>
                     </div>
                   ) : (
                     <div className="flex items-center gap-4 text-xs text-neutral-400">
@@ -195,7 +195,7 @@ export default function PostsTab({ posts, setPosts, displayName, displayHandle, 
                   <button
                     key={t}
                     onClick={() => setComposerTag(t)}
-                    className={`px-3 py-1 rounded-sm text-xs font-medium transition-colors ${composerTag === t ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'}`}
+                    className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${composerTag === t ? 'bg-black text-white' : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'}`}
                   >
                     {t}
                   </button>
@@ -207,7 +207,7 @@ export default function PostsTab({ posts, setPosts, displayName, displayHandle, 
               <span className="text-xs text-neutral-400">{composerContent.length} / 500</span>
               <div className="flex items-center gap-2">
                 <button onClick={() => { setShowPostComposer(false); setEditingPostId(null); }} className="px-5 py-2 border border-neutral-200 text-sm font-medium rounded-sm hover:bg-neutral-50 transition-colors">Cancel</button>
-                <button onClick={handleSavePost} disabled={!composerContent.trim()} className="px-5 py-2 bg-black text-white text-sm font-medium rounded-sm hover:bg-black/80 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                <button onClick={handleSavePost} disabled={!composerContent.trim()} className="px-5 py-2 bg-black text-white text-sm font-medium rounded-full hover:bg-black/80 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
                   {editingPostId ? 'Save' : 'Publish'}
                 </button>
               </div>

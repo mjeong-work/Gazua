@@ -139,7 +139,7 @@ export default function WatchlistPage() {
                 <h2 className="text-2xl font-bold">Your Watchlist ({watchlistItems.length})</h2>
                 <button
                   onClick={() => setShowAddModal(true)}
-                  className="px-4 py-2 bg-black text-white rounded-sm text-sm font-medium hover:bg-black/80 transition-colors flex items-center gap-2"
+                  className="px-4 py-2 bg-black text-white rounded-full text-sm font-medium hover:bg-black/80 transition-colors flex items-center gap-2"
                 >
                   <AddIcon sx={{ fontSize: 18 }} />
                   Add Asset
@@ -203,7 +203,7 @@ export default function WatchlistPage() {
 
                     <button
                       onClick={(e) => { e.stopPropagation(); setSelectedItem(item); }}
-                      className="w-full py-2 border border-neutral-200 rounded-sm text-sm font-medium hover:bg-neutral-50 transition-colors"
+                      className="w-full py-2 border border-neutral-200 rounded-full text-sm font-medium hover:bg-neutral-50 transition-colors"
                     >
                       View Thesis
                     </button>
@@ -218,7 +218,7 @@ export default function WatchlistPage() {
               <p className="text-neutral-600 mb-8 max-w-md">Save investing ideas from posts, reels, and models to track your thesis and build conviction over time.</p>
               <div className="flex items-center gap-3">
                 <button onClick={() => navigate('/main')} className="px-6 py-3 bg-black text-white rounded-sm hover:bg-black/90 transition-colors">Explore Content</button>
-                <button onClick={() => setShowAddModal(true)} className="px-6 py-3 border-2 border-neutral-200 rounded-sm hover:border-neutral-300 hover:bg-neutral-50 transition-colors">Add Asset</button>
+                <button onClick={() => setShowAddModal(true)} className="px-6 py-3 border-2 border-neutral-200 rounded-full hover:border-neutral-300 hover:bg-neutral-50 transition-colors">Add Asset</button>
               </div>
             </div>
           )}
@@ -365,13 +365,13 @@ export default function WatchlistPage() {
               <div className="flex items-center gap-3 pt-4">
                 <button
                   onClick={() => { setEditThesisText(selectedItem.thesis); setEditingThesis(true); }}
-                  className="flex-1 py-3 bg-black text-white rounded-sm font-medium hover:bg-black/80 transition-colors"
+                  className="flex-1 py-3 bg-black text-white rounded-full font-medium hover:bg-black/80 transition-colors"
                 >
                   Edit Thesis
                 </button>
                 <button
                   onClick={() => handleRemove(selectedItem.id)}
-                  className="px-6 py-3 border-2 border-red-200 text-red-600 rounded-sm font-medium hover:bg-red-50 transition-colors"
+                  className="px-6 py-3 border-2 border-red-200 text-red-600 rounded-full font-medium hover:bg-red-50 transition-colors"
                 >
                   Remove
                 </button>
@@ -402,7 +402,7 @@ export default function WatchlistPage() {
               <button onClick={handleSaveThesis} className="flex-1 py-3 bg-black text-white rounded-sm font-medium hover:bg-black/80 transition-colors">
                 Save Thesis
               </button>
-              <button onClick={() => setEditingThesis(false)} className="flex-1 py-3 border-2 border-neutral-200 rounded-sm font-medium hover:bg-neutral-50 transition-colors">
+              <button onClick={() => setEditingThesis(false)} className="flex-1 py-3 border-2 border-neutral-200 rounded-full font-medium hover:bg-neutral-50 transition-colors">
                 Cancel
               </button>
             </div>
@@ -458,7 +458,7 @@ export default function WatchlistPage() {
               <button
                 onClick={handleAddAsset}
                 disabled={!newTicker.trim()}
-                className="w-full py-3 bg-black text-white rounded-sm font-medium hover:bg-black/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 bg-black text-white rounded-full font-medium hover:bg-black/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Add to Watchlist
               </button>
