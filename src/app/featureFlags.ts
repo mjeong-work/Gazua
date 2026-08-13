@@ -12,6 +12,14 @@ export const SUBSCRIBE_ENABLED = false;
 export const ACTUAL_PORTFOLIO_ENABLED = false;
 
 /**
+ * Finance Models (upload/download Excel templates, Python scripts, calculators) — the whole
+ * /models surface (ModelHubPage) plus the "Finance Model" option on /create. Intentionally out
+ * of MVP scope, not a wiring gap — the feature itself (upload, download, browse) is fully built,
+ * just not part of this launch. Route redirects to /main and the Create tile is hidden while off.
+ */
+export const MODELS_ENABLED = false;
+
+/**
  * Real Stripe checkout for paid tiers (PricingPage's "Start Free Trial"/"Start Creating").
  * Disabled during closed beta — the checkout Edge Function creates a real Stripe Checkout
  * session against whatever price is configured server-side (STRIPE_PRICE_ID_ANALYST /

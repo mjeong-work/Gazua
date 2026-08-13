@@ -26,6 +26,7 @@ import { MessagesProvider } from './contexts/MessagesContext';
 import AuthGuard from './components/AuthGuard';
 import { useAuth } from './contexts/AuthContext';
 import AdminGuard from './components/admin/AdminGuard';
+import { MODELS_ENABLED } from './featureFlags';
 
 // Route-level code splitting (audit Issue 10) — every page previously imported eagerly here,
 // so App.tsx alone pulled the entire app (every onboarding step, the whole admin section, every
@@ -115,7 +116,7 @@ export default function App() {
                   <Route path="/main"                  element={<MainPagePosting />} />
                   <Route path="/home"                  element={<MainPagePosting />} />
                   <Route path="/main/reels"            element={<MainPageReels />} />
-                  <Route path="/models"                element={<ModelHubPage />} />
+                  <Route path="/models"                element={MODELS_ENABLED ? <ModelHubPage /> : <Navigate to="/main" replace />} />
                   <Route path="/creators"              element={<CreatorsPage />} />
                   <Route path="/watchlist"             element={<WatchlistRedirect />} />
                   <Route path="/insights"              element={<InvestmentProfilePage />} />

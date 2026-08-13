@@ -11,13 +11,7 @@ import { CHART_TOOLTIP_STYLE, chartCurrencyFormatter, hideChartLabel } from '../
 import { useCreatorProfileData } from '../hooks/useCreatorProfileData';
 import { parseAllocation } from '../utils/creator';
 import { ACTUAL_PORTFOLIO_ENABLED } from '../featureFlags';
-import type { Simulation } from '../data/simulations';
-import { MOCK_SIMULATIONS, filterChartData } from '../data/simulations';
-import SimulationSetupCard from './SimulationSetupCard';
-import PerformanceSummaryCards from './PerformanceSummaryCards';
-import PerformanceTrendChart from './PerformanceTrendChart';
-import PastSimulationsList from './PastSimulationsList';
-import SimulationInsights from './SimulationInsights';
+import SimulationsPanel from './shared/SimulationsPanel';
 
 // Same 4-color default palette the hardcoded allocation used, extended for portfolios with
 // more than 4 real slices.
@@ -40,9 +34,7 @@ export default function CreatorProfileInvestment() {
 
   // ── Investment tab ─────────────────────────────────────────────────
   const [simulatorMode, setSimulatorMode] = useState(true);
-  const [simulationExpanded, setSimulationExpanded] = useState(false);
   const [timeRange, setTimeRange] = useState<'1W' | '1M' | '3M' | '1Y' | 'ALL'>('1M');
-  const [selectedSimulation, setSelectedSimulation] = useState<Simulation>(MOCK_SIMULATIONS[0]);
 
   const portfolioData = useMemo(() => {
     const points = { '1W': 7, '1M': 30, '3M': 90, '1Y': 252, 'ALL': 400 }[timeRange];
@@ -53,16 +45,6 @@ export default function CreatorProfileInvestment() {
       return { time: `t${i}`, value: Math.max(val, base * 0.85) };
     });
   }, [timeRange]);
-
-  const simulationChartData = useMemo(
-    () => filterChartData(selectedSimulation.chartData, timeRange),
-    [selectedSimulation, timeRange],
-  );
-
-  const handleSelectSimulation = (simulation: Simulation) => {
-    setSelectedSimulation(simulation);
-    setSimulationExpanded(false);
-  };
 
   // Reads the real profiles.portfolio_allocation Json column via the shared parseAllocation
   // helper (also used by My Profile's About/Investment tabs), colors assigned by the frontend.
@@ -178,35 +160,10 @@ export default function CreatorProfileInvestment() {
             </div>
 
             {simulatorMode ? (
-              // Simulator View — meta strip + compare card in a left rail beside the (enlarged
-              // on md:+) chart, same split as myProfile/InvestmentTab.tsx's simulator.
-              <div className="space-y-4">
-                <div className="flex flex-col gap-4 md:flex-row md:items-start md:gap-6">
-                  <div className="md:w-[42%] md:flex-shrink-0 space-y-4">
-                    <SimulationSetupCard
-                      simulation={selectedSimulation}
-                      expanded={simulationExpanded}
-                      onToggle={() => setSimulationExpanded(v => !v)}
-                    />
-                    <PerformanceSummaryCards simulation={selectedSimulation} />
-                  </div>
-                  <div className="flex-1">
-                    <PerformanceTrendChart
-                      chartData={simulationChartData}
-                      timeRange={timeRange}
-                      onTimeRangeChange={setTimeRange}
-                    />
-                  </div>
-                </div>
-
-                <PastSimulationsList
-                  simulations={MOCK_SIMULATIONS}
-                  selectedId={selectedSimulation.id}
-                  onSelect={handleSelectSimulation}
-                />
-
-                <SimulationInsights insights={selectedSimulation.insights} />
-              </div>
+              // Read-only view of this creator's real simulations — same component and same
+              // `simulations` table row myProfile/InvestmentTab.tsx writes to, just editable=false
+              // here since this is someone else's public profile.
+              <SimulationsPanel userId={dbProfile?.id ?? null} editable={false} />
             ) : (
               // Real Portfolio View
               <div className="space-y-4">

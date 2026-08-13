@@ -4,7 +4,7 @@
 
 This project had no `tsconfig.json` before this branch (see the commit
 adding `tsconfig.json` + `src/vite-env.d.ts`), so `tsc --noEmit` had never
-been run against this codebase. Running it now surfaces 44 pre-existing
+been run against this codebase. Running it now surfaces 45 pre-existing
 errors, none of which are regressions from this branch's work — 2 real
 regressions it did surface (`MockCreator` missing `credibilityLevel`) were
 already fixed separately. The 44 below are intentionally **not fixed** here;
@@ -12,7 +12,7 @@ categorized so a future session can pick a category and knock it out.
 
 Re-run to reproduce: `npm exec --yes --package typescript -- tsc --noEmit -p .`
 
-### A. Supabase `.insert()/.update()/.rpc()` generic inference problem — 38 errors
+### A. Supabase `.insert()/.update()/.rpc()` generic inference problem — 39 errors
 
 The Supabase JS client isn't resolving its generics against this project's
 hand-written `Database` type (`src/types/database.ts`) the way it should —
@@ -30,7 +30,8 @@ inference.
   - `src/lib/services/adminContent.service.ts`
   - `src/lib/services/models.service.ts`
   - `src/lib/services/posts.service.ts`
-- **A2. `.insert()/.update()` payload, or a joined-select read result, typed as `never`/`never[]` — 33 of the 38**
+- **A2. `.insert()/.update()` payload, or a joined-select read result, typed as `never`/`never[]` — 34 of the 39**
+  - `src/lib/services/simulations.service.ts` (new — same pre-existing generics issue, not a regression)
   - `src/lib/services/follows.service.ts` (5 occurrences)
   - `src/lib/services/watchlist.service.ts` (4 occurrences)
   - `src/lib/services/reels.service.ts` (4 occurrences)

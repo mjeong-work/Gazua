@@ -623,8 +623,10 @@ export default function CreatorsPage() {
   };
 
   const handleContentClick = (item: ContentItem) => {
+    // 'model' was never actually produced by featuredContent/displayedContent/mobileReelsItems
+    // below (no ContentItem here is ever built with type: 'model') — dropped rather than kept
+    // as a dead branch pointing at a route that's now behind MODELS_ENABLED anyway.
     if (item.type === 'reel') setPlayingReelIndex(reelItems.findIndex(i => i.id === item.id));
-    else if (item.type === 'model') navigate('/models');
     else navigate('/main');
   };
 

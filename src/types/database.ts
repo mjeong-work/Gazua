@@ -499,6 +499,46 @@ export interface Database {
         }
       }
 
+      // ── simulations ───────────────────────────────────────────
+      simulations: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          start_date: string
+          end_date: string | null
+          capital: number
+          holdings: Json
+          rationale: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          start_date?: string
+          end_date?: string | null
+          capital: number
+          holdings?: Json
+          rationale?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          start_date?: string
+          end_date?: string | null
+          capital?: number
+          holdings?: Json
+          rationale?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+
       // ── follows ────────────────────────────────────────────────
       follows: {
         Row: {

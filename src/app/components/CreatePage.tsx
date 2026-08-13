@@ -8,6 +8,7 @@ import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import CloseIcon from '@mui/icons-material/Close';
 import CreatePostModal from './CreatePostModal';
 import CreateReelModal from './CreateReelModal';
+import { MODELS_ENABLED } from '../featureFlags';
 
 export default function CreatePage() {
   const navigate = useNavigate();
@@ -32,14 +33,16 @@ export default function CreatePage() {
       color: 'from-purple-500 to-pink-500',
       action: 'Create Reel'
     },
-    {
+    // Finance Models are out of MVP scope (see MODELS_ENABLED) — the tile is hidden rather than
+    // shown-then-"Coming Soon", since the feature itself isn't launching yet, not just unwired.
+    ...(MODELS_ENABLED ? [{
       id: 'model',
       title: 'Finance Model',
       description: 'Upload Excel templates, Python scripts, or investment calculators',
       icon: <InsertChartIcon sx={{ fontSize: 48 }} />,
       color: 'from-green-500 to-emerald-500',
       action: 'Upload Model'
-    },
+    }] : []),
     {
       id: 'idea',
       title: 'Market Idea',

@@ -294,6 +294,27 @@ export async function getWatchlistPrices(tickers: string[]): Promise<Map<string,
   return map
 }
 
+// ── getCurrentPrices ─────────────────────────────────────────────────────
+/**
+ * Raw numeric current price per ticker (unlike getWatchlistPrices' formatted display string) —
+ * for callers doing their own math with the value, e.g. the Portfolio Simulator computing
+ * entry-price-at-creation and actual-return-since-creation. Omits any ticker whose quote isn't
+ * available (no API key configured, or the fetch failed) rather than guessing.
+ */
+export async function getCurrentPrices(tickers: string[]): Promise<Map<string, number>> {
+  const map = new Map<string, number>()
+  if (!API_KEY || !tickers.length) return map
+
+  await Promise.allSettled(
+    [...new Set(tickers)].map(async ticker => {
+      const snap = await fetchSnapshot(ticker)
+      if (!snap) return
+      map.set(ticker, snap.price)
+    }),
+  )
+  return map
+}
+
 // ── Public: stock universe search + metadata ───────────────────────────────────
 //
 // Backed by Polygon's /v3/reference/tickers, which covers the full active US stock/ETF
