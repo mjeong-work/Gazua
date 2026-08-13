@@ -156,7 +156,7 @@ export default function CommentPanel({
         onDragEnd={handleDragEnd}
         animate={{ y: show ? 0 : '100%' }}
         transition={{ type: 'spring', damping: 32, stiffness: 300 }}
-        className="absolute inset-x-0 bottom-0 h-[75vh] bg-white rounded-t-md shadow-2xl flex flex-col touch-none"
+        className="absolute inset-x-0 bottom-0 h-[75vh] bg-white rounded-t-md shadow-2xl flex flex-col touch-none lg:mx-auto lg:bottom-6 lg:w-[440px] lg:max-w-[92vw] lg:h-[70vh] lg:rounded-md"
         onClick={e => e.stopPropagation()}
       >
         {/* Drag handle */}
