@@ -222,7 +222,7 @@ export default function SearchModal({ onClose }: SearchModalProps) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search Input */}
-        <div className="p-4 border-b border-neutral-200 flex items-center gap-3">
+        <div className="p-4 border-b border-neutral-200 flex items-center gap-2">
           <SearchIcon sx={{ fontSize: 24, color: 'var(--icon-muted)' }} />
           <input
             type="text"
@@ -249,7 +249,7 @@ export default function SearchModal({ onClose }: SearchModalProps) {
                 <button
                   key={index}
                   onClick={() => handleResultClick(result)}
-                  className="w-full p-3 flex items-center gap-3 hover:bg-neutral-50 rounded-md transition-colors text-left"
+                  className="w-full p-3 flex items-center gap-2 hover:bg-neutral-50 rounded-md transition-colors text-left"
                 >
                   {result.kind === 'creator' ? (
                     <>

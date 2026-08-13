@@ -773,7 +773,7 @@ export default function MainPagePosting() {
                       <div className="space-y-4">
                         {[1, 2, 3].map(n => (
                           <div key={n} className="bg-white border border-neutral-200 rounded-md p-5 animate-pulse">
-                            <div className="flex items-start gap-3 mb-3">
+                            <div className="flex items-start gap-2 mb-3">
                               <div className="w-10 h-10 rounded-full bg-neutral-200 flex-shrink-0" />
                               <div className="flex-1 space-y-2">
                                 <div className="h-3 bg-neutral-200 rounded w-1/3" />
@@ -840,7 +840,7 @@ export default function MainPagePosting() {
                       const algoLabel = derivePostLabel(post.likes, post.shares, post.verified, post.category);
                       return (
                         <div key={post.id} className="bg-white border border-neutral-200 rounded-md p-5 hover:border-neutral-300 transition-colors">
-                          <div className="flex items-start gap-3 mb-3">
+                          <div className="flex items-start gap-2 mb-3">
                             <button
                               onClick={() => navigate(`/profile/${post.creator_id}/investment`)}
                               className="w-10 h-10 rounded-full bg-neutral-200 flex items-center justify-center text-xl hover:opacity-80"
@@ -884,10 +884,10 @@ export default function MainPagePosting() {
                             </button>
                           )}
 
-                          <div className="flex items-center gap-6 text-neutral-500">
+                          <div className="flex items-center gap-2 text-neutral-500">
                             <button
                               onClick={() => toggleLike(post)}
-                              className={`flex items-center gap-2 transition-colors ${isLiked ? 'text-red-500' : 'hover:text-red-500'}`}
+                              className={`flex items-center gap-1.5 transition-colors ${isLiked ? 'text-red-500' : 'hover:text-red-500'}`}
                             >
                               {isLiked
                                 ? <FavoriteIcon sx={{ fontSize: 20 }} />
@@ -908,7 +908,7 @@ export default function MainPagePosting() {
                                   setExpandedCommentPostId(prev => prev === likeKey ? null : likeKey);
                                 }
                               }}
-                              className={`flex items-center gap-2 transition-colors ${expandedCommentPostId === likeKey ? 'text-blue-500' : 'hover:text-blue-500'}`}
+                              className={`flex items-center gap-1.5 transition-colors ${expandedCommentPostId === likeKey ? 'text-blue-500' : 'hover:text-blue-500'}`}
                             >
                               <ChatBubbleOutlineIcon sx={{ fontSize: 20 }} />
                               <span className="text-xs">
@@ -917,7 +917,7 @@ export default function MainPagePosting() {
                             </button>
                             <button
                               onClick={() => handleShare(post)}
-                              className="flex items-center gap-2 hover:text-green-500 transition-colors"
+                              className="flex items-center gap-1.5 hover:text-green-500 transition-colors"
                             >
                               <ShareIcon sx={{ fontSize: 20 }} />
                               <span className="text-xs">{shareCounts[getLikeKey(post)] ?? post.shares}</span>

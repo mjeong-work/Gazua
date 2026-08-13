@@ -58,7 +58,7 @@ export default function CreatorProfileHeader({
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 mb-6 sm:mb-8">
+      <div className="flex flex-col sm:flex-row items-start gap-2 sm:gap-3 mb-6 sm:mb-8">
         <div className="w-20 h-20 sm:w-32 sm:h-32 rounded-full bg-neutral-100 border border-neutral-200 flex items-center justify-center text-4xl sm:text-5xl flex-shrink-0">
           {creator.avatar}
         </div>
@@ -72,7 +72,7 @@ export default function CreatorProfileHeader({
                 )}
               </div>
               <p className="text-neutral-600 mb-3">{creator.handle}</p>
-              <div className="flex items-center flex-wrap gap-3 sm:gap-6 text-sm mb-4">
+              <div className="flex items-center flex-wrap gap-2 sm:gap-3 text-sm mb-4">
                 <div>
                   <span className="font-bold text-lg">
                     {followerCount !== null ? followerCount.toLocaleString() : creator.followers}
@@ -127,7 +127,7 @@ export default function CreatorProfileHeader({
             {creator.bio || <span className="text-neutral-400 italic">This creator hasn't added a bio yet.</span>}
           </p>
 
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               onClick={handleFollowToggle}
               variant="pill"

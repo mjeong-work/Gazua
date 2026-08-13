@@ -866,7 +866,7 @@ export default function CreatorsPage() {
               </p>
 
               {/* Filter Tabs */}
-              <div className="flex items-center justify-center gap-3">
+              <div className="flex items-center justify-center gap-2">
                 {DESKTOP_FILTERS.map((filter) => (
                   <button
                     key={filter}

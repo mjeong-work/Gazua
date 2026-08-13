@@ -177,7 +177,7 @@ export default function CreatePostModal({ onClose, onSuccess }: CreatePostModalP
           {/* Identity row — who's posting + category, standing in for LinkedIn's avatar/name
               + audience-selector row (this app has no post-visibility concept, so category
               fills that "context for this post" slot instead of a fake control). */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <div className="w-11 h-11 rounded-full bg-neutral-200 flex-shrink-0 flex items-center justify-center text-sm font-semibold text-neutral-600 overflow-hidden">
               {profile?.avatar_url
                 ? <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
