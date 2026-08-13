@@ -62,6 +62,39 @@ export default function CreatorProfileHeader({
 
   const focusAreas = dbProfile?.tags?.length ? dbProfile.tags : creator.focus ? [creator.focus] : [];
 
+  // Rendered twice — inline next to the name on mobile, top-right of the right column on
+  // desktop (see the render site for why: crammed into the 320px left rail alongside a 96px
+  // avatar, it left the name only ~90px to work with, which is why "David Kim" was rendering
+  // as "Da…" even though the name isn't unusually long).
+  const renderActionIcons = () => (
+    <>
+      <button
+        disabled
+        className="icon-tap-target p-2 rounded-full opacity-40 cursor-not-allowed"
+        title="Notification preferences aren't available during beta"
+      >
+        <NotificationsIcon sx={{ fontSize: 18 }} />
+      </button>
+      <button onClick={handleShare} className="icon-tap-target p-2 hover:bg-neutral-100 rounded-full transition-colors" title="Share profile">
+        <ShareIcon sx={{ fontSize: 18 }} />
+      </button>
+      <div className="relative">
+        <button onClick={() => setShowMoreMenu(v => !v)} className="icon-tap-target p-2 hover:bg-neutral-100 rounded-full transition-colors">
+          <MoreHorizIcon sx={{ fontSize: 18 }} />
+        </button>
+        {showMoreMenu && dbProfile && (
+          <div className="absolute right-0 top-full mt-1 bg-white border border-neutral-200 rounded-md shadow-lg py-2 w-44 z-10" onMouseLeave={() => setShowMoreMenu(false)}>
+            <ReportButton
+              contentType="creator_profile"
+              contentId={dbProfile.id}
+              label="Report creator"
+            />
+          </div>
+        )}
+      </div>
+    </>
+  );
+
   // Rendered twice — mobile (end of stack) and desktop (top of the left rail) — same reasoning
   // as MyProfilePage's renderProfileActionButtons: the *position* genuinely differs by
   // breakpoint, not just the styling.
@@ -97,7 +130,7 @@ export default function CreatorProfileHeader({
     <>
       {/* Same mobile-stack / desktop-left-rail+right-column pattern as MyProfilePage's header
           (see MyProfilePage.tsx for the full rationale on why the action buttons render twice). */}
-      <div className="flex flex-col gap-3 md:flex-row md:gap-10 md:items-start mb-6 md:mb-8">
+      <div className="flex flex-col gap-3 md:flex-row md:gap-8 md:items-start mb-6 md:mb-8">
         {/* Left rail (desktop) / top block (mobile) */}
         <div className="md:w-80 md:flex-shrink-0 space-y-3">
           <div className="flex items-center gap-3">
@@ -108,7 +141,10 @@ export default function CreatorProfileHeader({
               verified={creator.verified}
               className="w-16 h-16 text-3xl md:w-24 md:h-24 md:text-5xl"
             />
-            <div className="flex-1 min-w-0">
+            {/* max-width, not a fixed width — lets the name use up to ~200px before truncating,
+                instead of whatever sliver was left over after the icon group ate most of the
+                320px rail. min-w-0 is what actually lets it shrink inside the flex row at all. */}
+            <div className="min-w-0 max-w-[200px]">
               <div className="flex items-center gap-1.5">
                 <h1 className="text-lg md:text-2xl font-bold truncate">{creator.name}</h1>
                 {creator.verified && (
@@ -121,32 +157,13 @@ export default function CreatorProfileHeader({
               <p className="text-neutral-500 text-xs md:text-sm truncate">{creator.handle}</p>
             </div>
 
-            {/* Action icons */}
-            <div className="flex items-center gap-1 flex-shrink-0 self-start">
-              <button
-                disabled
-                className="icon-tap-target p-2 rounded-full opacity-40 cursor-not-allowed"
-                title="Notification preferences aren't available during beta"
-              >
-                <NotificationsIcon sx={{ fontSize: 18 }} />
-              </button>
-              <button onClick={handleShare} className="icon-tap-target p-2 hover:bg-neutral-100 rounded-full transition-colors" title="Share profile">
-                <ShareIcon sx={{ fontSize: 18 }} />
-              </button>
-              <div className="relative">
-                <button onClick={() => setShowMoreMenu(v => !v)} className="icon-tap-target p-2 hover:bg-neutral-100 rounded-full transition-colors">
-                  <MoreHorizIcon sx={{ fontSize: 18 }} />
-                </button>
-                {showMoreMenu && dbProfile && (
-                  <div className="absolute right-0 top-full mt-1 bg-white border border-neutral-200 rounded-md shadow-lg py-2 w-44 z-10" onMouseLeave={() => setShowMoreMenu(false)}>
-                    <ReportButton
-                      contentType="creator_profile"
-                      contentId={dbProfile.id}
-                      label="Report creator"
-                    />
-                  </div>
-                )}
-              </div>
+            {/* Action icons — mobile position, inline next to the name. ml-auto (not a flex-1
+                name column) pushes them to the row's right edge regardless of how much of the
+                name's max-width is actually used. Hidden on md:+ — see the right column for the
+                desktop position, now off in its own row instead of competing with the name for
+                space in the 320px rail. */}
+            <div className="flex md:hidden items-center gap-1 flex-shrink-0 self-start ml-auto">
+              {renderActionIcons()}
             </div>
           </div>
 
@@ -165,8 +182,14 @@ export default function CreatorProfileHeader({
           </div>
         </div>
 
-        {/* Right column (desktop) / rest of the stack (mobile) */}
-        <div className="flex-1 min-w-0 space-y-3 md:space-y-4">
+        {/* Right column (desktop) / rest of the stack (mobile). A thin 1px divider — not a big
+            empty gap — is what actually marks the column boundary now. */}
+        <div className="flex-1 min-w-0 space-y-3 md:space-y-4 md:border-l md:border-neutral-200 md:pl-8">
+          {/* Action icons — desktop position, top-right of the right column */}
+          <div className="hidden md:flex items-center justify-end gap-1 -mt-1">
+            {renderActionIcons()}
+          </div>
+
           <AllocationBar raw={dbProfile?.portfolio_allocation} />
 
           <p className="text-sm leading-relaxed max-w-2xl">
