@@ -193,6 +193,27 @@ export default function MainPageReels() {
     );
   }, [dbReels, ticker]);
 
+  // Deep-link from a notification ("X shared a new reel about $TICKER") — ?reel=<db_id> jumps
+  // the scroll-snap feed straight to that reel. No-ops silently if the reel isn't in the
+  // current filtered view (e.g. a ticker filter is active) — the notification is still
+  // "correct", it just isn't reachable from this exact feed view.
+  const deepLinkReelId = searchParams.get('reel');
+  useEffect(() => {
+    if (!deepLinkReelId) return;
+    const list = activeTab === 'following' ? (followingReels ?? []) : filteredReels;
+    const index = list.findIndex(r => r.db_id === deepLinkReelId);
+    if (index === -1) return;
+
+    setActiveIndex(index);
+    const el = scrollRef.current;
+    if (el) el.scrollTo({ top: index * el.clientHeight, behavior: 'instant' as ScrollBehavior });
+
+    const next = new URLSearchParams(searchParams);
+    next.delete('reel');
+    setSearchParams(next, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deepLinkReelId, filteredReels, followingReels, activeTab]);
+
   const triggerToast = (message: string, subtitle = '') => {
     setToastMessage(message);
     setToastSubtitle(subtitle);

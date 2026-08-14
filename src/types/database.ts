@@ -35,7 +35,9 @@ export type WatchlistStatus = 'Watching' | 'Building Thesis' | 'Ready to Act' | 
 export type InterestLevel = 'Low' | 'Medium' | 'High'
 export type TimeHorizon = 'Short-term' | 'Medium-term' | 'Long-term'
 export type WatchlistSourceType = 'post' | 'reel' | 'model' | 'manual'
-export type NotificationType = 'creator_post' | 'price_alert' | 'model_update' | 'system'
+export type NotificationType = 'creator_post' | 'watchlist_post' | 'comment' | 'price_alert' | 'model_update' | 'system'
+/** What entity_id points at, when set — used to build the click-through route. */
+export type NotificationEntityType = 'post' | 'reel' | 'video' | 'asset'
 export type ModelDifficulty = 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert'
 export type ModelFileType = 'Excel' | 'Google Sheet' | 'Python' | 'Notebook' | 'PDF'
 export type ModelCategory =
@@ -567,6 +569,12 @@ export interface Database {
           title: string
           message: string | null
           read: boolean
+          // What this notification is about, for click-through — set by the DB triggers that
+          // insert notifications (notify_followers_of_new_content / notify_on_comment).
+          // Null for 'system' notifications, which have nothing to link to.
+          entity_type: NotificationEntityType | null
+          entity_id: string | null
+          entity_ticker: string | null
           created_at: string
         }
         Insert: {
@@ -576,6 +584,9 @@ export interface Database {
           title: string
           message?: string | null
           read?: boolean
+          entity_type?: NotificationEntityType | null
+          entity_id?: string | null
+          entity_ticker?: string | null
           created_at?: string
         }
         Update: {
@@ -585,6 +596,9 @@ export interface Database {
           title?: string
           message?: string | null
           read?: boolean
+          entity_type?: NotificationEntityType | null
+          entity_id?: string | null
+          entity_ticker?: string | null
           created_at?: string
         }
       }

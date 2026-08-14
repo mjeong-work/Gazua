@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import ArticleIcon from '@mui/icons-material/Article';
 import CampaignIcon from '@mui/icons-material/Campaign';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
 import AppHeader from './AppHeader';
 import { useAuth } from '../contexts/AuthContext';
 import { getNotifications, markAsRead, markAllAsRead } from '../../lib/services/notifications.service';
@@ -24,13 +27,30 @@ function formatRelativeTime(iso: string): string {
 function typeIcon(type: NotificationType) {
   switch (type) {
     case 'creator_post': return <ArticleIcon sx={{ fontSize: 20, color: 'var(--brand)' }} />;
+    case 'watchlist_post': return <BookmarkIcon sx={{ fontSize: 20, color: 'var(--brand)' }} />;
+    case 'comment': return <ChatBubbleOutlineIcon sx={{ fontSize: 20, color: '#2563eb' }} />;
     case 'price_alert': return <TrendingUpIcon sx={{ fontSize: 20, color: '#d97706' }} />;
     case 'model_update': return <CampaignIcon sx={{ fontSize: 20, color: '#2563eb' }} />;
     default: return <NotificationsIcon sx={{ fontSize: 20, color: '#6b7280' }} />;
   }
 }
 
+/** Where clicking a notification should go — null (no navigation, just marks read) when
+ * there's nothing to link to (a 'system' notification, or a legacy row from before
+ * entity_type/entity_id existed). */
+function buildRoute(n: Notification): string | null {
+  if (!n.entity_type || !n.entity_id) return null;
+  switch (n.entity_type) {
+    case 'post': return `/main?post=${n.entity_id}`;
+    case 'reel': return `/main/reels?reel=${n.entity_id}`;
+    case 'video': return `/watch/${n.entity_id}`;
+    case 'asset': return n.entity_ticker ? `/asset/${n.entity_ticker}` : null;
+    default: return null;
+  }
+}
+
 export default function NotificationsPage() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
@@ -51,6 +71,12 @@ export default function NotificationsPage() {
     // navigation, but not when marking read without leaving this page) — nudge it to refetch
     // rather than going stale until the next route change.
     window.dispatchEvent(new Event('gazua:notifications-read'));
+  };
+
+  const handleNotificationClick = (n: Notification) => {
+    if (!n.read) handleMarkRead(n.id);
+    const route = buildRoute(n);
+    if (route) navigate(route);
   };
 
   const handleMarkAllRead = () => {
@@ -109,7 +135,7 @@ export default function NotificationsPage() {
               {notifications.map(n => (
                 <button
                   key={n.id}
-                  onClick={() => !n.read && handleMarkRead(n.id)}
+                  onClick={() => handleNotificationClick(n)}
                   className={`w-full flex gap-3 p-4 rounded-md border text-left transition-colors ${
                     n.read ? 'border-neutral-100 bg-white' : 'border-brand/30 bg-brand/5'
                   } hover:border-neutral-300`}

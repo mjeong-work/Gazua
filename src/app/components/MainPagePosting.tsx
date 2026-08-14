@@ -500,6 +500,30 @@ export default function MainPagePosting() {
     return [...matching, ...nonMatching].slice(0, 6);
   }, [dbPosts, ticker, contentFilter, isOnboarded, onboardingData.interests]);
 
+  // Deep-link from a notification ("X commented on your post" / "new post about $TICKER") —
+  // ?post=<db_id> scrolls to that post and opens its inline comments. Runs once the matching
+  // post actually shows up in `posts` (it may still be loading, or filtered out by the current
+  // ticker/category filter, in which case this just never fires — no error state, since the
+  // notification is still "correct", the post just isn't in today's feed view).
+  const deepLinkPostId = searchParams.get('post');
+  useEffect(() => {
+    if (!deepLinkPostId) return;
+    const target = posts.find(p => p.db_id === deepLinkPostId);
+    if (!target) return;
+
+    const key = getLikeKey(target);
+    setExpandedCommentPostId(key);
+    const el = document.getElementById(`post-${key}`);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    // Drop ?post= so it doesn't re-trigger (e.g. re-collapsing after the user closes it) and
+    // doesn't linger in the URL bar past the initial landing.
+    const next = new URLSearchParams(searchParams);
+    next.delete('post');
+    setSearchParams(next, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [deepLinkPostId, posts]);
+
   const timeRanges: TimeRange[] = ['1D', '1W', '1M', '3M', '1Y', 'ALL'];
 
   const reelsPath = ticker ? `/main/reels?ticker=${ticker}` : '/main/reels';
@@ -839,7 +863,7 @@ export default function MainPagePosting() {
                       const isPostSaved = isSaved('post', post.db_id);
                       const algoLabel = derivePostLabel(post.likes, post.shares, post.verified, post.category);
                       return (
-                        <div key={post.id} className="bg-white border border-neutral-200 rounded-md p-5 hover:border-neutral-300 transition-colors">
+                        <div key={post.id} id={`post-${likeKey}`} className="bg-white border border-neutral-200 rounded-md p-5 hover:border-neutral-300 transition-colors">
                           <div className="flex items-start gap-2 mb-3">
                             <button
                               onClick={() => navigate(`/profile/${post.creator_id}/investment`)}
