@@ -33,8 +33,12 @@ export default function EditProfileModal({ onClose }: EditProfileModalProps) {
     setSavingProfile(true);
     setProfileSaveError(null);
 
+    // Collapse embedded whitespace/newlines, not just leading/trailing — a name field is a
+    // single-line input, but pasting from elsewhere (e.g. a CRLF-terminated source) can carry a
+    // literal line break into the value that .trim() alone doesn't touch (found live on a seed
+    // profile: "Alex  \r\n  Rodriguez").
     const { error } = await updateProfile(profile.id, {
-      full_name: editName.trim(),
+      full_name: editName.replace(/\s+/g, ' ').trim(),
       handle: editHandle.trim().replace(/^@/, '') || null,
       bio: editBio.trim() || null,
     });
