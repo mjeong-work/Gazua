@@ -26,6 +26,7 @@ import { MessagesProvider } from './contexts/MessagesContext';
 import AuthGuard from './components/AuthGuard';
 import { useAuth } from './contexts/AuthContext';
 import AdminGuard from './components/admin/AdminGuard';
+import ErrorBoundary from './components/ErrorBoundary';
 import { MODELS_ENABLED } from './featureFlags';
 
 // Route-level code splitting (audit Issue 10) — every page previously imported eagerly here,
@@ -78,8 +79,12 @@ function RouteFallback() {
 
 export default function App() {
   return (
-    // AuthProvider is outermost — resolves the session once for the whole tree.
-    // OnboardingProvider and WatchlistProvider consume AuthContext via useAuth().
+    // ErrorBoundary is the true outermost layer — a render-time throw anywhere below (including
+    // inside a provider) or a stale-chunk lazy-import failure after a redeploy used to
+    // white-screen the whole app with nothing catching it (audit finding).
+    <ErrorBoundary>
+    {/* AuthProvider is outermost inside that — resolves the session once for the whole tree.
+        OnboardingProvider and WatchlistProvider consume AuthContext via useAuth(). */}
     <AuthProvider>
       <OnboardingProvider>
         <WatchlistProvider>
@@ -172,5 +177,6 @@ export default function App() {
         </WatchlistProvider>
       </OnboardingProvider>
     </AuthProvider>
+    </ErrorBoundary>
   );
 }

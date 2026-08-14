@@ -1,0 +1,42 @@
+name: CI
+
+# Minimal build gate (audit finding — no CI existed at all, so a lint/type/build regression
+# only surfaced if whoever pushed happened to run these locally first). Deliberately not a full
+# test suite — there isn't one yet (separate, bigger item) — just the two checks that were
+# already being run by hand every session: typecheck and production build.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  typecheck-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck (no new errors beyond the tracked baseline)
+        # TypeScript isn't a project devDependency yet (see TODO.md) — `npm exec --yes` fetches
+        # it on the fly, same command used for local verification throughout this project.
+        # 45 pre-existing errors are tracked in TODO.md as known, non-regression debt (mostly a
+        # Supabase generics inference issue — category A). Rather than ignore tsc entirely until
+        # that backlog is cleared, fail only if the count grows past the baseline, so this still
+        # catches real regressions without blocking on debt that already has its own tracking.
+        run: |
+          COUNT=$(npm exec --yes --package typescript -- tsc --noEmit -p . 2>&1 | grep -c "error TS" || true)
+          echo "tsc error count: $COUNT (baseline: 45)"
+          if [ "$COUNT" -gt 45 ]; then
+            echo "::error::tsc error count ($COUNT) exceeds tracked baseline (45) — see TODO.md"
+            exit 1
+          fi
+
+      - name: Build
+        run: npm run build
