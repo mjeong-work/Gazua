@@ -101,10 +101,16 @@ export async function getUserActivity(
 
       followedCreatorFoci = (profiles ?? []).map(p => p.focus).filter(Boolean) as string[];
     } else {
-      // No follows yet — fall back to mock creator foci
-      followedCreatorFoci = Object.values(MOCK_CREATORS).slice(0, 5).map(c => c.focus);
+      // A real, authenticated user who genuinely doesn't follow anyone yet — [], not mock
+      // creator foci standing in for their (nonexistent) activity. Claude gets an honestly
+      // empty signal here, same as any other real-but-sparse account, rather than analyzing
+      // data that isn't theirs (audit finding — this is what "AI insights are fed by
+      // fabricated activity" meant).
+      followedCreatorFoci = [];
     }
   } else {
+    // Genuinely logged-out preview — mock is a reasonable stand-in here, since there's no
+    // "your real data" claim being made to a guest.
     followedCreatorFoci = Object.values(MOCK_CREATORS).slice(0, 5).map(c => c.focus);
   }
 
@@ -129,9 +135,12 @@ export async function getUserActivity(
         .map(([category, count]) => ({ category, count }))
         .sort((a, b) => b.count - a.count);
     } else {
-      categoryEngagement = buildMockCategoryEngagement();
+      // A real user who hasn't liked anything yet — [], not global mock-post category counts
+      // presented as if they reflected this person's engagement.
+      categoryEngagement = [];
     }
   } else {
+    // Genuinely logged-out preview — same reasoning as followedCreatorFoci above.
     categoryEngagement = buildMockCategoryEngagement();
   }
 
