@@ -31,6 +31,7 @@ import { getComments, addComment, type CommentWithAuthor } from '../../lib/servi
 import { useServiceQuery, reportServiceError } from '../hooks/useServiceQuery';
 import CommentPanel from './CommentPanel';
 import Footer from './Footer';
+import MockFallbackNotice from './shared/MockFallbackNotice';
 
 type TimeRange = '1D' | '1W' | '1M' | '3M' | '1Y' | 'ALL';
 
@@ -735,6 +736,12 @@ export default function MainPagePosting() {
 
                 return (
                   <>
+                    {/* Fetch genuinely failed (not "still loading", not "really empty") — the
+                        posts below are MOCK_POSTS, not this account's real feed. */}
+                    {!isFollowingTab && !postsLoading && dbPosts === null && (
+                      <MockFallbackNotice className="mb-4" />
+                    )}
+
                     {/* ── Following tab: no followed creators yet ────────── */}
                     {isFollowingTab && !followLoading && followedIds.size === 0 && (
                       <div className="flex flex-col items-center justify-center py-20 text-center">

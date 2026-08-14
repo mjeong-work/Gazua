@@ -477,6 +477,15 @@ export default function MainPageReels() {
                   Following
                 </button>
               </div>
+              {/* Fetch genuinely failed (not "still loading", not "really empty") — the reels
+                  below are MOCK_REELS, not this app's real content. Small dark-theme pill, not
+                  the light MockFallbackNotice used elsewhere — this sits over video, not a
+                  white page background. */}
+              {activeTab === 'reels' && !reelsLoading && dbReels === null && (
+                <div className="pointer-events-auto inline-flex items-center gap-1.5 mt-3 px-2.5 py-1 bg-amber-400/90 text-black text-[11px] font-medium rounded-full">
+                  Showing examples — live content unavailable
+                </div>
+              )}
             </div>
 
             {/* Vertical scroll container */}

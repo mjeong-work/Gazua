@@ -19,6 +19,7 @@ import { isCreatorVerified } from '../utils/creator';
 import VerifiedBadge from './VerifiedBadge';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import { searchTickers, type TickerSearchResult } from '../../lib/market.service';
+import MockFallbackNotice from './shared/MockFallbackNotice';
 
 interface SearchModalProps {
   onClose: () => void;
@@ -240,6 +241,12 @@ export default function SearchModal({ onClose }: SearchModalProps) {
             <CloseIcon sx={{ fontSize: 20 }} />
           </button>
         </div>
+
+        {/* Creator search genuinely failed (not "still loading", not "really empty") — creator
+            results below are ranked from a small hardcoded set, not this app's real profiles. */}
+        {!isSearchingCreators && dbCreators === null && (
+          <MockFallbackNotice className="mx-4 mt-3" message="Couldn't load creators — showing a few examples instead." />
+        )}
 
         {/* Results */}
         <div className="max-h-96 overflow-y-auto">
