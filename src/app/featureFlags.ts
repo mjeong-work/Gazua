@@ -20,6 +20,15 @@ export const ACTUAL_PORTFOLIO_ENABLED = false;
 export const MODELS_ENABLED = false;
 
 /**
+ * Creator analytics tab (views, watch time, engagement, revenue) on the profile page. Unlike
+ * the other flags here, this isn't "built but held back" — no view/engagement/revenue tracking
+ * exists anywhere in the schema yet, so the tab has only ever been able to show a static "coming
+ * soon" placeholder. Pulled from the tab bar entirely rather than shipped as a permanent stub
+ * (audit finding). Flip on once there's real data behind it.
+ */
+export const ANALYTICS_ENABLED = false;
+
+/**
  * Real Stripe checkout for paid tiers (PricingPage's "Start Free Trial"/"Start Creating").
  * Disabled during closed beta — the checkout Edge Function creates a real Stripe Checkout
  * session against whatever price is configured server-side (STRIPE_PRICE_ID_ANALYST /

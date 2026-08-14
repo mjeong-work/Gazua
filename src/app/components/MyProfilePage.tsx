@@ -24,8 +24,13 @@ import RiskPill from './shared/RiskPill';
 import StatRow from './shared/StatRow';
 import AllocationBar from './shared/AllocationBar';
 import { isCreatorVerified } from '../utils/creator';
+import { ANALYTICS_ENABLED } from '../featureFlags';
 
 type Tab = 'investment' | 'videos' | 'posts' | 'saved' | 'watching' | 'about' | 'analytics';
+
+// Single source of truth for tab bar + panel list — analytics is pulled out entirely while
+// ANALYTICS_ENABLED is off (no permanent "coming soon" stub; see featureFlags.ts).
+const TABS: Tab[] = ['investment', 'videos', 'posts', 'saved', 'watching', 'about', ...(ANALYTICS_ENABLED ? (['analytics'] as const) : [])];
 
 function getInitials(name: string) {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -216,7 +221,7 @@ export default function MyProfilePage() {
             {/* Tabs */}
             <div className="border-b border-neutral-200 mb-8">
               <div className="flex gap-8 overflow-x-auto no-scrollbar">
-                {(['investment', 'videos', 'posts', 'saved', 'watching', 'about', 'analytics'] as Tab[]).map((tab) => (
+                {TABS.map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setActiveTab(tab)}
@@ -233,7 +238,7 @@ export default function MyProfilePage() {
                 draft, a scroll position) that would otherwise reset the instant you switched
                 away and back, since a conditionally-rendered subtree unmounts and remounts
                 fresh. See TabPanel.tsx for why hiding it also needs more than a CSS class. */}
-            {(['investment', 'videos', 'posts', 'saved', 'watching', 'about', 'analytics'] as Tab[]).map((tab) => (
+            {TABS.map((tab) => (
               <TabPanel key={tab} active={activeTab === tab}>
                 {tab === 'investment' && <InvestmentTab />}
                 {tab === 'videos' && <VideosTab videos={videos} setVideos={setVideos} refreshVideos={refreshVideos} />}
