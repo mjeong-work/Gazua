@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import ShareIcon from '@mui/icons-material/Share';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import SubscriptionModal from '../SubscriptionModal';
@@ -26,10 +25,11 @@ interface CreatorProfileHeaderProps {
 }
 
 // Shared by CreatorProfileInvestment and CreatorProfileVideos — avatar, name/verified/handle,
-// follower-following-post counts, notification/share/more actions, bio, and the Follow/
-// Subscribe/Message action row, plus the modals and toast those actions open. Previously
-// duplicated near-verbatim in both page files (audit finding); this is the single place a
-// future header fix needs to land.
+// follower-following-post counts, share/more actions, bio, and the Follow/Subscribe/Message
+// action row, plus the modals and toast those actions open. Previously duplicated near-verbatim
+// in both page files (audit finding); this is the single place a future header fix needs to land.
+// (The notification-preferences bell that used to live here was dropped — a permanently
+// disabled button with no real preferences system behind it yet; audit finding.)
 export default function CreatorProfileHeader({
   creatorId,
   creator,
@@ -68,13 +68,6 @@ export default function CreatorProfileHeader({
   // as "Da…" even though the name isn't unusually long).
   const renderActionIcons = () => (
     <>
-      <button
-        disabled
-        className="icon-tap-target p-2 rounded-full opacity-40 cursor-not-allowed"
-        title="Notification preferences aren't available during beta"
-      >
-        <NotificationsIcon sx={{ fontSize: 18 }} />
-      </button>
       <button onClick={handleShare} className="icon-tap-target p-2 hover:bg-neutral-100 rounded-full transition-colors" title="Share profile">
         <ShareIcon sx={{ fontSize: 18 }} />
       </button>
