@@ -4,7 +4,6 @@ import ArticleIcon from '@mui/icons-material/Article';
 import AppHeader from './AppHeader';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
-import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import CloseIcon from '@mui/icons-material/Close';
 import CreatePostModal from './CreatePostModal';
 import CreateReelModal from './CreateReelModal';
@@ -43,14 +42,9 @@ export default function CreatePage() {
       color: 'from-green-500 to-emerald-500',
       action: 'Upload Model'
     }] : []),
-    {
-      id: 'idea',
-      title: 'Market Idea',
-      description: 'Share a trade idea, thesis, or investment opportunity',
-      icon: <LightbulbIcon sx={{ fontSize: 48 }} />,
-      color: 'from-amber-500 to-orange-500',
-      action: 'Share Idea'
-    }
+    // "Market Idea" dropped (audit finding) — it had no distinct feature behind it; its own
+    // description ("share a trade idea, thesis...") already overlaps Text Post, and building a
+    // separate content type just to fill a fourth tile isn't "finishing what's built."
   ];
 
   const handleCreate = (type: string) => {
@@ -178,7 +172,7 @@ export default function CreatePage() {
                 </div>
                 <h3 className="text-xl font-bold mb-2">Coming Soon</h3>
                 <p className="text-neutral-600 mb-6 max-w-sm mx-auto">
-                  Content creation tools are currently in development. You'll be able to create and publish {selectedType === 'post' ? 'posts' : selectedType === 'reel' ? 'reels' : selectedType === 'model' ? 'models' : 'market ideas'} soon.
+                  Content creation tools are currently in development. You'll be able to create and publish models soon.
                 </p>
                 <button
                   onClick={handleCloseModal}
