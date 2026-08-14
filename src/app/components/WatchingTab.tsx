@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { useWatchlist } from '../contexts/WatchlistContext';
-import type { WatchlistItem } from '../../types/database';
-import { MOCK_POSTS } from '../data/posts';
+import type { WatchlistItem, PostWithCreator } from '../../types/database';
+import { getPostsByTickers } from '../../lib/services/posts.service';
 
 function sentimentStyle(s: string) {
   if (s === 'Bullish') return 'bg-green-100 text-green-700';
@@ -13,8 +13,10 @@ function sentimentStyle(s: string) {
   return 'bg-neutral-100 text-neutral-500';
 }
 
-function creatorActivityFor(ticker: string) {
-  return MOCK_POSTS.filter(p => p.asset === ticker).slice(0, 3);
+function creatorInitials(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '?';
+  return parts.length === 1 ? parts[0].slice(0, 2).toUpperCase() : (parts[0][0] + parts[1][0]).toUpperCase();
 }
 
 function formatSaved(item: WatchlistItem): string {
@@ -33,6 +35,28 @@ export default function WatchingTab() {
   const [newTicker, setNewTicker] = useState('');
   const [newName, setNewName] = useState('');
   const [newType, setNewType] = useState<WatchlistItem['asset_type']>('Stock');
+
+  // Real "Creator Activity" per watched ticker — one batched query for the whole watchlist
+  // (audit finding: this used to unconditionally show MOCK_POSTS regardless of what's actually
+  // been posted about a ticker). Grouped client-side since posts.asset is a single ticker per
+  // row, not something Postgres needs to fan out for us.
+  const [activityByTicker, setActivityByTicker] = useState<Map<string, PostWithCreator[]>>(new Map());
+  const watchedTickers = [...new Set(watchlistItems.map(i => i.ticker))].sort().join(',');
+  useEffect(() => {
+    const tickers = watchedTickers ? watchedTickers.split(',') : [];
+    if (tickers.length === 0) { setActivityByTicker(new Map()); return; }
+    let cancelled = false;
+    getPostsByTickers(tickers).then(({ data }) => {
+      if (cancelled || !data) return;
+      const map = new Map<string, PostWithCreator[]>();
+      for (const post of data) {
+        const list = map.get(post.asset) ?? [];
+        if (list.length < 3) { list.push(post); map.set(post.asset, list); }
+      }
+      setActivityByTicker(map);
+    });
+    return () => { cancelled = true; };
+  }, [watchedTickers]);
 
   const startEdit = (item: WatchlistItem) => {
     setEditingId(item.id);
@@ -120,7 +144,7 @@ export default function WatchingTab() {
 
       {/* Watchlist items */}
       {watchlistItems.map(item => {
-        const activity = creatorActivityFor(item.ticker);
+        const activity = activityByTicker.get(item.ticker) ?? [];
         const isEditing = editingId === item.id;
 
         return (
@@ -218,18 +242,24 @@ export default function WatchingTab() {
                   {activity.map(post => (
                     <button
                       key={post.id}
-                      onClick={() => navigate('/main')}
+                      onClick={() => navigate(`/main?post=${post.id}`)}
                       className="w-full flex items-start gap-3 text-left group"
                     >
-                      <span className="text-base flex-shrink-0">{post.avatar}</span>
+                      <span className="w-6 h-6 rounded-full bg-neutral-200 flex items-center justify-center text-[10px] font-bold text-neutral-600 flex-shrink-0 overflow-hidden">
+                        {post.creator.avatar_url
+                          ? <img src={post.creator.avatar_url} alt="" className="w-full h-full object-cover" />
+                          : creatorInitials(post.creator.full_name)}
+                      </span>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
                           <span className="text-xs font-semibold text-neutral-700 group-hover:text-black transition-colors">
-                            {post.creator}
+                            {post.creator.full_name}
                           </span>
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded-sm font-medium ${sentimentStyle(post.sentiment)}`}>
-                            {post.sentiment}
-                          </span>
+                          {post.sentiment && (
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded-sm font-medium ${sentimentStyle(post.sentiment)}`}>
+                              {post.sentiment}
+                            </span>
+                          )}
                         </div>
                         <p className="text-xs text-neutral-500 line-clamp-1">{post.content}</p>
                       </div>

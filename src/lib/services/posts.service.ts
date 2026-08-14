@@ -137,6 +137,31 @@ export async function getPostsByTicker(
   }
 }
 
+// ── getPostsByTickers ─────────────────────────────────────────────
+/** Posts tagged with any of the given tickers, newest first overall (not grouped/limited per
+ * ticker) — callers that want "up to N per ticker" slice client-side. Used by the Watching tab's
+ * "Creator Activity" section, one query for the whole watchlist instead of one per item. */
+export async function getPostsByTickers(
+  tickers: string[],
+  limit = 60
+): Promise<ServiceResult<PostWithCreator[]>> {
+  if (!tickers.length) return { data: [], error: null }
+
+  const { data, error } = await supabase
+    .from('posts')
+    .select(POST_WITH_CREATOR_AND_LIKES)
+    .in('asset', tickers.map(t => t.toUpperCase()))
+    .eq('moderation_status', 'visible')
+    .order('created_at', { ascending: false })
+    .limit(limit)
+
+  if (error) return { data: null, error: error.message }
+  return {
+    data: (data as unknown as RawPostRow[]).map(normalizePost),
+    error: null,
+  }
+}
+
 // ── getUserLikedPostIds ──────────────────────────────────────────
 /**
  * Returns the set of post IDs the given user has liked.
