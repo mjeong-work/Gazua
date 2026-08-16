@@ -8,6 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useOnboarding } from '../contexts/OnboardingContext';
 import { supabase } from '../../lib/supabase';
 import EditProfileModal from './myProfile/EditProfileModal';
+import FeedbackModal from './shared/FeedbackModal';
 
 const TIER_CONFIG: Record<string, { label: string; badge: string; features: string[] }> = {
   free: {
@@ -63,6 +64,7 @@ export default function ProfileSettingsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
   const { user, profile, refreshProfile } = useAuth();
   const { data: onboarding } = useOnboarding();
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -289,15 +291,25 @@ export default function ProfileSettingsPage() {
         {/* ── 4. Account actions ─────────────────────────────────── */}
         <section className="border border-neutral-200 rounded-md p-6">
           <p className="text-sm font-semibold text-neutral-700 mb-3">Account Actions</p>
-          <button
-            onClick={handleSignOut}
-            disabled={isLoading}
-            className="w-full py-2.5 border border-red-200 text-red-600 rounded-sm text-sm font-medium hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isLoading ? 'Signing out…' : 'Sign Out'}
-          </button>
+          <div className="space-y-2">
+            <button
+              onClick={() => setShowFeedback(true)}
+              className="w-full py-2.5 border border-neutral-200 rounded-sm text-sm font-medium text-neutral-700 hover:bg-neutral-50 transition-colors"
+            >
+              Send Feedback
+            </button>
+            <button
+              onClick={handleSignOut}
+              disabled={isLoading}
+              className="w-full py-2.5 border border-red-200 text-red-600 rounded-sm text-sm font-medium hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? 'Signing out…' : 'Sign Out'}
+            </button>
+          </div>
         </section>
       </div>
+
+      {showFeedback && <FeedbackModal onClose={() => setShowFeedback(false)} />}
     </div>
   );
 }

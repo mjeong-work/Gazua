@@ -8,12 +8,14 @@ import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined';
 import FlagOutlinedIcon from '@mui/icons-material/FlagOutlined';
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 
 const NAV_ITEMS = [
   { to: '/admin', label: 'Dashboard', icon: DashboardOutlinedIcon, exact: true },
   { to: '/admin/users', label: 'Users', icon: GroupOutlinedIcon, exact: false },
   { to: '/admin/reports', label: 'Reports', icon: FlagOutlinedIcon, exact: false },
   { to: '/admin/content', label: 'Content', icon: ArticleOutlinedIcon, exact: false },
+  { to: '/admin/feedback', label: 'Feedback', icon: ChatBubbleOutlineIcon, exact: false },
   { to: '/admin/audit-log', label: 'Audit Log', icon: HistoryOutlinedIcon, exact: false },
 ];
 

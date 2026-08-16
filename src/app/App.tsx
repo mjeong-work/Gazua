@@ -67,6 +67,7 @@ const AdminUsersPage = lazy(() => import('./components/admin/AdminUsersPage'));
 const AdminUserDetailPage = lazy(() => import('./components/admin/AdminUserDetailPage'));
 const AdminReportsPage = lazy(() => import('./components/admin/AdminReportsPage'));
 const AdminContentPage = lazy(() => import('./components/admin/AdminContentPage'));
+const AdminFeedbackPage = lazy(() => import('./components/admin/AdminFeedbackPage'));
 const AdminAuditLogPage = lazy(() => import('./components/admin/AdminAuditLogPage'));
 
 function RouteFallback() {
@@ -142,6 +143,7 @@ export default function App() {
                     <Route path="users/:userId" element={<AdminUserDetailPage />} />
                     <Route path="reports"       element={<AdminReportsPage />} />
                     <Route path="content"       element={<AdminContentPage />} />
+                    <Route path="feedback"      element={<AdminFeedbackPage />} />
                     <Route path="audit-log"     element={<AdminAuditLogPage />} />
                   </Route>
                   <Route path="/admin/moderation" element={<Navigate to="/admin/reports" replace />} />

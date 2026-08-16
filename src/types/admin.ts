@@ -83,6 +83,16 @@ export interface AdminReportListItem {
   created_at: string
 }
 
+export interface AdminFeedbackListItem {
+  id: string
+  user_id: string
+  authorUsername: string | null
+  message: string
+  page_url: string | null
+  status: 'new' | 'reviewed' | 'resolved'
+  created_at: string
+}
+
 export interface AdminModerationActionItem {
   id: string
   moderator_id: string | null

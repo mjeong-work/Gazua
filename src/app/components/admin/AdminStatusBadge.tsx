@@ -8,6 +8,9 @@ const COLORS: Record<string, string> = {
   reviewed: 'bg-blue-50 text-blue-700',
   actioned: 'bg-green-50 text-green-700',
   dismissed: 'bg-neutral-100 text-neutral-500',
+  // feedback status
+  new: 'bg-amber-50 text-amber-700',
+  resolved: 'bg-green-50 text-green-700',
   // user status
   active: 'bg-green-50 text-green-700',
   warned: 'bg-amber-50 text-amber-700',

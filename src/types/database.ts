@@ -39,6 +39,7 @@ export type NotificationType = 'creator_post' | 'watchlist_post' | 'comment' | '
 /** What entity_id points at, when set — used to build the click-through route. */
 export type NotificationEntityType = 'post' | 'reel' | 'video' | 'asset'
 export type ModelDifficulty = 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert'
+export type FeedbackStatus = 'new' | 'reviewed' | 'resolved'
 export type ModelFileType = 'Excel' | 'Google Sheet' | 'Python' | 'Notebook' | 'PDF'
 export type ModelCategory =
   | 'Valuation' | 'Portfolio' | 'Quant Strategy'
@@ -538,6 +539,34 @@ export interface Database {
           rationale?: string | null
           created_at?: string
           updated_at?: string
+        }
+      }
+
+      // ── feedback ───────────────────────────────────────────────
+      feedback: {
+        Row: {
+          id: string
+          user_id: string
+          message: string
+          page_url: string | null
+          status: FeedbackStatus
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          message: string
+          page_url?: string | null
+          status?: FeedbackStatus
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          message?: string
+          page_url?: string | null
+          status?: FeedbackStatus
+          created_at?: string
         }
       }
 
