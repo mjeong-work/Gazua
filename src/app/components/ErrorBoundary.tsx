@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { reportError } from '../../lib/sentry';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -50,8 +51,8 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
         return;
       }
     }
-    // No error-reporting service wired up yet (audit finding) — console is the only record for now.
     console.error('Unhandled render error caught by ErrorBoundary:', error, info.componentStack);
+    reportError(error, { componentStack: info.componentStack });
   }
 
   handleReload = () => {
