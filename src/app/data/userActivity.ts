@@ -1,7 +1,13 @@
 import { supabase } from '../../lib/supabase';
-import { MOCK_WATCHLIST_ITEMS, type WatchlistItem } from './watchlist';
+import { MOCK_WATCHLIST_ITEMS } from './watchlist';
 import { MOCK_POSTS } from './posts';
 import { MOCK_CREATORS } from './creators';
+// The live watchlist passed in via `opts.liveWatchlist` is always the DB-row shape (from
+// WatchlistContext, which stores `types/database`'s WatchlistItem) — not `./watchlist`'s
+// app-level display shape (camelCase `assetType`, no `asset_type`). Using the latter here
+// previously type-checked as fine only because nothing enforced it; the body already reads
+// `asset_type`/`source_type` (DB shape), so the annotation was simply the wrong import.
+import type { WatchlistItem } from '../../types/database';
 
 export interface UserActivity {
   watchlistTickers: string[];

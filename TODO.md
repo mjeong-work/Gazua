@@ -1,14 +1,14 @@
 # TODO
 
-## Pre-existing `tsc --noEmit` errors (partially fixed — remaining tracked here)
+## Pre-existing `tsc --noEmit` errors — ALL FIXED (was 57, now 0)
 
 This project had no `tsconfig.json` before the branch that added it (see the
 commit adding `tsconfig.json` + `src/vite-env.d.ts`), so `tsc --noEmit` had
 never been run against this codebase. Running it then surfaced 45 pre-existing
 errors; that grew to 57 as later branches (`simulations`, `feedback`) hit the
-same underlying bug on their new tables.
-
-Re-run to reproduce: `npm exec --yes --package typescript -- tsc --noEmit -p .`
+same underlying bug on their new tables. All three tracked categories below
+are now fixed — `npm exec --yes --package typescript -- tsc --noEmit -p .`
+is clean.
 
 ### A. Supabase `.insert()/.update()/.rpc()` generic inference problem — FIXED (was 51 errors)
 
@@ -51,28 +51,24 @@ real `Relationships` arrays per FK is a possible follow-up if joined-select
 typing needs to get stricter, but is not required for the errors this
 category was tracking.
 
-### B. `@types/react-dom` missing devDependency — 3 errors (not fixed)
+### B. `@types/react-dom` missing devDependency — FIXED (was 3 errors)
 
-`@types/react` (v19.2.14) is installed but `@types/react-dom` isn't — every
-`react-dom`/`react-dom/client` import implicitly types as `any`. Also worth
-checking whether pinning `@types/react` to a v18-line version (matching the
-actual `react`/`react-dom` runtime, 18.3.1) is more correct than the
-currently-installed v19 types before adding `@types/react-dom` — installing
-a mismatched-major-version `@types/react-dom` alongside a v19 `@types/react`
-and v18 runtime could either fix or compound the existing type/runtime
-version mismatch.
+`@types/react` was resolving to a hoisted v19.2.14 (pulled in transitively by
+MUI/Radix, none of which this project pinned) against a v18.3.1 `react`/
+`react-dom` runtime, and `@types/react-dom` wasn't installed at all. Pinned
+both `@types/react` and `@types/react-dom` to `^18.3.1` in `devDependencies`
+to match the actual runtime version.
 
-- `src/main.tsx`
-- `src/app/components/reels/ReelEngagementActions.tsx`
-- `src/app/components/reels/ReelEngagementBar.tsx`
+### C. `WatchlistItem` type mismatch: app-level shape vs. DB row shape — FIXED (was 3 errors)
 
-### C. `WatchlistItem` type mismatch: app-level shape vs. DB row shape — 2 errors (not fixed)
-
-Two different things are both called `WatchlistItem` — the DB row shape
-(snake_case, e.g. `asset_type`) and an app-level display shape (camelCase,
-e.g. `assetType`, plus derived fields like `price`/`change1D`/`change1W`
-that don't exist on the DB row at all). `userActivity.ts` also has a plain
-`asset_type` → `assetType` typo/naming mismatch on top of the shape gap.
-
-- `src/app/components/InvestmentProfilePage.tsx`
-- `src/app/data/userActivity.ts`
+Two different things were both called `WatchlistItem` — the DB row shape
+(snake_case, e.g. `asset_type`, exported from `types/database.ts`) and an
+app-level display shape (camelCase, e.g. `assetType`, plus derived fields
+like `price`/`change1D`/`change1W` that don't exist on the DB row at all,
+exported from `data/watchlist.ts`). `data/userActivity.ts`'s
+`getUserActivity()` annotated its `liveWatchlist` param with the *app-level*
+`WatchlistItem` import, but its body already read `asset_type`/`source_type`
+(DB-shape fields), and its one real caller (`InvestmentProfilePage.tsx`, via
+`useWatchlist()`) always passes the DB-shape array — the annotation was
+simply importing from the wrong file. Fixed by importing `WatchlistItem`
+from `types/database` instead.
