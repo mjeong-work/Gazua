@@ -2,8 +2,7 @@ import { useState, useEffect, useMemo, type KeyboardEvent as ReactKeyboardEvent 
 import { useNavigate, useLocation, useSearchParams } from 'react-router';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
-import { getCreators, searchCreators as searchCreatorsDb } from '../../lib/services/profiles.service';
-import type { Profile } from '../../types/database';
+import { getCreators, searchCreators as searchCreatorsDb, type CreatorListProfile } from '../../lib/services/profiles.service';
 import {
   nameToCreatorId,
   FEATURED_CREATORS,
@@ -93,7 +92,7 @@ export default function SearchModal({ onClose }: SearchModalProps) {
   // every keystroke. null = not yet resolved / Supabase unreachable -> use the full local mock
   // creator catalog below instead of the old hardcoded 7-name subset.
   const debouncedQuery = useDebouncedValue(query, 250);
-  const [dbCreators, setDbCreators] = useState<Profile[] | null>(null);
+  const [dbCreators, setDbCreators] = useState<CreatorListProfile[] | null>(null);
   const [isSearchingCreators, setIsSearchingCreators] = useState(true);
 
   useEffect(() => {

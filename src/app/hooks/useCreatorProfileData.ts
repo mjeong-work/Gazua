@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { getCreator, type MockCreator } from '../data/creators';
-import { getCreatorByUsername, getFollowerCount } from '../../lib/services/profiles.service';
+import { getCreatorByUsername, getFollowerCount, type CreatorListProfile } from '../../lib/services/profiles.service';
 import { getPostCountByCreator, getPostsByCreator } from '../../lib/services/posts.service';
 import { getCommentCount } from '../../lib/services/comments.service';
 import { getFollowingCount } from '../../lib/services/follows.service';
 import { reportServiceError } from './useServiceQuery';
-import type { Profile, PostWithCreator } from '../../types/database';
+import type { PostWithCreator } from '../../types/database';
 
 export interface DisplayPost {
   id: string;
@@ -59,7 +59,7 @@ async function normalizeDbPost(p: PostWithCreator): Promise<DisplayPost> {
 export function useCreatorProfileData(creatorId: string) {
   const mockCreator = getCreator(creatorId);
 
-  const [dbProfile, setDbProfile] = useState<Profile | null>(null);
+  const [dbProfile, setDbProfile] = useState<CreatorListProfile | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileRefreshKey, setProfileRefreshKey] = useState(0);
   const [followerCount, setFollowerCount] = useState<number | null>(null);

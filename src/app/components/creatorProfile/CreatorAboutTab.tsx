@@ -1,10 +1,10 @@
 import type { MockCreator } from '../../data/creators';
-import type { Profile } from '../../../types/database';
+import type { CreatorListProfile } from '../../../lib/services/profiles.service';
 import { RISK_STYLE_LABELS } from '../../utils/creator';
 
 interface CreatorAboutTabProps {
   creator: MockCreator;
-  dbProfile: Profile | null;
+  dbProfile: CreatorListProfile | null;
   followerCount: number | null;
   /** The one stat that differs between the two pages: post count on Investment, video count on Videos. */
   secondaryStat: { label: string; value: string };

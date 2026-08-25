@@ -26,17 +26,19 @@ jobs:
       - name: Typecheck (no new errors beyond the tracked baseline)
         # TypeScript isn't a project devDependency yet (see TODO.md) — `npm exec --yes` fetches
         # it on the fly, same command used for local verification throughout this project.
-        # Pre-existing errors are tracked in TODO.md as known, non-regression debt (mostly a
-        # Supabase generics inference issue — category A). Rather than ignore tsc entirely until
-        # that backlog is cleared, fail only if the count grows past the baseline, so this still
-        # catches real regressions without blocking on debt that already has its own tracking.
+        # Pre-existing errors are tracked in TODO.md as known, non-regression debt. Rather than
+        # ignore tsc entirely until that backlog is cleared, fail only if the count grows past
+        # the baseline, so this still catches real regressions without blocking on debt that
+        # already has its own tracking.
         # Baseline was 45; bumped to 57 when feedback.service.ts/adminFeedback.service.ts hit
-        # the same category A issue on the new feedback table (TODO.md has the breakdown).
+        # the category A Supabase-generics issue on the new feedback table; dropped to 5 once
+        # category A was fixed (missing `Relationships` field on every table — see TODO.md).
+        # Remaining 5 are categories B (@types/react-dom) and C (WatchlistItem shape mismatch).
         run: |
           COUNT=$(npm exec --yes --package typescript -- tsc --noEmit -p . 2>&1 | grep -c "error TS" || true)
-          echo "tsc error count: $COUNT (baseline: 57)"
-          if [ "$COUNT" -gt 57 ]; then
-            echo "::error::tsc error count ($COUNT) exceeds tracked baseline (57) — see TODO.md"
+          echo "tsc error count: $COUNT (baseline: 5)"
+          if [ "$COUNT" -gt 5 ]; then
+            echo "::error::tsc error count ($COUNT) exceeds tracked baseline (5) — see TODO.md"
             exit 1
           fi
 

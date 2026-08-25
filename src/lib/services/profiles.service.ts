@@ -18,6 +18,16 @@ const CREATOR_LIST_COLUMNS = `
   subscription_tier, onboarding_completed, created_at
 ` as const
 
+/** Shape actually returned by CREATOR_LIST_COLUMNS — a subset of the full `Profile` row.
+ * Keep in sync with the column list above. */
+export type CreatorListProfile = Pick<
+  Profile,
+  | 'id' | 'username' | 'handle' | 'full_name' | 'avatar_url' | 'bio'
+  | 'focus' | 'tagline' | 'tags' | 'is_verified' | 'is_creator' | 'featured_category'
+  | 'credibility_level' | 'portfolio_allocation' | 'creator_risk_style'
+  | 'subscription_tier' | 'onboarding_completed' | 'created_at'
+>
+
 // ── getProfile ───────────────────────────────────────────────────
 /** Fetch a single profile by UUID. Used for the authenticated user's own profile. */
 export async function getProfile(userId: string): Promise<ServiceResult<Profile>> {
@@ -38,7 +48,7 @@ export async function getProfile(userId: string): Promise<ServiceResult<Profile>
  * (e.g. the /watchlist -> /profile/:username/investment redirect), so
  * this intentionally does not filter on is_creator.
  */
-export async function getCreatorByUsername(username: string): Promise<ServiceResult<Profile>> {
+export async function getCreatorByUsername(username: string): Promise<ServiceResult<CreatorListProfile>> {
   const { data, error } = await supabase
     .from('profiles')
     .select(CREATOR_LIST_COLUMNS)
@@ -59,7 +69,7 @@ export async function getCreators(options?: {
   featuredCategory?: FeaturedCategory
   tags?: string[]
   limit?: number
-}): Promise<ServiceResult<Profile[]>> {
+}): Promise<ServiceResult<CreatorListProfile[]>> {
   let query = supabase
     .from('profiles')
     .select(CREATOR_LIST_COLUMNS)
@@ -89,7 +99,7 @@ export async function getCreators(options?: {
 export async function searchCreators(
   query: string,
   limit = 7
-): Promise<ServiceResult<Profile[]>> {
+): Promise<ServiceResult<CreatorListProfile[]>> {
   const { data, error } = await supabase
     .from('profiles')
     .select(CREATOR_LIST_COLUMNS)

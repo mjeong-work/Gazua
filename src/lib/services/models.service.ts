@@ -1,6 +1,6 @@
 import { supabase } from '../supabase'
 import type { ServiceResult } from '../supabase'
-import type { Model, ModelInsert, ModelWithCreator } from '../../types/database'
+import type { Model, ModelInsert, ModelWithCreator, ModelCategory, ModelAccessLevel } from '../../types/database'
 
 const MODEL_WITH_CREATOR = `
   *,
@@ -49,8 +49,8 @@ export async function getModelsByCreatorUsername(
 // ── getModels ────────────────────────────────────────────────────
 /** All models for the ModelHub page, ordered by download count. */
 export async function getModels(options?: {
-  category?: string
-  accessLevel?: string
+  category?: ModelCategory
+  accessLevel?: ModelAccessLevel
   limit?: number
 }): Promise<ServiceResult<ModelWithCreator[]>> {
   let query = supabase

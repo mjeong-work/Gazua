@@ -1,50 +1,57 @@
 # TODO
 
-## Pre-existing `tsc --noEmit` errors (not fixed — tracked here)
+## Pre-existing `tsc --noEmit` errors (partially fixed — remaining tracked here)
 
-This project had no `tsconfig.json` before this branch (see the commit
-adding `tsconfig.json` + `src/vite-env.d.ts`), so `tsc --noEmit` had never
-been run against this codebase. Running it now surfaces 45 pre-existing
-errors, none of which are regressions from this branch's work — 2 real
-regressions it did surface (`MockCreator` missing `credibilityLevel`) were
-already fixed separately. The 44 below are intentionally **not fixed** here;
-categorized so a future session can pick a category and knock it out.
-Current count is **57** — the +12 on top of the original 45 is
-`feedback.service.ts`/`adminFeedback.service.ts` hitting the same category A
-generics bug on the new `feedback` table, not a new kind of error.
+This project had no `tsconfig.json` before the branch that added it (see the
+commit adding `tsconfig.json` + `src/vite-env.d.ts`), so `tsc --noEmit` had
+never been run against this codebase. Running it then surfaced 45 pre-existing
+errors; that grew to 57 as later branches (`simulations`, `feedback`) hit the
+same underlying bug on their new tables.
 
 Re-run to reproduce: `npm exec --yes --package typescript -- tsc --noEmit -p .`
 
-### A. Supabase `.insert()/.update()/.rpc()` generic inference problem — 51 errors
+### A. Supabase `.insert()/.update()/.rpc()` generic inference problem — FIXED (was 51 errors)
 
-The Supabase JS client isn't resolving its generics against this project's
-hand-written `Database` type (`src/types/database.ts`) the way it should —
-write payloads and some joined-select read results type-check as `never` /
-`never[]`, and every `.rpc()` call's argument type-checks as `undefined`
-(traces back to `Functions: Record<string, never>` in `database.ts` — the
-Functions map was never fleshed out with real RPC signatures). Needs its
-own investigation — likely either a `@supabase/supabase-js` version
-mismatch against how the Database type is shaped, or missing pieces
-(`Relationships`, etc.) that newer supabase-js versions expect for
-inference.
+Root cause: every table entry in `src/types/database.ts` was missing a
+`Relationships: []` field. `@supabase/postgrest-js`'s `GenericTable` type
+requires `Row`/`Insert`/`Update`/`Relationships` all present — without it,
+`Database['public']` structurally fails to extend `GenericSchema`, so
+`SupabaseClient`'s `Schema` generic collapses to `never` for the *entire*
+client, not just the table missing the field. That's why write payloads,
+joined-select reads, and `.rpc()` args were all typing as `never`/`undefined`
+project-wide: one missing field, cascading everywhere.
 
-- **A1. `.rpc()` args → `undefined` parameter — 5 of the 38**
-  - `src/lib/services/adminUsers.service.ts` (2 occurrences)
-  - `src/lib/services/adminContent.service.ts`
-  - `src/lib/services/models.service.ts`
-  - `src/lib/services/posts.service.ts`
-- **A2. `.insert()/.update()` payload, or a joined-select read result, typed as `never`/`never[]` — 46 of the 51**
-  - `src/lib/services/simulations.service.ts` (new — same pre-existing generics issue, not a regression)
-  - `src/lib/services/feedback.service.ts`, `adminFeedback.service.ts` (new — same issue, 12 occurrences)
-  - `src/lib/services/follows.service.ts` (5 occurrences)
-  - `src/lib/services/watchlist.service.ts` (4 occurrences)
-  - `src/lib/services/reels.service.ts` (4 occurrences)
-  - `src/lib/services/posts.service.ts` (3 more, distinct from A1)
-  - `src/lib/services/profiles.service.ts`, `notifications.service.ts`, `messages.service.ts`, `comments.service.ts`, `reelComments.service.ts`, `savedContent.service.ts`
-  - `src/app/data/userActivity.ts` (5 occurrences — mock/seed data file, not a service)
-  - `src/app/components/onboarding/SignUp.tsx`
+Fix applied: added `Relationships: []` to all 23 tables, and filled in the
+`Functions` map (was `Record<string, never>`) with real `Args`/`Returns`
+signatures for the 5 RPCs actually called from the client
+(`admin_set_user_status`, `admin_set_content_moderation_status`,
+`admin_set_credibility_level`, `increment_post_shares`,
+`increment_model_downloads`). Also added the `reel_comments` table, which
+existed in the DB schema (`20260713000000_reel_comments.sql`) but was never
+added to `database.ts` at all — a separate, genuine gap the `never`-masking
+had been hiding.
 
-### B. `@types/react-dom` missing devDependency — 3 errors
+This also surfaced two real (pre-existing, previously-masked) bugs, now fixed:
+- `profiles.service.ts`'s `getCreatorByUsername`/`getCreators`/`searchCreators`
+  declared their return type as the full `Profile` row but only ever
+  `.select()`ed a column subset (`CREATOR_LIST_COLUMNS`) — every caller was
+  already only reading fields within that subset, so this was latent, not a
+  live bug. Introduced `CreatorListProfile` (a `Pick<Profile, ...>` matching
+  the column list) as the accurate return type and updated the 6 call sites
+  (`CreatorsPage`, `SearchModal`, `useCreatorProfileData`,
+  `CreatorProfileHeader`, `CreatorAboutTab`) accordingly.
+- `models.service.ts`'s `getModels(options)` typed `category`/`accessLevel`
+  as loose `string` instead of `ModelCategory`/`ModelAccessLevel`.
+
+`Relationships` is `[]` (not populated with real FK metadata) for every
+table — this unblocks generic inference for writes/RPCs but embedded-resource
+selects (`.select('*, creator:profiles(...)')`) still don't get fully precise
+per-relationship typing (they fall back to a looser embed type). Populating
+real `Relationships` arrays per FK is a possible follow-up if joined-select
+typing needs to get stricter, but is not required for the errors this
+category was tracking.
+
+### B. `@types/react-dom` missing devDependency — 3 errors (not fixed)
 
 `@types/react` (v19.2.14) is installed but `@types/react-dom` isn't — every
 `react-dom`/`react-dom/client` import implicitly types as `any`. Also worth
@@ -59,7 +66,7 @@ version mismatch.
 - `src/app/components/reels/ReelEngagementActions.tsx`
 - `src/app/components/reels/ReelEngagementBar.tsx`
 
-### C. `WatchlistItem` type mismatch: app-level shape vs. DB row shape — 3 errors
+### C. `WatchlistItem` type mismatch: app-level shape vs. DB row shape — 2 errors (not fixed)
 
 Two different things are both called `WatchlistItem` — the DB row shape
 (snake_case, e.g. `asset_type`) and an app-level display shape (camelCase,

@@ -13,12 +13,12 @@ import AllocationBar from '../shared/AllocationBar';
 import { useFollow } from '../../contexts/FollowContext';
 import { SUBSCRIBE_ENABLED } from '../../featureFlags';
 import type { MockCreator } from '../../data/creators';
-import type { Profile } from '../../../types/database';
+import type { CreatorListProfile } from '../../../lib/services/profiles.service';
 
 interface CreatorProfileHeaderProps {
   creatorId: string;
   creator: MockCreator;
-  dbProfile: Profile | null;
+  dbProfile: CreatorListProfile | null;
   followerCount: number | null;
   followingCount: number | null;
   postCount: number | null;

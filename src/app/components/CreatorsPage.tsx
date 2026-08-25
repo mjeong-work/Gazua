@@ -32,11 +32,11 @@ import { useAuth } from '../contexts/AuthContext';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import { searchCreators, matchesCreatorSearch } from '../utils/creatorSearch';
 import type { SavedContentInput } from '../contexts/SavedContentContext';
-import { getCreators } from '../../lib/services/profiles.service';
+import { getCreators, type CreatorListProfile } from '../../lib/services/profiles.service';
 import { getFollowerCounts } from '../../lib/services/follows.service';
 import { getReels, getVideos } from '../../lib/services/reels.service';
 import { formatCount, formatDurationSeconds } from './reels/format';
-import type { Profile, FeaturedCategory, ReelWithCreator, VideoWithCreator } from '../../types/database';
+import type { FeaturedCategory, ReelWithCreator, VideoWithCreator } from '../../types/database';
 import { BUCKETS, getPublicUrl } from '../../lib/storage';
 
 interface VideoItem {
@@ -166,7 +166,7 @@ export default function CreatorsPage() {
 
   // Real Supabase creator directory. null = not yet resolved / error (use mock fallback);
   // [] is a legitimate real empty result and is NOT treated as a fallback signal.
-  const [dbProfiles, setDbProfiles] = useState<Profile[] | null>(null);
+  const [dbProfiles, setDbProfiles] = useState<CreatorListProfile[] | null>(null);
   const [followerCounts, setFollowerCounts] = useState<Record<string, number>>({});
   // Gates the initial render so real data doesn't flash-replace mock data a moment after
   // paint — mirrors the reelsLoading/postsLoading pattern in MainPageReels/MainPagePosting.
@@ -217,7 +217,7 @@ export default function CreatorsPage() {
   // Maps a real profile row onto the same CreatorCard shape every card/search/follow
   // helper already consumes, so none of that logic needs to know whether it's looking at
   // real or mock data.
-  const profileToCreatorCard = (p: Profile): Creator => ({
+  const profileToCreatorCard = (p: CreatorListProfile): Creator => ({
     id: p.id,
     name: p.full_name,
     avatar: p.avatar_url ?? '👤',

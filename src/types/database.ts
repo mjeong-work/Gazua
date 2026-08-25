@@ -177,6 +177,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
 
       // ── posts ──────────────────────────────────────────────────
@@ -232,6 +233,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
 
       // ── post_likes ─────────────────────────────────────────────
@@ -251,6 +253,7 @@ export interface Database {
           user_id?: string
           created_at?: string
         }
+        Relationships: []
       }
 
       // ── post_comments ─────────────────────────────────────────
@@ -279,6 +282,41 @@ export interface Database {
           moderation_status?: ContentModerationStatus
           created_at?: string
         }
+        Relationships: []
+      }
+
+      // ── reel_comments ─────────────────────────────────────────
+      // Backs comments on both Reels and Video watch page — content_id polymorphically
+      // points at either reels(id) or videos(id), no FK (see 20260713000000_reel_comments.sql).
+      reel_comments: {
+        Row: {
+          id: string
+          content_type: 'reel' | 'video'
+          content_id: string
+          user_id: string
+          content: string
+          moderation_status: ContentModerationStatus
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          content_type?: 'reel' | 'video'
+          content_id: string
+          user_id: string
+          content: string
+          moderation_status?: ContentModerationStatus
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          content_type?: 'reel' | 'video'
+          content_id?: string
+          user_id?: string
+          content?: string
+          moderation_status?: ContentModerationStatus
+          created_at?: string
+        }
+        Relationships: []
       }
 
       // ── reels ──────────────────────────────────────────────────
@@ -319,6 +357,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
 
       // ── reel_likes ─────────────────────────────────────────────
@@ -338,6 +377,7 @@ export interface Database {
           user_id?: string
           created_at?: string
         }
+        Relationships: []
       }
 
       // ── videos ─────────────────────────────────────────────────
@@ -378,6 +418,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
 
       // ── models ─────────────────────────────────────────────────
@@ -433,6 +474,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
 
       // ── watchlist_items ────────────────────────────────────────
@@ -500,6 +542,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
 
       // ── simulations ───────────────────────────────────────────
@@ -540,6 +583,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
 
       // ── feedback ───────────────────────────────────────────────
@@ -568,6 +612,7 @@ export interface Database {
           status?: FeedbackStatus
           created_at?: string
         }
+        Relationships: []
       }
 
       // ── follows ────────────────────────────────────────────────
@@ -587,6 +632,7 @@ export interface Database {
           creator_id?: string
           created_at?: string
         }
+        Relationships: []
       }
 
       // ── notifications ──────────────────────────────────────────
@@ -630,6 +676,7 @@ export interface Database {
           entity_ticker?: string | null
           created_at?: string
         }
+        Relationships: []
       }
 
       // ── messages ───────────────────────────────────────────────
@@ -658,6 +705,7 @@ export interface Database {
           read_at?: string | null
           created_at?: string
         }
+        Relationships: []
       }
 
       // ── subscriptions (Stripe platform) ───────────────────────
@@ -710,6 +758,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
 
       // ── creator_memberships (Stripe per-creator) ───────────────
@@ -756,6 +805,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
 
       // ── creator_payouts (Stripe Connect) ───────────────────────
@@ -799,6 +849,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
 
       // ── compliance_reviews ───────────────────────────────────────
@@ -848,6 +899,7 @@ export interface Database {
           outcome?: ComplianceOutcome
           created_at?: string
         }
+        Relationships: []
       }
 
       // ── content_reports ───────────────────────────────────────────
@@ -882,6 +934,7 @@ export interface Database {
           status?: ReportStatus
           created_at?: string
         }
+        Relationships: []
       }
 
       // ── moderation_actions ─────────────────────────────────────────
@@ -916,6 +969,7 @@ export interface Database {
           notes?: string | null
           created_at?: string
         }
+        Relationships: []
       }
 
       // ── compliance_audit_logs ───────────────────────────────────────
@@ -953,6 +1007,7 @@ export interface Database {
           metadata?: Json
           created_at?: string
         }
+        Relationships: []
       }
 
       // ── user_legal_acceptances ──────────────────────────────────────
@@ -987,6 +1042,7 @@ export interface Database {
           ip_address?: string | null
           accepted_at?: string
         }
+        Relationships: []
       }
 
       // ── saved_content ────────────────────────────────────────────
@@ -1033,11 +1089,48 @@ export interface Database {
           meta?: string | null
           saved_at?: string
         }
+        Relationships: []
       }
 
     }
     Views: Record<string, never>
-    Functions: Record<string, never>
+    Functions: {
+      // Narrow, single-purpose write RPCs — see 20260711000000_admin_roles_and_moderation.sql
+      // and 20260805000000_credibility_level.sql for the server-side definitions.
+      admin_set_user_status: {
+        Args: {
+          p_user_id: string
+          p_status: string
+          p_reason?: string | null
+        }
+        Returns: void
+      }
+      admin_set_content_moderation_status: {
+        Args: {
+          p_content_type: string
+          p_content_id: string
+          p_status: string
+        }
+        Returns: void
+      }
+      admin_set_credibility_level: {
+        Args: {
+          p_user_id: string
+          p_level: string
+        }
+        Returns: void
+      }
+      // Atomic counters — 20260530000000_increment_post_shares_fn.sql,
+      // 20260715110000_increment_model_downloads_fn.sql.
+      increment_post_shares: {
+        Args: { post_id: string }
+        Returns: void
+      }
+      increment_model_downloads: {
+        Args: { model_id: string }
+        Returns: void
+      }
+    }
     Enums: Record<string, never>
   }
 }
